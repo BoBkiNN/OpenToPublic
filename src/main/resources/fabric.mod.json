@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "id": "opentopublic",
+  "version": "0.1-b4",
+  "name": "OpenToPublic",
+  "description": "Allows you to open LAN world to 0.0.0.0",
+  "authors": [
+    "BoBkiNN_"
+  ],
+  "contact": {},
+  "license": "MIT",
+  "icon": "assets/opentopublic/icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "client": [
+      "xyz.bobkinn_.opentopublic.client.OpenToPublicClient"
+    ],
+    "main": [
+      "xyz.bobkinn_.opentopublic.OpenToPublic"
+    ]
+  },
+  "mixins": [
+    "opentopublic.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=0.14.14",
+    "fabric": "*",
+    "minecraft": "1.16.5"
+  }
+}

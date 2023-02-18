@@ -1,0 +1,15 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "xyz.bobkinn_.opentopublic.mixin",
+  "compatibilityLevel": "JAVA_8",
+  "mixins": [
+    "MixinIntegratedServer",
+    "MixinServerNetworkIo"
+  ],
+  "client": [
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}
