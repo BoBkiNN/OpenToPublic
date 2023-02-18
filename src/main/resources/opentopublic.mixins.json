@@ -8,6 +8,7 @@
     "MixinServerNetworkIo"
   ],
   "client": [
+    "MixinLanServerScreen"
   ],
   "injectors": {
     "defaultRequire": 1

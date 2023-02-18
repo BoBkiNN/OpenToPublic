@@ -1,4 +1,3 @@
 {
-  "opentopublic.notstarted": "Этот мир не был открыт по сети",
-  "opentopublic.ownercmd": "%s является владельцем сервера"
+  "opentopublic.button.open_public": "Открыть в Интернет: $1"
 }
