@@ -2,5 +2,8 @@
   "opentopublic.button.open_public": "Open to WAN: %s",
   "opentopublic.button.port": "Port",
   "opentopublic.publish.started_wan": "Public game hosted on %s",
-  "opentopublic.publish.failed_wan": "Unable to host public game"
+  "opentopublic.publish.failed_wan": "Unable to host public game",
+  "opentopublic.button.online_mode": "Online mode: %s",
+  "opentopublic.tooltip.online_mode_tooltip": "Check is user has license or not",
+  "opentopublic.tooltip.wan_tooltip": "Opens world to outer network. Requires opened port on router"
 }

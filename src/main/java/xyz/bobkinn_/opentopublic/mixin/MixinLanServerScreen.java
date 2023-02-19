@@ -6,6 +6,7 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.ClickableWidget;
 import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.world.GameMode;
@@ -16,7 +17,9 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import xyz.bobkinn_.opentopublic.OpenToPublic;
+import xyz.bobkinn_.opentopublic.Util;
 import xyz.bobkinn_.opentopublic.client.IPAddressTextField;
+import xyz.bobkinn_.opentopublic.client.ToggleButton;
 
 import static xyz.bobkinn_.opentopublic.client.IPAddressTextField.validatePort;
 
@@ -31,8 +34,8 @@ public abstract class MixinLanServerScreen extends Screen {
     @Shadow protected abstract void updateButtonText();
 
     ButtonWidget openToWan = null;
-    TranslatableText yes = new TranslatableText("gui.yes");
-    TranslatableText no = new TranslatableText("gui.no");
+    ToggleButton onlineModeButton = null;
+
     @Shadow
     private String gameMode = "survival";
     @Shadow
@@ -53,6 +56,7 @@ public abstract class MixinLanServerScreen extends Screen {
 
             this.client.openScreen(null);
 
+            this.client.getServer().setOnlineMode(OpenToPublic.onlineMode);
             boolean successOpen = this.client.getServer().openToLan(GameMode.byName(this.gameMode), this.allowCommands, OpenToPublic.customPort);
             TranslatableText successWAN = new TranslatableText("opentopublic.publish.started_wan", "0.0.0.0:"+OpenToPublic.customPort);
             TranslatableText text;
@@ -61,6 +65,7 @@ public abstract class MixinLanServerScreen extends Screen {
                 text = successOpen ? new TranslatableText("commands.publish.started", OpenToPublic.customPort) : new TranslatableText("commands.publish.failed");
             }
             this.client.inGameHud.getChatHud().addMessage(text);
+            this.client.inGameHud.getChatHud().addMessage(new LiteralText("is online mode: "+this.client.getServer().isOnlineMode()));
             this.client.updateWindowTitle();
         });
         this.addButton(newBtn);
@@ -73,14 +78,19 @@ public abstract class MixinLanServerScreen extends Screen {
         if (player == null){
             return;
         }
+        Screen self = this;
+        // open to wan button
+        ButtonWidget.TooltipSupplier wanTooltip = (button, matrices, mouseX, mouseY) -> self.renderTooltip(matrices, new TranslatableText("opentopublic.tooltip.wan_tooltip"), mouseX, mouseY);
         openToWan = new ButtonWidget(this.width / 2 + 5,
                 this.height - 54, 150, 20,
                 new TranslatableText("opentopublic.button.open_public"), button -> {
                     OpenToPublic.openPublic = !OpenToPublic.openPublic;
 //                    player.sendMessage(new LiteralText("wan: "+OpenToPublic.openPublic), false);
                     updateButtonText();
-                });
+                }, wanTooltip);
         this.addButton(openToWan);
+
+        // port enter field
         IPAddressTextField portField = new IPAddressTextField(textRenderer, this.width / 2 - 154, this.height - 54, 147, 20,
                 new TranslatableText("opentopublic.button.port"), OpenToPublic.customPort);
         portField.setChangedListener((text) -> {
@@ -89,15 +99,29 @@ public abstract class MixinLanServerScreen extends Screen {
 //            player.sendMessage(new LiteralText("port changed: "+enteredPort), false);
         });
         this.addButton(portField);
+
+        // online mode switch
+        ButtonWidget.TooltipSupplier onlineModeTooltip = (button, matrices, mouseX, mouseY) -> self.renderTooltip(matrices, new TranslatableText("opentopublic.tooltip.online_mode_tooltip"), mouseX, mouseY);
+        onlineModeButton =
+                new ToggleButton(this.width / 2 - 155, 124, 150, 20,
+                        Util.parseYN("opentopublic.button.online_mode", OpenToPublic.onlineMode), true,
+                        button -> {
+                            OpenToPublic.onlineMode = !OpenToPublic.onlineMode;
+                            player.sendMessage(new LiteralText("online mode: "+OpenToPublic.onlineMode), false);
+                            button.setMessage(Util.parseYN("opentopublic.button.online_mode", OpenToPublic.onlineMode));
+                            this.updateButtonText();
+                        },
+                        onlineModeTooltip
+                );
+        this.addButton(onlineModeButton);
     }
 
 
-    public TranslatableText translateYN(boolean bool){
-        return bool ? yes : no;
-    }
+
 
     @Inject(method = "updateButtonText", at = @At("TAIL"))
     private void updateText(CallbackInfo ci){
-        this.openToWan.setMessage(new TranslatableText("opentopublic.button.open_public", translateYN(OpenToPublic.openPublic)));
+        this.openToWan.setMessage(Util.parseYN("opentopublic.button.open_public", OpenToPublic.openPublic));
+        this.onlineModeButton.setMessage(Util.parseYN("opentopublic.button.online_mode", OpenToPublic.onlineMode));
     }
 }
