@@ -22,8 +22,6 @@ public class OpenToPublic implements ModInitializer {
 
     @Override
     public void onInitialize() {
-//        Event<CommandRegistrationCallback> cmdRegEvent = CommandRegistrationCallback.EVENT;
-//        cmdRegEvent.register(((dispatcher, dedicated) -> OpenToPublicCommand.register(dispatcher)));
         LOGGER.info("Initialized!");
     }
 }

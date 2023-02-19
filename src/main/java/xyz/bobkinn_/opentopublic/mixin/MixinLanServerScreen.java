@@ -37,7 +37,7 @@ public abstract class MixinLanServerScreen extends Screen {
     private String gameMode = "survival";
     @Shadow
     private boolean allowCommands;
-    int enteredPort = 25565;
+    int enteredPort = OpenToPublic.customPort;
 
 
     @Redirect(method = "init", at = @At(value = "INVOKE",ordinal = 0, target = "Lnet/minecraft/client/gui/screen/OpenToLanScreen;addButton(Lnet/minecraft/client/gui/widget/ClickableWidget;)Lnet/minecraft/client/gui/widget/ClickableWidget;"))
@@ -85,7 +85,7 @@ public abstract class MixinLanServerScreen extends Screen {
                 new TranslatableText("opentopublic.button.port"), OpenToPublic.customPort);
         portField.setChangedListener((text) -> {
             portField.setEditableColor(validatePort(text) >= 0 ? 0xFFFFFF : 0xFF0000);
-//            enteredPort = portField.getServerPort();
+            enteredPort = portField.getServerPort();
 //            player.sendMessage(new LiteralText("port changed: "+enteredPort), false);
         });
         this.addButton(portField);
