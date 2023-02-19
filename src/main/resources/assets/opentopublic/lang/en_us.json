@@ -1,4 +1,6 @@
 {
   "opentopublic.button.open_public": "Open to WAN: %s",
-  "opentopublic.button.port": "Port"
+  "opentopublic.button.port": "Port",
+  "opentopublic.publish.started_wan": "Public game hosted on %s",
+  "opentopublic.publish.failed_wan": "Unable to host public game"
 }

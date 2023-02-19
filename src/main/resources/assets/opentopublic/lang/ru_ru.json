@@ -1,4 +1,6 @@
 {
   "opentopublic.button.open_public": "Открыть в Интернет: %s",
-  "opentopublic.button.port": "Порт"
+  "opentopublic.button.port": "Порт",
+  "opentopublic.publish.started_wan": "Публичный сервер открыт на %s",
+  "opentopublic.publish.failed_wan": "Невозможно запустить публичный сервер"
 }

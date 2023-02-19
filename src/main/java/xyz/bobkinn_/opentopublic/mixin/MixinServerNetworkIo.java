@@ -24,12 +24,12 @@ public abstract class MixinServerNetworkIo {
                     OpenToPublic.LOGGER.error(e);
                 }
             }
-            if (MinecraftClient.getInstance().getServer() != null) {
-                OpenToPublic.LOGGER.info("Bind: " + (address==null ? "localhost" : address.getHostAddress())+":"+port);
-                if (MinecraftClient.getInstance().player != null) {
-                    MinecraftClient.getInstance().player.sendMessage(new LiteralText("Bind: " + MinecraftClient.getInstance().getServer().getServerIp()+":"+port),false);
-                }
-            }
+//            if (MinecraftClient.getInstance().getServer() != null) {
+//                OpenToPublic.LOGGER.info("Bind: " + (address==null ? "localhost" : address.getHostAddress())+":"+port);
+//                if (MinecraftClient.getInstance().player != null) {
+//                    MinecraftClient.getInstance().player.sendMessage(new LiteralText("Bind: " + MinecraftClient.getInstance().getServer().getServerIp()+":"+port),false);
+//                }
+//            }
             OpenToPublic.lanOpening = false;
         }
     }

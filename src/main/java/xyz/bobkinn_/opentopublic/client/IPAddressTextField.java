@@ -21,8 +21,8 @@ public class IPAddressTextField extends TextFieldWidget {
     }
 
     public int getServerPort() {
-        String portStr = getText();
-        return portStr.length() > 0 ? Integer.parseInt(portStr) : defaultPort;
+        int port = validatePort(getText());
+        return String.valueOf(port).length() > 0 ? port : defaultPort;
     }
 
     /**

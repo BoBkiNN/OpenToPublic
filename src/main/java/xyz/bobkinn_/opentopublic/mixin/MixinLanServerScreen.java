@@ -6,8 +6,6 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.ClickableWidget;
 import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.client.util.NetworkUtils;
-import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.world.GameMode;
@@ -42,11 +40,6 @@ public abstract class MixinLanServerScreen extends Screen {
     int enteredPort = 25565;
 
 
-//    @Redirect(method = "method_19851",at = @At(value = "INVOKE", ordinal = 0, target = "net/minecraft/client/util/NetworkUtils.findLocalPort()I"))
-//    public int getPort(){
-//        return OpenToPublic.openPublic ? OpenToPublic.customPort : NetworkUtils.findLocalPort();
-//    }
-
     @Redirect(method = "init", at = @At(value = "INVOKE",ordinal = 0, target = "Lnet/minecraft/client/gui/screen/OpenToLanScreen;addButton(Lnet/minecraft/client/gui/widget/ClickableWidget;)Lnet/minecraft/client/gui/widget/ClickableWidget;"))
     private ClickableWidget addButtonRedirect(OpenToLanScreen instance, ClickableWidget btn) {
         // Your custom logic here
@@ -60,7 +53,13 @@ public abstract class MixinLanServerScreen extends Screen {
 
             this.client.openScreen(null);
 
-            TranslatableText text = this.client.getServer().openToLan(GameMode.byName(this.gameMode), this.allowCommands, OpenToPublic.customPort) ? new TranslatableText("commands.publish.started", OpenToPublic.customPort) : new TranslatableText("commands.publish.failed");
+            boolean successOpen = this.client.getServer().openToLan(GameMode.byName(this.gameMode), this.allowCommands, OpenToPublic.customPort);
+            TranslatableText successWAN = new TranslatableText("opentopublic.publish.started_wan", "0.0.0.0:"+OpenToPublic.customPort);
+            TranslatableText text;
+            if (OpenToPublic.openPublic) text = successOpen ? successWAN : new TranslatableText("opentopublic.publish.failed_wan");
+            else {
+                text = successOpen ? new TranslatableText("commands.publish.started", OpenToPublic.customPort) : new TranslatableText("commands.publish.failed");
+            }
             this.client.inGameHud.getChatHud().addMessage(text);
             this.client.updateWindowTitle();
         });
@@ -78,16 +77,16 @@ public abstract class MixinLanServerScreen extends Screen {
                 this.height - 54, 150, 20,
                 new TranslatableText("opentopublic.button.open_public"), button -> {
                     OpenToPublic.openPublic = !OpenToPublic.openPublic;
-                    player.sendMessage(new LiteralText("wan: "+OpenToPublic.openPublic), false);
+//                    player.sendMessage(new LiteralText("wan: "+OpenToPublic.openPublic), false);
                     updateButtonText();
                 });
         this.addButton(openToWan);
         IPAddressTextField portField = new IPAddressTextField(textRenderer, this.width / 2 - 154, this.height - 54, 147, 20,
-                new TranslatableText("opentopublic.button.port"), 25565);
+                new TranslatableText("opentopublic.button.port"), OpenToPublic.customPort);
         portField.setChangedListener((text) -> {
             portField.setEditableColor(validatePort(text) >= 0 ? 0xFFFFFF : 0xFF0000);
-            enteredPort = portField.getServerPort();
-            player.sendMessage(new LiteralText("port changed: "+enteredPort), false);
+//            enteredPort = portField.getServerPort();
+//            player.sendMessage(new LiteralText("port changed: "+enteredPort), false);
         });
         this.addButton(portField);
     }
