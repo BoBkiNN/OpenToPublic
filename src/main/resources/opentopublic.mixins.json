@@ -5,7 +5,8 @@
   "compatibilityLevel": "JAVA_8",
   "mixins": [
     "MixinIntegratedServer",
-    "MixinServerNetworkIo"
+    "MixinServerNetworkIo",
+    "PlayerManagerAccessor"
   ],
   "client": [
     "MixinLanServerScreen"

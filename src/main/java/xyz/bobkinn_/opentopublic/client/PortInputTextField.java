@@ -9,10 +9,10 @@ import net.minecraft.text.Text;
 /**
  * @author <a href="https://github.com/rikka0w0/LanServerProperties/">rikka0w0</a>
  */
-public class IPAddressTextField extends TextFieldWidget {
+public class PortInputTextField extends TextFieldWidget {
     private final int defaultPort;
 
-    public IPAddressTextField(TextRenderer textRenderer, int x, int y, int width, int height, Text name, int defaultPort) {
+    public PortInputTextField(TextRenderer textRenderer, int x, int y, int width, int height, Text name, int defaultPort) {
         super(textRenderer, x, y, width, height, name);
         this.defaultPort = defaultPort;
         this.setText(String.valueOf(defaultPort));

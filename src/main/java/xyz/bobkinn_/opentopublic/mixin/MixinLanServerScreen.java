@@ -6,6 +6,8 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.ClickableWidget;
 import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.server.integrated.IntegratedServer;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
@@ -18,10 +20,11 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import xyz.bobkinn_.opentopublic.OpenToPublic;
 import xyz.bobkinn_.opentopublic.Util;
-import xyz.bobkinn_.opentopublic.client.IPAddressTextField;
+import xyz.bobkinn_.opentopublic.client.MaxPlayersInputTextField;
+import xyz.bobkinn_.opentopublic.client.PortInputTextField;
 import xyz.bobkinn_.opentopublic.client.ToggleButton;
 
-import static xyz.bobkinn_.opentopublic.client.IPAddressTextField.validatePort;
+import static xyz.bobkinn_.opentopublic.client.PortInputTextField.validatePort;
 
 @Mixin(value = OpenToLanScreen.class, priority = 1005)
 public abstract class MixinLanServerScreen extends Screen {
@@ -35,29 +38,51 @@ public abstract class MixinLanServerScreen extends Screen {
 
     ButtonWidget openToWan = null;
     ToggleButton onlineModeButton = null;
+    ToggleButton pvpButton = null;
 
     @Shadow
     private String gameMode = "survival";
     @Shadow
     private boolean allowCommands;
-    int enteredPort = OpenToPublic.customPort;
 
+    int enteredPort = OpenToPublic.customPort;
+    int enteredMaxPN = OpenToPublic.maxPlayers;
+    boolean enablePvp = true;
+
+    @Inject(at = @At("HEAD"), method = "render", cancellable = true)
+    public void render(MatrixStack matrices, int mouseX, int mouseY, float delta, CallbackInfo ci) {
+        this.renderBackground(matrices);
+        OpenToLanScreen.drawCenteredText(matrices, this.textRenderer, this.title, this.width / 2, 50, 0xFFFFFF);
+        OpenToLanScreen.drawCenteredText(matrices, this.textRenderer, new TranslatableText("opentopublic.gui.new_player_settings"), this.width / 2, 82, 0xFFFFFF);
+        OpenToLanScreen.drawCenteredText(matrices, this.textRenderer, new TranslatableText("opentopublic.gui.server_settings"), this.width / 2, 130, 0xFFFFFF);
+        OpenToLanScreen.drawTextWithShadow(matrices, this.textRenderer, new TranslatableText("opentopublic.button.port"), this.width / 2 - 154, this.height - 48, 0xFFFFFF);
+        OpenToLanScreen.drawTextWithShadow(matrices, this.textRenderer, new TranslatableText("opentopublic.button.max_players"), this.width / 2 - 154, 168, 0xFFFFFF);
+        super.render(matrices, mouseX, mouseY, delta);
+        ci.cancel();
+    }
 
     @Redirect(method = "init", at = @At(value = "INVOKE",ordinal = 0, target = "Lnet/minecraft/client/gui/screen/OpenToLanScreen;addButton(Lnet/minecraft/client/gui/widget/ClickableWidget;)Lnet/minecraft/client/gui/widget/ClickableWidget;"))
     private ClickableWidget addButtonRedirect(OpenToLanScreen instance, ClickableWidget btn) {
-        // Your custom logic here
-//        System.out.println("Redirecting addButton call");
         ClickableWidget newBtn = new ButtonWidget(this.width / 2 - 155, this.height - 28, 150, 20, new TranslatableText("lanServer.start"), buttonWidget -> {
             if (this.client == null) return;
-            if (this.client.getServer() == null) return;
+            IntegratedServer server = this.client.getServer();
+            if (server == null) return;
 
             if (validatePort(Integer.toString(enteredPort)) == -1) return;
+            if (MaxPlayersInputTextField.validateNum(Integer.toString(enteredMaxPN)) == -1) return;
+
             OpenToPublic.customPort = enteredPort;
+            OpenToPublic.maxPlayers = enteredMaxPN;
 
             this.client.openScreen(null);
 
-            this.client.getServer().setOnlineMode(OpenToPublic.onlineMode);
-            boolean successOpen = this.client.getServer().openToLan(GameMode.byName(this.gameMode), this.allowCommands, OpenToPublic.customPort);
+            if (OpenToPublic.maxPlayers != 8){
+                ((PlayerManagerAccessor) server.getPlayerManager()).setMaxPlayers(OpenToPublic.maxPlayers);
+            }
+
+            server.setPvpEnabled(enablePvp);
+            server.setOnlineMode(OpenToPublic.onlineMode);
+            boolean successOpen = server.openToLan(GameMode.byName(this.gameMode), this.allowCommands, OpenToPublic.customPort);
             TranslatableText successWAN = new TranslatableText("opentopublic.publish.started_wan", "0.0.0.0:"+OpenToPublic.customPort);
             TranslatableText text;
             if (OpenToPublic.openPublic) text = successOpen ? successWAN : new TranslatableText("opentopublic.publish.failed_wan");
@@ -65,7 +90,7 @@ public abstract class MixinLanServerScreen extends Screen {
                 text = successOpen ? new TranslatableText("commands.publish.started", OpenToPublic.customPort) : new TranslatableText("commands.publish.failed");
             }
             this.client.inGameHud.getChatHud().addMessage(text);
-            this.client.inGameHud.getChatHud().addMessage(new LiteralText("is online mode: "+this.client.getServer().isOnlineMode()));
+            this.client.inGameHud.getChatHud().addMessage(new LiteralText("max players: "+server.getMaxPlayerCount()));
             this.client.updateWindowTitle();
         });
         this.addButton(newBtn);
@@ -79,6 +104,7 @@ public abstract class MixinLanServerScreen extends Screen {
             return;
         }
         Screen self = this;
+
         // open to wan button
         ButtonWidget.TooltipSupplier wanTooltip = (button, matrices, mouseX, mouseY) -> self.renderTooltip(matrices, new TranslatableText("opentopublic.tooltip.wan_tooltip"), mouseX, mouseY);
         openToWan = new ButtonWidget(this.width / 2 + 5,
@@ -91,7 +117,7 @@ public abstract class MixinLanServerScreen extends Screen {
         this.addButton(openToWan);
 
         // port enter field
-        IPAddressTextField portField = new IPAddressTextField(textRenderer, this.width / 2 - 154, this.height - 54, 147, 20,
+        PortInputTextField portField = new PortInputTextField(textRenderer, this.width / 2 - 154 + 147/2, this.height - 54, 147/2, 20,
                 new TranslatableText("opentopublic.button.port"), OpenToPublic.customPort);
         portField.setChangedListener((text) -> {
             portField.setEditableColor(validatePort(text) >= 0 ? 0xFFFFFF : 0xFF0000);
@@ -103,17 +129,35 @@ public abstract class MixinLanServerScreen extends Screen {
         // online mode switch
         ButtonWidget.TooltipSupplier onlineModeTooltip = (button, matrices, mouseX, mouseY) -> self.renderTooltip(matrices, new TranslatableText("opentopublic.tooltip.online_mode_tooltip"), mouseX, mouseY);
         onlineModeButton =
-                new ToggleButton(this.width / 2 - 155, 124, 150, 20,
+                new ToggleButton(this.width / 2 - 155, 144, 150, 20,
                         Util.parseYN("opentopublic.button.online_mode", OpenToPublic.onlineMode), true,
                         button -> {
                             OpenToPublic.onlineMode = !OpenToPublic.onlineMode;
-                            player.sendMessage(new LiteralText("online mode: "+OpenToPublic.onlineMode), false);
+//                            player.sendMessage(new LiteralText("online mode: "+OpenToPublic.onlineMode), false);
                             button.setMessage(Util.parseYN("opentopublic.button.online_mode", OpenToPublic.onlineMode));
                             this.updateButtonText();
                         },
                         onlineModeTooltip
                 );
         this.addButton(onlineModeButton);
+
+        // pvp on/off button
+        pvpButton =
+                new ToggleButton(this.width / 2 + 5, 144, 150, 20, Util.parseYN("opentopublic.button.enable_pvp", enablePvp), true, button -> {
+                    enablePvp = !enablePvp;
+                    button.setMessage(Util.parseYN("opentopublic.button.enable_pvp", enablePvp));
+                    this.updateButtonText();
+                });
+        this.addButton(pvpButton);
+
+        // max player input field
+        MaxPlayersInputTextField maxPlayers = new MaxPlayersInputTextField(this.textRenderer, this.width / 2 -155, 180, 150,20, new TranslatableText("opentopublic.button.max_players"), OpenToPublic.maxPlayers);
+        maxPlayers.setChangedListener((text) -> {
+            maxPlayers.setEditableColor(MaxPlayersInputTextField.validateNum(text) >= 0 ? 0xFFFFFF : 0xFF0000);
+            enteredMaxPN = maxPlayers.getVal();
+//            player.sendMessage(new LiteralText("max players change: "+enteredMaxPN), false);
+        });
+        this.addButton(maxPlayers);
     }
 
 
@@ -123,5 +167,6 @@ public abstract class MixinLanServerScreen extends Screen {
     private void updateText(CallbackInfo ci){
         this.openToWan.setMessage(Util.parseYN("opentopublic.button.open_public", OpenToPublic.openPublic));
         this.onlineModeButton.setMessage(Util.parseYN("opentopublic.button.online_mode", OpenToPublic.onlineMode));
+        this.pvpButton.setMessage(Util.parseYN("opentopublic.button.enable_pvp", enablePvp));
     }
 }

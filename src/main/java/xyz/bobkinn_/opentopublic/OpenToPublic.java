@@ -11,6 +11,7 @@ public class OpenToPublic implements ModInitializer {
     public static boolean openPublic = true;
     public static int customPort = 25565;
     public static boolean onlineMode = true;
+    public static int maxPlayers = 8;
     public static Logger LOGGER = LogManager.getLogger("OpenToPublic");
 
     public static GameProfile getWorldOwner(){

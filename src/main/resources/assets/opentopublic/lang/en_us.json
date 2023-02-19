@@ -5,5 +5,9 @@
   "opentopublic.publish.failed_wan": "Unable to host public game",
   "opentopublic.button.online_mode": "Online mode: %s",
   "opentopublic.tooltip.online_mode_tooltip": "Check is user has license or not",
-  "opentopublic.tooltip.wan_tooltip": "Opens world to outer network. Requires opened port on router"
+  "opentopublic.tooltip.wan_tooltip": "Opens world to outer network. Requires opened port on router",
+  "opentopublic.gui.new_player_settings": "Settings for new players",
+  "opentopublic.gui.server_settings": "Server settings",
+  "opentopublic.button.enable_pvp": "PVP: %s",
+  "opentopublic.button.max_players": "Max player count"
 }

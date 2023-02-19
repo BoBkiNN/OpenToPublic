@@ -3,8 +3,8 @@ package xyz.bobkinn_.opentopublic;
 import net.minecraft.text.TranslatableText;
 
 public class Util {
-    static TranslatableText yes = new TranslatableText("gui.yes");
-    static TranslatableText no = new TranslatableText("gui.no");
+    static TranslatableText yes = new TranslatableText("options.on");
+    static TranslatableText no = new TranslatableText("options.off");
     public static TranslatableText translateYN(boolean bool){
         return bool ? yes : no;
     }

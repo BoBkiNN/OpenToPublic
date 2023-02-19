@@ -13,6 +13,13 @@ public class ToggleButton extends ButtonWidget {
         this.state = defaultState;
     }
 
+    public ToggleButton(int x, int y, int width, int height,
+                        Text text, boolean defaultState,
+                        PressAction onCheck) {
+        super(x, y, width, height, text, onCheck);
+        this.state = defaultState;
+    }
+
     public void setState(boolean newState) {
         this.state = newState;
     }
