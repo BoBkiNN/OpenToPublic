@@ -1,3 +1,4 @@
 {
-  "opentopublic.button.open_public": "Open to WAN: $1"
+  "opentopublic.button.open_public": "Open to WAN: %s",
+  "opentopublic.button.port": "Port"
 }

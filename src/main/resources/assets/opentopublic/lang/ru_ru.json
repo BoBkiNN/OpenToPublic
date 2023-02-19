@@ -1,3 +1,4 @@
 {
-  "opentopublic.button.open_public": "Открыть в Интернет: $1"
+  "opentopublic.button.open_public": "Открыть в Интернет: %s",
+  "opentopublic.button.port": "Порт"
 }
