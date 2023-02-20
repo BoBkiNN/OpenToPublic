@@ -7,6 +7,7 @@ import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.ClickableWidget;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.integrated.IntegratedServer;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
@@ -19,6 +20,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import xyz.bobkinn_.opentopublic.OpenToPublic;
+import xyz.bobkinn_.opentopublic.OtpPersistentState;
 import xyz.bobkinn_.opentopublic.Util;
 import xyz.bobkinn_.opentopublic.client.MaxPlayersInputTextField;
 import xyz.bobkinn_.opentopublic.client.PortInputTextField;
@@ -82,6 +84,21 @@ public abstract class MixinLanServerScreen extends Screen {
 
             server.setPvpEnabled(enablePvp);
             server.setOnlineMode(OpenToPublic.onlineMode);
+
+            try {
+                OpenToPublic.LOGGER.info("Saving world custom data..");
+                OtpPersistentState ps = OtpPersistentState.get(server.getOverworld());
+                NbtCompound nbt = ps.getData();
+                nbt.putString("motd", "test motd");
+                nbt.putInt("maxPlayers", OpenToPublic.maxPlayers);
+                OpenToPublic.LOGGER.info(nbt.toText().getString());
+                ps.setData(nbt);
+                ps.saveToFile(server.getOverworld());
+                OpenToPublic.LOGGER.info("Saved");
+            } catch (Exception e) {
+                OpenToPublic.LOGGER.error(e);
+            }
+
             boolean successOpen = server.openToLan(GameMode.byName(this.gameMode), this.allowCommands, OpenToPublic.customPort);
             TranslatableText successWAN = new TranslatableText("opentopublic.publish.started_wan", "0.0.0.0:"+OpenToPublic.customPort);
             TranslatableText text;
