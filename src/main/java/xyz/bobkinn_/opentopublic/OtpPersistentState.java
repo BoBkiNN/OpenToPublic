@@ -4,9 +4,7 @@ import net.minecraft.SharedConstants;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtIo;
 import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.WorldSavePath;
 import net.minecraft.world.PersistentState;
-import net.minecraft.world.WorldProperties;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
