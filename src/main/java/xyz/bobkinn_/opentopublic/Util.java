@@ -4,14 +4,10 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.util.WorldSavePath;
-import net.minecraft.world.level.LevelProperties;
 import net.minecraft.world.level.storage.LevelStorage;
-import net.minecraft.world.level.storage.LevelStorageException;
-import net.minecraft.world.level.storage.LevelSummary;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Objects;
 
 public class Util {
     public static Path savesFolder = MinecraftClient.getInstance().getLevelStorage().getSavesDirectory();
