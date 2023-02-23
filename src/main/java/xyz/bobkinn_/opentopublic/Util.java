@@ -12,8 +12,6 @@ import java.util.ArrayList;
 public class Util {
     public static Path savesFolder = MinecraftClient.getInstance().getLevelStorage().getSavesDirectory();
 
-    public static ArrayList<LevelStorage.Session> sessions = new ArrayList<>();
-
     static TranslatableText yes = new TranslatableText("options.on");
     static TranslatableText no = new TranslatableText("options.off");
 
