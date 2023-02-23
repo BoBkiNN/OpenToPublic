@@ -4,7 +4,9 @@ import net.minecraft.SharedConstants;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtIo;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.util.WorldSavePath;
 import net.minecraft.world.PersistentState;
+import net.minecraft.world.WorldProperties;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
@@ -69,7 +71,7 @@ public class OtpPersistentState extends PersistentState {
     public void saveToFile(@NotNull ServerWorld world) {
         try {
             if (world.getServer().getRunDirectory() == null) return;
-            Path worldDir = world.getServer().getRunDirectory().toPath().resolve(world.getRegistryKey().getValue().toString());
+            Path worldDir = world.getServer().getRunDirectory().toPath().resolve(Util.savesFolder).resolve(Util.getLevelName(world));
             File dataFolder = new File(worldDir.toFile(), "data");
             if (!dataFolder.exists()) {
                 Files.createDirectory(dataFolder.toPath());
@@ -80,6 +82,8 @@ public class OtpPersistentState extends PersistentState {
             NbtCompound compressedTag = tag.copy();
             compressedTag.putInt("DataVersion", SharedConstants.getGameVersion().getWorldVersion());
             NbtIo.writeCompressed(compressedTag, outputFile);
+
+            OpenToPublic.LOGGER.info(outputFile.getAbsolutePath());
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -92,7 +96,7 @@ public class OtpPersistentState extends PersistentState {
     public void loadFromFile(@NotNull ServerWorld world) {
         try {
             if (world.getServer().getRunDirectory() == null) return;
-            Path worldDir = world.getServer().getRunDirectory().toPath().resolve(world.getRegistryKey().getValue().toString());
+            Path worldDir = world.getServer().getRunDirectory().toPath().resolve(Util.savesFolder).resolve(Util.getLevelName(world));
             File dataFolder = new File(worldDir.toFile(), "data");
             if (!dataFolder.exists()) {
                 return;

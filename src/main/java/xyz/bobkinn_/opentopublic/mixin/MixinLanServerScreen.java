@@ -107,7 +107,7 @@ public abstract class MixinLanServerScreen extends Screen {
                 text = successOpen ? new TranslatableText("commands.publish.started", OpenToPublic.customPort) : new TranslatableText("commands.publish.failed");
             }
             this.client.inGameHud.getChatHud().addMessage(text);
-            this.client.inGameHud.getChatHud().addMessage(new LiteralText("max players: "+server.getMaxPlayerCount()));
+//            this.client.inGameHud.getChatHud().addMessage(new LiteralText("max players: "+server.getMaxPlayerCount()));
             this.client.updateWindowTitle();
         });
         this.addButton(newBtn);
