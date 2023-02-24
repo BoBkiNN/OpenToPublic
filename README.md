@@ -1,4 +1,5 @@
-[![See on Modrinth - OpenToPublic](https://img.shields.io/badge/See_on_Modrinth-OpenToPublic-2ea44f?logo=modrinth)](https://modrinth.com/mod/opentopublic)
+[![See on Modrinth - OpenToPublic](https://img.shields.io/badge/See_on_Modrinth-OpenToPublic-2ea44f?logo=modrinth)](https://modrinth.com/mod/opentopublic) (Under review
+)
 # OpenToPublic
 With this mod, you can make "Open to LAN" button open your world to outer network
 
