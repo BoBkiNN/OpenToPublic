@@ -9,6 +9,7 @@ import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.integrated.IntegratedServer;
+import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.world.GameMode;
@@ -22,6 +23,7 @@ import xyz.bobkinn_.opentopublic.OpenToPublic;
 import xyz.bobkinn_.opentopublic.OtpPersistentState;
 import xyz.bobkinn_.opentopublic.Util;
 import xyz.bobkinn_.opentopublic.client.MaxPlayersInputTextField;
+import xyz.bobkinn_.opentopublic.client.MotdInputTextField;
 import xyz.bobkinn_.opentopublic.client.PortInputTextField;
 import xyz.bobkinn_.opentopublic.client.ToggleButton;
 
@@ -40,15 +42,19 @@ public abstract class MixinLanServerScreen extends Screen {
     ButtonWidget openToWan = null;
     ToggleButton onlineModeButton = null;
     ToggleButton pvpButton = null;
+    MotdInputTextField motdInput;
 
     @Shadow
     private String gameMode = "survival";
     @Shadow
     private boolean allowCommands;
 
+    @Shadow public abstract void render(MatrixStack matrices, int mouseX, int mouseY, float delta);
+
     int enteredPort = OpenToPublic.customPort;
     int enteredMaxPN = OpenToPublic.maxPlayers;
     boolean enablePvp = true;
+    String motd = null;
 
     @Inject(at = @At("HEAD"), method = "render", cancellable = true)
     public void render(MatrixStack matrices, int mouseX, int mouseY, float delta, CallbackInfo ci) {
@@ -58,6 +64,7 @@ public abstract class MixinLanServerScreen extends Screen {
         OpenToLanScreen.drawCenteredText(matrices, this.textRenderer, new TranslatableText("opentopublic.gui.server_settings"), this.width / 2, 130, 0xFFFFFF);
         OpenToLanScreen.drawTextWithShadow(matrices, this.textRenderer, new TranslatableText("opentopublic.button.port"), this.width / 2 - 154, this.height - 48, 0xFFFFFF);
         OpenToLanScreen.drawTextWithShadow(matrices, this.textRenderer, new TranslatableText("opentopublic.button.max_players"), this.width / 2 - 154, 168, 0xFFFFFF);
+        OpenToLanScreen.drawTextWithShadow(matrices, this.textRenderer, new TranslatableText("opentopublic.button.motd"), this.width / 2 - 154, 204, 0xFFFFFF);
         super.render(matrices, mouseX, mouseY, delta);
         ci.cancel();
     }
@@ -67,10 +74,15 @@ public abstract class MixinLanServerScreen extends Screen {
         ClickableWidget newBtn = new ButtonWidget(this.width / 2 - 155, this.height - 28, 150, 20, new TranslatableText("lanServer.start"), buttonWidget -> {
             if (this.client == null) return;
             IntegratedServer server = this.client.getServer();
+            String playerName = MinecraftClient.getInstance().getSession().getUsername();
             if (server == null) return;
 
             if (validatePort(Integer.toString(enteredPort)) == -1) return;
             if (MaxPlayersInputTextField.validateNum(Integer.toString(enteredMaxPN)) == -1) return;
+            String enteredMotd = motdInput.getMotd();
+            if (enteredMotd == null) return;
+            this.motd = enteredMotd;
+            String worldName = server.getSaveProperties().getLevelName();
 
             OpenToPublic.customPort = enteredPort;
             OpenToPublic.maxPlayers = enteredMaxPN;
@@ -83,22 +95,24 @@ public abstract class MixinLanServerScreen extends Screen {
 
             server.setPvpEnabled(enablePvp);
             server.setOnlineMode(OpenToPublic.onlineMode);
+            server.setMotd(Util.parseValues(motd, playerName, worldName));
 
             try {
-                OpenToPublic.LOGGER.info("Saving world custom data..");
+//                OpenToPublic.LOGGER.info("Saving world custom data..");
                 OtpPersistentState ps = OtpPersistentState.get(server.getOverworld());
                 NbtCompound nbt = ps.getData();
-                nbt.putString("motd", "test motd");
+                nbt.putString("motd", motd);
                 nbt.putInt("maxPlayers", OpenToPublic.maxPlayers);
-                OpenToPublic.LOGGER.info(nbt.toText().getString());
+//                OpenToPublic.LOGGER.info(nbt.toText().getString());
                 ps.setData(nbt);
                 ps.saveToFile(server.getOverworld());
-                OpenToPublic.LOGGER.info("Saved");
+//                OpenToPublic.LOGGER.info("Saved");
             } catch (Exception e) {
                 OpenToPublic.LOGGER.error(e);
             }
 
             boolean successOpen = server.openToLan(GameMode.byName(this.gameMode), this.allowCommands, OpenToPublic.customPort);
+            ((ServerMetadataAccessor) server).getMetadata().setDescription(new LiteralText(Util.parseValues(motd, playerName, worldName)));
             TranslatableText successWAN = new TranslatableText("opentopublic.publish.started_wan", "0.0.0.0:"+OpenToPublic.customPort);
             TranslatableText text;
             if (OpenToPublic.openPublic) text = successOpen ? successWAN : new TranslatableText("opentopublic.publish.failed_wan");
@@ -106,7 +120,6 @@ public abstract class MixinLanServerScreen extends Screen {
                 text = successOpen ? new TranslatableText("commands.publish.started", OpenToPublic.customPort) : new TranslatableText("commands.publish.failed");
             }
             this.client.inGameHud.getChatHud().addMessage(text);
-//            this.client.inGameHud.getChatHud().addMessage(new LiteralText("max players: "+server.getMaxPlayerCount()));
             this.client.updateWindowTitle();
         });
         this.addButton(newBtn);
@@ -116,10 +129,27 @@ public abstract class MixinLanServerScreen extends Screen {
     @Inject(method = "init", at = @At("HEAD"))
     private void onInit(CallbackInfo ci){
         ClientPlayerEntity player = MinecraftClient.getInstance().player;
-        if (player == null){
+        if (this.client == null) return;
+        IntegratedServer server = this.client.getServer();
+        if (player == null || server == null){
             return;
         }
         Screen self = this;
+        this.motd = server.getServerMotd();
+
+        // load data
+        try {
+//            OpenToPublic.LOGGER.info("Loading world custom data..");
+            OtpPersistentState ps = OtpPersistentState.get(server.getOverworld());
+            ps.loadFromFile(server.getOverworld());
+            NbtCompound nbt = ps.getData();
+            this.motd = nbt.getString("motd");
+            this.enteredMaxPN = nbt.getInt("maxPlayers");
+            OpenToPublic.maxPlayers = this.enteredMaxPN;
+//            OpenToPublic.LOGGER.info("Loaded! "+ nbt);
+        } catch (Exception e) {
+            OpenToPublic.LOGGER.error(e);
+        }
 
         // open to wan button
         ButtonWidget.TooltipSupplier wanTooltip = (button, matrices, mouseX, mouseY) -> self.renderTooltip(matrices, new TranslatableText("opentopublic.tooltip.wan_tooltip"), mouseX, mouseY);
@@ -174,6 +204,11 @@ public abstract class MixinLanServerScreen extends Screen {
 //            player.sendMessage(new LiteralText("max players change: "+enteredMaxPN), false);
         });
         this.addButton(maxPlayers);
+
+        // motd input
+        motdInput = new MotdInputTextField(this.textRenderer, this.width / 2 -155, 215, 311, 20, new TranslatableText("opentopublic.button.motd"), motd);
+        this.addButton(motdInput);
+
     }
 
 

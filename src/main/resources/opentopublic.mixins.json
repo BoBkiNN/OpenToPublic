@@ -6,7 +6,8 @@
   "mixins": [
     "MixinIntegratedServer",
     "MixinServerNetworkIo",
-    "PlayerManagerAccessor"
+    "PlayerManagerAccessor",
+    "ServerMetadataAccessor"
   ],
   "client": [
     "MixinLanServerScreen"

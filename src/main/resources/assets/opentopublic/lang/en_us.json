@@ -9,5 +9,6 @@
   "opentopublic.gui.new_player_settings": "Settings for new players",
   "opentopublic.gui.server_settings": "Server settings",
   "opentopublic.button.enable_pvp": "PVP: %s",
+  "opentopublic.button.motd": "MOTD",
   "opentopublic.button.max_players": "Max player count"
 }

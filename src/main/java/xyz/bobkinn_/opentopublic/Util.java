@@ -4,10 +4,8 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.util.WorldSavePath;
-import net.minecraft.world.level.storage.LevelStorage;
 
 import java.nio.file.Path;
-import java.util.ArrayList;
 
 public class Util {
     public static Path savesFolder = MinecraftClient.getInstance().getLevelStorage().getSavesDirectory();
@@ -21,11 +19,14 @@ public class Util {
      * @return world folder name
      */
     public static String getLevelName(ServerWorld world){
-        OpenToPublic.LOGGER.info("Getting level folder name");
         Path folder = getWorldFolder(world);
         if (folder == null) return "";
 //        OpenToPublic.LOGGER.info(folder +" "+folder.getFileName());
         return folder.getName(folder.getNameCount()-1).toString();
+    }
+
+    public static String parseValues(String text, String playerName, String worldName){
+        return text.replace("%owner%",playerName).replace("%world%", worldName).replace("&", "§");
     }
 
     /**

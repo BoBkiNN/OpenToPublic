@@ -81,7 +81,7 @@ public class OtpPersistentState extends PersistentState {
             compressedTag.putInt("DataVersion", SharedConstants.getGameVersion().getWorldVersion());
             NbtIo.writeCompressed(compressedTag, outputFile);
 
-            OpenToPublic.LOGGER.info(outputFile.getAbsolutePath());
+//            OpenToPublic.LOGGER.info(outputFile.getAbsolutePath());
         } catch (IOException e) {
             e.printStackTrace();
         }
