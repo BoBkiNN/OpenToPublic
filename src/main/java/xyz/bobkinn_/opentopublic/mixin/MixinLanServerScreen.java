@@ -97,19 +97,15 @@ public abstract class MixinLanServerScreen extends Screen {
             server.setOnlineMode(OpenToPublic.onlineMode);
             server.setMotd(Util.parseValues(motd, playerName, worldName));
 
-            try {
-//                OpenToPublic.LOGGER.info("Saving world custom data..");
-                OtpPersistentState ps = OtpPersistentState.get(server.getOverworld());
-                NbtCompound nbt = ps.getData();
-                nbt.putString("motd", motd);
-                nbt.putInt("maxPlayers", OpenToPublic.maxPlayers);
-//                OpenToPublic.LOGGER.info(nbt.toText().getString());
-                ps.setData(nbt);
-                ps.saveToFile(server.getOverworld());
-//                OpenToPublic.LOGGER.info("Saved");
-            } catch (Exception e) {
-                OpenToPublic.LOGGER.error(e);
-            }
+//          OpenToPublic.LOGGER.info("Saving world custom data..");
+            OtpPersistentState ps = OtpPersistentState.get(server.getOverworld());
+            NbtCompound nbt = ps.getData();
+            nbt.putString("motd", motd);
+            nbt.putInt("maxPlayers", OpenToPublic.maxPlayers);
+//          OpenToPublic.LOGGER.info(nbt.toText().getString());
+            ps.setData(nbt);
+            ps.saveToFile(server.getOverworld());
+//          OpenToPublic.LOGGER.info("Saved");
 
             boolean successOpen = server.openToLan(GameMode.byName(this.gameMode), this.allowCommands, OpenToPublic.customPort);
             ((ServerMetadataAccessor) server).getMetadata().setDescription(new LiteralText(Util.parseValues(motd, playerName, worldName)));

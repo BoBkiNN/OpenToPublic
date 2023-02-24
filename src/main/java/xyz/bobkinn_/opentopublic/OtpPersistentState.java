@@ -80,10 +80,8 @@ public class OtpPersistentState extends PersistentState {
             NbtCompound compressedTag = tag.copy();
             compressedTag.putInt("DataVersion", SharedConstants.getGameVersion().getWorldVersion());
             NbtIo.writeCompressed(compressedTag, outputFile);
-
-//            OpenToPublic.LOGGER.info(outputFile.getAbsolutePath());
         } catch (IOException e) {
-            e.printStackTrace();
+            OpenToPublic.LOGGER.error("Could not save data", e);
         }
     }
 
@@ -108,7 +106,7 @@ public class OtpPersistentState extends PersistentState {
             tag.remove("DataVersion");
             fromTag(tag);
         } catch (IOException e) {
-            OpenToPublic.LOGGER.error("Could not save data {}", this, e);
+            OpenToPublic.LOGGER.error("Could not load data", e);
         }
     }
 }
