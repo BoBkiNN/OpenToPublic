@@ -1,13 +1,17 @@
 {
   "schemaVersion": 1,
   "id": "opentopublic",
-  "version": "1.0-b2",
+  "version": "1.0-b3",
   "name": "OpenToPublic",
   "description": "Allows you to open LAN world to WAN and set server settings",
   "authors": [
     "BoBkiNN_"
   ],
-  "contact": {},
+  "contact": {
+    "issues": "https://github.com/BoBkiNN/OpenToPublic/issues",
+    "sources": "https://github.com/BoBkiNN/OpenToPublic",
+    "homepage": "https://modrinth.com/user/BoBkiNN"
+  },
   "license": "MIT",
   "icon": "assets/opentopublic/icon.png",
   "environment": "*",
