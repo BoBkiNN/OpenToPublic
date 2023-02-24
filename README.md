@@ -21,3 +21,5 @@ If ON, then Minecraft will be check players for license, else players with crack
 
 ## More versions?
  \- yes, versions for 1.19.2 forge/fabric and 1.16.5 forge are planned
+
+PS: Writed with use of ChatGPT :)
