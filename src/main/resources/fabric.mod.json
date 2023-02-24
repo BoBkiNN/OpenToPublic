@@ -1,9 +1,9 @@
 {
   "schemaVersion": 1,
   "id": "opentopublic",
-  "version": "0.1-b10",
+  "version": "1.0",
   "name": "OpenToPublic",
-  "description": "Allows you to open LAN world to 0.0.0.0",
+  "description": "Allows you to open LAN world to WAN and set server settings",
   "authors": [
     "BoBkiNN_"
   ],
@@ -12,9 +12,6 @@
   "icon": "assets/opentopublic/icon.png",
   "environment": "*",
   "entrypoints": {
-    "client": [
-      "xyz.bobkinn_.opentopublic.client.OpenToPublicClient"
-    ],
     "main": [
       "xyz.bobkinn_.opentopublic.OpenToPublic"
     ]
