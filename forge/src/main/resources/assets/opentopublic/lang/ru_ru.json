@@ -1,0 +1,14 @@
+{
+  "opentopublic.button.open_public": "Открыть в Интернет: %s",
+  "opentopublic.button.port": "Порт",
+  "opentopublic.publish.started_wan": "Публичный сервер открыт на %s",
+  "opentopublic.publish.failed_wan": "Невозможно запустить публичный сервер",
+  "opentopublic.button.online_mode": "Проверка лицензии: %s",
+  "opentopublic.tooltip.online_mode_tooltip": "Проверять есть ли у игрока лицензия или нет",
+  "opentopublic.tooltip.wan_tooltip": "Открывает сервер во внешнюю сеть. Требуется открытый порт на роутере",
+  "opentopublic.gui.new_player_settings": "Настройки для новых игроков",
+  "opentopublic.gui.server_settings": "Настройки сервера",
+  "opentopublic.button.enable_pvp": "PVP: %s",
+  "opentopublic.button.motd": "MOTD",
+  "opentopublic.button.max_players": "Максимум игроков"
+}

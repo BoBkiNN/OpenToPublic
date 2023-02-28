@@ -1,0 +1,19 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "xyz.bobkinn_.opentopublic.mixin",
+  "compatibilityLevel": "JAVA_8",
+  "refmap": "opentopublic.refmap.json",
+  "mixins": [
+    "MixinIntegratedServer",
+    "MixinServerNetworkIo",
+    "PlayerListAccessor",
+    "ServerMetadataAccessor"
+  ],
+  "client": [
+    "MixinLanServerScreen"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}
