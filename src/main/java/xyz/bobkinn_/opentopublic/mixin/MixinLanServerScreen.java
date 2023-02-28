@@ -25,7 +25,6 @@ import xyz.bobkinn_.opentopublic.Util;
 import xyz.bobkinn_.opentopublic.client.MaxPlayersInputTextField;
 import xyz.bobkinn_.opentopublic.client.MotdInputTextField;
 import xyz.bobkinn_.opentopublic.client.PortInputTextField;
-import xyz.bobkinn_.opentopublic.client.ToggleButton;
 
 import static xyz.bobkinn_.opentopublic.client.PortInputTextField.validatePort;
 
@@ -40,8 +39,8 @@ public abstract class MixinLanServerScreen extends Screen {
     @Shadow protected abstract void updateButtonText();
 
     ButtonWidget openToWan = null;
-    ToggleButton onlineModeButton = null;
-    ToggleButton pvpButton = null;
+    ButtonWidget onlineModeButton = null;
+    ButtonWidget pvpButton = null;
     MotdInputTextField motdInput;
 
     @Shadow
@@ -53,7 +52,6 @@ public abstract class MixinLanServerScreen extends Screen {
 
     int enteredPort = OpenToPublic.customPort;
     int enteredMaxPN = OpenToPublic.maxPlayers;
-    boolean enablePvp = true;
     String motd = null;
 
     @Inject(at = @At("HEAD"), method = "render", cancellable = true)
@@ -93,7 +91,7 @@ public abstract class MixinLanServerScreen extends Screen {
                 ((PlayerManagerAccessor) server.getPlayerManager()).setMaxPlayers(OpenToPublic.maxPlayers);
             }
 
-            server.setPvpEnabled(enablePvp);
+            server.setPvpEnabled(OpenToPublic.enablePvp);
             server.setOnlineMode(OpenToPublic.onlineMode);
             server.setMotd(Util.parseValues(motd, playerName, worldName));
 
@@ -102,6 +100,7 @@ public abstract class MixinLanServerScreen extends Screen {
             NbtCompound nbt = ps.getData();
             nbt.putString("motd", motd);
             nbt.putInt("maxPlayers", OpenToPublic.maxPlayers);
+            nbt.putBoolean("enablePvp", OpenToPublic.enablePvp);
 //          OpenToPublic.LOGGER.info(nbt.toText().getString());
             ps.setData(nbt);
             ps.saveToFile(server.getOverworld());
@@ -134,18 +133,15 @@ public abstract class MixinLanServerScreen extends Screen {
         this.motd = server.getServerMotd();
 
         // load data
-        try {
-//            OpenToPublic.LOGGER.info("Loading world custom data..");
-            OtpPersistentState ps = OtpPersistentState.get(server.getOverworld());
-            ps.loadFromFile(server.getOverworld());
-            NbtCompound nbt = ps.getData();
-            this.motd = nbt.getString("motd");
-            this.enteredMaxPN = nbt.getInt("maxPlayers");
-            OpenToPublic.maxPlayers = this.enteredMaxPN;
-//            OpenToPublic.LOGGER.info("Loaded! "+ nbt);
-        } catch (Exception e) {
-            OpenToPublic.LOGGER.error(e);
-        }
+//      OpenToPublic.LOGGER.info("Loading world custom data..");
+        OtpPersistentState ps = OtpPersistentState.get(server.getOverworld());
+        ps.loadFromFile(server.getOverworld());
+        NbtCompound nbt = ps.getData();
+        if (nbt.contains("motd", 8)) this.motd = nbt.getString("motd");
+        if (nbt.contains("maxPlayers", 99)) this.enteredMaxPN = nbt.getInt("maxPlayers");
+        if (nbt.contains("enablePvp")) OpenToPublic.enablePvp = nbt.getBoolean("enablePvp");
+        OpenToPublic.maxPlayers = this.enteredMaxPN;
+//      OpenToPublic.LOGGER.info("Loaded! "+ nbt);
 
         // open to wan button
         ButtonWidget.TooltipSupplier wanTooltip = (button, matrices, mouseX, mouseY) -> self.renderTooltip(matrices, new TranslatableText("opentopublic.tooltip.wan_tooltip"), mouseX, mouseY);
@@ -171,13 +167,12 @@ public abstract class MixinLanServerScreen extends Screen {
         // online mode switch
         ButtonWidget.TooltipSupplier onlineModeTooltip = (button, matrices, mouseX, mouseY) -> self.renderTooltip(matrices, new TranslatableText("opentopublic.tooltip.online_mode_tooltip"), mouseX, mouseY);
         onlineModeButton =
-                new ToggleButton(this.width / 2 - 155, 144, 150, 20,
-                        Util.parseYN("opentopublic.button.online_mode", OpenToPublic.onlineMode), true,
+                new ButtonWidget(this.width / 2 - 155, 144, 150, 20,
+                        Util.parseYN("opentopublic.button.online_mode", OpenToPublic.onlineMode),
                         button -> {
                             OpenToPublic.onlineMode = !OpenToPublic.onlineMode;
-//                            player.sendMessage(new LiteralText("online mode: "+OpenToPublic.onlineMode), false);
                             button.setMessage(Util.parseYN("opentopublic.button.online_mode", OpenToPublic.onlineMode));
-                            this.updateButtonText();
+                            updateButtonText();
                         },
                         onlineModeTooltip
                 );
@@ -185,10 +180,10 @@ public abstract class MixinLanServerScreen extends Screen {
 
         // pvp on/off button
         pvpButton =
-                new ToggleButton(this.width / 2 + 5, 144, 150, 20, Util.parseYN("opentopublic.button.enable_pvp", enablePvp), true, button -> {
-                    enablePvp = !enablePvp;
-                    button.setMessage(Util.parseYN("opentopublic.button.enable_pvp", enablePvp));
-                    this.updateButtonText();
+                new ButtonWidget(this.width / 2 + 5, 144, 150, 20, Util.parseYN("opentopublic.button.enable_pvp", OpenToPublic.enablePvp), button -> {
+                    OpenToPublic.enablePvp = ! OpenToPublic.enablePvp;
+                    button.setMessage(Util.parseYN("opentopublic.button.enable_pvp",  OpenToPublic.enablePvp));
+                    updateButtonText();
                 });
         this.addButton(pvpButton);
 
@@ -214,6 +209,6 @@ public abstract class MixinLanServerScreen extends Screen {
     private void updateText(CallbackInfo ci){
         this.openToWan.setMessage(Util.parseYN("opentopublic.button.open_public", OpenToPublic.openPublic));
         this.onlineModeButton.setMessage(Util.parseYN("opentopublic.button.online_mode", OpenToPublic.onlineMode));
-        this.pvpButton.setMessage(Util.parseYN("opentopublic.button.enable_pvp", enablePvp));
+        this.pvpButton.setMessage(Util.parseYN("opentopublic.button.enable_pvp",  OpenToPublic.enablePvp));
     }
 }
