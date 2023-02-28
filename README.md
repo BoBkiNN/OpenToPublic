@@ -2,10 +2,6 @@
 # OpenToPublic
 With this mod, you can make "Open to LAN" button open your world to outer network
 
-## Requirements for available versions
- - Minecraft 1.16.5
- - Fabric mod loader
-
 ## Features
  - Enable/Disable online mode
  - Enable/Disable PVP
@@ -25,7 +21,7 @@ With this mod, you can make "Open to LAN" button open your world to outer networ
 If ON, then Minecraft will be check players for license, else players with cracked launchers can join
 
 ## More versions?
- \- yes, versions for 1.19.2 forge/fabric and 1.16.5 forge are planned
+ \- yes, versions for 1.19.2 forge/fabric are planned
 
 ## Credit
  - to ChatGPT for helping in development my first mod
