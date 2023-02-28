@@ -1,4 +1,4 @@
-[![See on Modrinth - OpenToPublic](https://img.shields.io/badge/See_on_Modrinth-OpenToPublic-2ea44f?logo=modrinth)](https://modrinth.com/mod/opentopublic)
+[![See on Modrinth - OpenToPublic](https://img.shields.io/badge/See_on_Modrinth-OpenToPublic-2ea44f?logo=modrinth)](https://modrinth.com/mod/opentopublic) [![See on CurseForge - OpenToPublic](https://img.shields.io/badge/See_on_CurseForge-OpenToPublic-orange?logo=curseforge)](https://www.curseforge.com/minecraft/mc-mods/opentopublic)
 # OpenToPublic
 With this mod, you can make "Open to LAN" button open your world to outer network
 
