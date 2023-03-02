@@ -143,6 +143,9 @@ public abstract class MixinLanServerScreen extends Screen {
         OpenToPublic.maxPlayers = this.enteredMaxPN;
 //      OpenToPublic.LOGGER.info("Loaded! "+ nbt);
 
+
+        //TODO add uPnP support to this button using ThreeLean
+
         // open to wan button
         ButtonWidget.TooltipSupplier wanTooltip = (button, matrices, mouseX, mouseY) -> self.renderTooltip(matrices, new TranslatableText("opentopublic.tooltip.wan_tooltip"), mouseX, mouseY);
         openToWan = new ButtonWidget(this.width / 2 + 5,
