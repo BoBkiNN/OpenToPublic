@@ -24,10 +24,27 @@ public class ThreeLean<A, B, C>{
         current = a;
     }
 
+    @Override
+    public String toString() {
+        return current.toString();
+    }
+
+    /**
+     * Set current state using it index
+     * @param index state index, in order as passed type parameters
+     */
+    public void setCurrentState(int index){
+        if (index < list.size() && index > -1) {
+            current = list.get(index);
+            currentI = index;
+        }
+    }
+
     /**
      * Get list of values
      * @return values list
      */
+    @SuppressWarnings("unused")
     public ArrayList<Object> getList(){
         return list;
     }
@@ -36,64 +53,85 @@ public class ThreeLean<A, B, C>{
      * Set current to next value
      */
     public void next(){
-        Object o = list.get(currentI);
         if (currentI >= list.size()-1) currentI = 0;
-        else currentI += 1;
-        current = o;
+        else currentI = currentI + 1;
+        current = list.get(currentI);
     }
 
     /**
      * Get current state as Object
      * @return current state as Object
      */
+    @SuppressWarnings("unused")
     public Object getCurrentRaw(){
         return current;
     }
 
     /**
-     * Get current type
+     * Get current type index
      * @return index of current type value, in order of constructor arguments
      */
+    @SuppressWarnings("unused")
     public int currentType(){
         return currentI;
     }
 
     /**
      * Get A object
-     * @return A or null if current is other
+     * @return A
      */
+    @SuppressWarnings({"unused", "unchecked"})
     public A getA(){
-        if (current != null) return null;
-        try {
-            return (A) current;
-        } catch (ClassCastException ignored){
-            return null;
-        }
+        return (A) list.get(0);
     }
 
     /**
      * Get B object
-     * @return B or null if current is other
+     * @return B
      */
+    @SuppressWarnings({"unused", "unchecked"})
     public B getB(){
-        if (current != null) return null;
-        try {
-            return (B) current;
-        } catch (ClassCastException ignored){
-            return null;
-        }
+        return (B) list.get(1);
     }
 
     /**
      * Get C object
-     * @return C or null if current is other
+     * @return C
      */
+    @SuppressWarnings({"unused", "unchecked"})
     public C getC(){
-        if (current != null) return null;
+        return (C) list.get(2);
+    }
+
+    public boolean isThird(){
+        return currentI == 2;
+    }
+
+    /**
+     * Checks is current state is boolean {@code true}
+     * @return {@code true} or {@code false} if current state is {@code false} or other
+     */
+    @SuppressWarnings("all")
+    public boolean isTrue(){
         try {
-            return (C) current;
+            boolean val = (Boolean) current;
+            return val == true;
         } catch (ClassCastException ignored){
-            return null;
+            return false;
+        }
+    }
+
+    /**
+     * Checks is current state is boolean {@code false}
+     * @return {@code true} or {@code false} if current state is {@code true} or other
+     */
+    @SuppressWarnings("all")
+    public boolean isFalse(){
+        try {
+            boolean val = (Boolean) current;
+            return val == false;
+        } catch (ClassCastException ignored){
+            return false;
         }
     }
 

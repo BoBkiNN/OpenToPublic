@@ -21,14 +21,16 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import xyz.bobkinn_.opentopublic.OpenToPublic;
 import xyz.bobkinn_.opentopublic.OtpPersistentState;
+import xyz.bobkinn_.opentopublic.PortContainer;
 import xyz.bobkinn_.opentopublic.Util;
 import xyz.bobkinn_.opentopublic.client.MaxPlayersInputTextField;
 import xyz.bobkinn_.opentopublic.client.MotdInputTextField;
 import xyz.bobkinn_.opentopublic.client.PortInputTextField;
+import xyz.bobkinn_.opentopublic.upnp.UpnpThread;
 
 import static xyz.bobkinn_.opentopublic.client.PortInputTextField.validatePort;
 
-@Mixin(value = OpenToLanScreen.class, priority = 1005)
+@Mixin(value = OpenToLanScreen.class)
 public abstract class MixinLanServerScreen extends Screen {
     Screen parent;
     protected MixinLanServerScreen(Text title, Screen parent) {
@@ -106,15 +108,21 @@ public abstract class MixinLanServerScreen extends Screen {
             ps.saveToFile(server.getOverworld());
 //          OpenToPublic.LOGGER.info("Saved");
 
+            boolean doUPnP = OpenToPublic.openPublic.isThird();
+            if (doUPnP) {
+                PortContainer.self.mainPort = OpenToPublic.customPort;
+                PortContainer.saveBackup(PortContainer.self, OpenToPublic.backupFile);
+            }
+
             boolean successOpen = server.openToLan(GameMode.byName(this.gameMode), this.allowCommands, OpenToPublic.customPort);
             ((ServerMetadataAccessor) server).getMetadata().setDescription(new LiteralText(Util.parseValues(motd, playerName, worldName)));
-            TranslatableText successWAN = new TranslatableText("opentopublic.publish.started_wan", "0.0.0.0:"+OpenToPublic.customPort);
-            TranslatableText text;
-            if (OpenToPublic.openPublic) text = successOpen ? successWAN : new TranslatableText("opentopublic.publish.failed_wan");
-            else {
-                text = successOpen ? new TranslatableText("commands.publish.started", OpenToPublic.customPort) : new TranslatableText("commands.publish.failed");
+
+            if (doUPnP) {
+                Util.displayToast(new TranslatableText("opentopublic.toast.upnp_in_process.title"), new TranslatableText("opentopublic.toast.upnp_in_process.desc"));
+                UpnpThread.runSetup();
+            } else {
+                Util.atSuccessOpen(successOpen);
             }
-            this.client.inGameHud.getChatHud().addMessage(text);
             this.client.updateWindowTitle();
         });
         this.addButton(newBtn);
@@ -132,6 +140,8 @@ public abstract class MixinLanServerScreen extends Screen {
         Screen self = this;
         this.motd = server.getServerMotd();
 
+        OpenToPublic.updateConfig(OpenToPublic.modConfigPath.resolve("config.json")); // update config
+
         // load data
 //      OpenToPublic.LOGGER.info("Loading world custom data..");
         OtpPersistentState ps = OtpPersistentState.get(server.getOverworld());
@@ -144,37 +154,46 @@ public abstract class MixinLanServerScreen extends Screen {
 //      OpenToPublic.LOGGER.info("Loaded! "+ nbt);
 
 
-        //TODO add uPnP support to this button using ThreeLean
-
         // open to wan button
-        ButtonWidget.TooltipSupplier wanTooltip = (button, matrices, mouseX, mouseY) -> self.renderTooltip(matrices, new TranslatableText("opentopublic.tooltip.wan_tooltip"), mouseX, mouseY);
+        ButtonWidget.TooltipSupplier wanTooltip = (button, matrices, mouseX, mouseY) -> {
+            String tooltipTextKey;
+            if (OpenToPublic.openPublic.isTrue()){
+                tooltipTextKey = "opentopublic.tooltip.wan_tooltip.manual";
+            } else if (OpenToPublic.openPublic.isFalse()) {
+                tooltipTextKey = "opentopublic.tooltip.wan_tooltip.lan";
+            } else {
+                tooltipTextKey = "opentopublic.tooltip.wan_tooltip.upnp";
+            }
+            self.renderTooltip(matrices, new TranslatableText(tooltipTextKey), mouseX, mouseY);
+        };
         openToWan = new ButtonWidget(this.width / 2 + 5,
                 this.height - 54, 150, 20,
                 new TranslatableText("opentopublic.button.open_public"), button -> {
-                    OpenToPublic.openPublic = !OpenToPublic.openPublic;
-//                    player.sendMessage(new LiteralText("wan: "+OpenToPublic.openPublic), false);
+                    OpenToPublic.openPublic.next();
                     updateButtonText();
                 }, wanTooltip);
         this.addButton(openToWan);
 
         // port enter field
-        PortInputTextField portField = new PortInputTextField(textRenderer, this.width / 2 - 154 + 147/2, this.height - 54, 147/2, 20,
+        PortInputTextField portField = new PortInputTextField(textRenderer, this.width / 2 - 154 + 147/2,
+                this.height - 54,
+                147/2, 20,
                 new TranslatableText("opentopublic.button.port"), OpenToPublic.customPort);
         portField.setChangedListener((text) -> {
-            portField.setEditableColor(validatePort(text) >= 0 ? 0xFFFFFF : 0xFF0000);
+            portField.setEditableColor(validatePort(text) >= 0 ? 0xFFFFFF : 0xFF5555);
             enteredPort = portField.getServerPort();
-//            player.sendMessage(new LiteralText("port changed: "+enteredPort), false);
         });
         this.addButton(portField);
 
         // online mode switch
-        ButtonWidget.TooltipSupplier onlineModeTooltip = (button, matrices, mouseX, mouseY) -> self.renderTooltip(matrices, new TranslatableText("opentopublic.tooltip.online_mode_tooltip"), mouseX, mouseY);
+        ButtonWidget.TooltipSupplier onlineModeTooltip = (button, matrices, mouseX, mouseY) ->
+                self.renderTooltip(matrices,
+                        new TranslatableText("opentopublic.tooltip.online_mode_tooltip"), mouseX, mouseY);
         onlineModeButton =
                 new ButtonWidget(this.width / 2 - 155, 144, 150, 20,
                         Util.parseYN("opentopublic.button.online_mode", OpenToPublic.onlineMode),
                         button -> {
                             OpenToPublic.onlineMode = !OpenToPublic.onlineMode;
-                            button.setMessage(Util.parseYN("opentopublic.button.online_mode", OpenToPublic.onlineMode));
                             updateButtonText();
                         },
                         onlineModeTooltip
@@ -185,7 +204,6 @@ public abstract class MixinLanServerScreen extends Screen {
         pvpButton =
                 new ButtonWidget(this.width / 2 + 5, 144, 150, 20, Util.parseYN("opentopublic.button.enable_pvp", OpenToPublic.enablePvp), button -> {
                     OpenToPublic.enablePvp = ! OpenToPublic.enablePvp;
-                    button.setMessage(Util.parseYN("opentopublic.button.enable_pvp",  OpenToPublic.enablePvp));
                     updateButtonText();
                 });
         this.addButton(pvpButton);
@@ -193,7 +211,7 @@ public abstract class MixinLanServerScreen extends Screen {
         // max player input field
         MaxPlayersInputTextField maxPlayers = new MaxPlayersInputTextField(this.textRenderer, this.width / 2 -155, 180, 150,20, new TranslatableText("opentopublic.button.max_players"), OpenToPublic.maxPlayers);
         maxPlayers.setChangedListener((text) -> {
-            maxPlayers.setEditableColor(MaxPlayersInputTextField.validateNum(text) >= 0 ? 0xFFFFFF : 0xFF0000);
+            maxPlayers.setEditableColor(MaxPlayersInputTextField.validateNum(text) >= 0 ? 0xFFFFFF : 0xFF5555);
             enteredMaxPN = maxPlayers.getVal();
 //            player.sendMessage(new LiteralText("max players change: "+enteredMaxPN), false);
         });
@@ -206,11 +224,11 @@ public abstract class MixinLanServerScreen extends Screen {
     }
 
 
-
-
     @Inject(method = "updateButtonText", at = @At("TAIL"))
     private void updateText(CallbackInfo ci){
-        this.openToWan.setMessage(Util.parseYN("opentopublic.button.open_public", OpenToPublic.openPublic));
+        if (OpenToPublic.openPublic.isTrue()) this.openToWan.setMessage(new TranslatableText("opentopublic.button.open_public", new TranslatableText("opentopublic.text.manual")));
+        else if (OpenToPublic.openPublic.isFalse()) this.openToWan.setMessage(new TranslatableText("opentopublic.button.open_public", Util.off));
+        else if (OpenToPublic.openPublic.isThird()) this.openToWan.setMessage(new TranslatableText("opentopublic.button.open_public", "UPnP"));
         this.onlineModeButton.setMessage(Util.parseYN("opentopublic.button.online_mode", OpenToPublic.onlineMode));
         this.pvpButton.setMessage(Util.parseYN("opentopublic.button.enable_pvp",  OpenToPublic.enablePvp));
     }

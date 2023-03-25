@@ -1,10 +1,19 @@
 plugins {
     id 'fabric-loom' version '1.1-SNAPSHOT'
     id 'maven-publish'
+
+    id 'com.github.johnrengelman.shadow' version '7.0.0'
 }
 
 version = project.mod_version
 group = project.maven_group
+
+println("Fabric mod version: "+version)
+
+build.doLast(() -> {
+    println "Build output directory: ${project.buildDir}"+"\\libs"
+})
+
 
 repositories {
     // Add repositories to retrieve artifacts from in here.
@@ -15,13 +24,14 @@ repositories {
 }
 
 dependencies {
+    implementation files('libs/WaifUPnP.jar')
     // To change the versions see the gradle.properties file
     minecraft "com.mojang:minecraft:${project.minecraft_version}"
     mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
     modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 
     // Fabric API. This is technically optional, but you probably want it anyway.
-    modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+//    modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 }
 
 processResources {
@@ -31,6 +41,8 @@ processResources {
     filesMatching("fabric.mod.json") {
         expand "version": project.version
     }
+    from(replaceText("fabric.mod.json", '$version', version))
+    outputs.upToDateWhen { false }
 }
 
 def targetJavaVersion = 8
@@ -57,10 +69,49 @@ java {
     withSourcesJar()
 }
 
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+
+
+
+task fatJar(type: ShadowJar) {
+//    dependsOn(jar)
+//    from configurations.dependencies.collect
+    from files('libs/WaifUPnP.jar').collect {
+        zipTree(it)
+    }
+    from sourceSets.main.output
+//    from("LICENSE") {
+//        rename { "${it}_${project.archivesBaseName}"}
+//    }
+//    from(replaceText("fabric.mod.json", "%version%", project.mod_version))
+
+    archiveClassifier = "fat"
+    configurations = [project.configurations.include]
+
+    outputs.upToDateWhen { false }
+}
+
+// helper function to replace text in a file
+def replaceText(String fileName, String targetText, String textToReplace) {
+    copy {
+        from fileName
+        into buildDir
+//        rename { "test_replaced.txt" }
+        filter { line -> line.replaceAll(targetText, textToReplace) }
+    }
+
+    return "${buildDir}/"+fileName
+}
+
 jar {
+//    dependsOn fatJar
+    from files('libs/WaifUPnP.jar').collect {
+        zipTree(it)
+    }
     from("LICENSE") {
         rename { "${it}_${project.archivesBaseName}" }
     }
+//    dependsOn fatJar
 }
 
 // configure the maven publication
