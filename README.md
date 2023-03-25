@@ -31,7 +31,7 @@ If ON, then Minecraft will be check players for license, else players with crack
  - to FasT1k (Discord ID: 631850581580972106) for testing
 
 ## config.json explanation
-Config path: `.minecraft/config/opentopublic/config.json`
+Config path: `.minecraft/config/opentopublic/config.json`\
 Example config:
 ```json
 {
