@@ -16,7 +16,13 @@ plugins {
 apply plugin: 'org.spongepowered.mixin'
 
 group = 'xyz.bobkinn_'
-version = '1.0-b9_Forge_1.16.5'
+version = '1.1-b12_Forge_1.16.5'
+
+println("Forge mod version: "+version)
+
+build.doLast(() -> {
+    println "Build output directory: ${project.buildDir}"+"\\libs"
+})
 
 java {
     archivesBaseName = 'opentopublic'
@@ -112,6 +118,8 @@ mixin {
 sourceSets.main.resources { srcDir 'src/generated/resources' }
 
 repositories {
+    mavenCentral()
+
     // Put repositories for dependencies here
     // ForgeGradle automatically adds the Forge maven and Maven Central for you
 
@@ -122,6 +130,9 @@ repositories {
 }
 
 dependencies {
+    implementation files('../libs/WaifUPnP.jar')
+    // https://mvnrepository.com/artifact/org.jetbrains/annotations
+    implementation 'org.jetbrains:annotations:24.0.1'
     // Specify the version of Minecraft to use. If this is any group other than 'net.minecraft' it is assumed
     // that the dep is a ForgeGradle 'patcher' dependency, and its patches will be applied.
     // The userdev artifact is a special name and will get all sorts of transformations applied to it.
@@ -144,6 +155,12 @@ dependencies {
 
 // Example for how to get properties into the manifest for reading at runtime.
 jar {
+    from files('../libs/WaifUPnP.jar').collect {
+        zipTree(it)
+    }
+    from("LICENSE") {
+        rename { "${it}_${project.archivesBaseName}" }
+    }
     manifest {
         attributes([
                 "Specification-Title"     : "opentopublic",

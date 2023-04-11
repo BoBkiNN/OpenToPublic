@@ -1,18 +1,21 @@
 package xyz.bobkinn_.opentopublic;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.toasts.SystemToast;
 import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.world.server.ServerWorld;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.storage.FolderName;
 
 import java.nio.file.Path;
 
 public class Util {
-    public static Path savesFolder = Minecraft.getInstance().gameDir.toPath().resolve("saves");
+    static Minecraft mc = Minecraft.getInstance();
+    public static Path savesFolder = mc.gameDir.toPath().resolve("saves");
 
-    static TranslationTextComponent yes = new TranslationTextComponent("options.on");
-    static TranslationTextComponent no = new TranslationTextComponent("options.off");
+    public static TranslationTextComponent on = new TranslationTextComponent("options.on");
+    public static TranslationTextComponent off = new TranslationTextComponent("options.off");
 
     /**
      * Get world folder name
@@ -22,7 +25,6 @@ public class Util {
     public static String getLevelName(ServerWorld world){
         Path folder = getWorldFolder(world);
         if (folder == null) return "";
-//        OpenToPublic.LOGGER.info(folder +" "+folder.getFileName());
         return folder.getName(folder.getNameCount()-1).toString();
     }
 
@@ -36,15 +38,47 @@ public class Util {
      * @return folder
      */
     public static Path getWorldFolder(ServerWorld world){
-        if (Minecraft.getInstance().getIntegratedServer() == null) return null;
+        if (mc.getIntegratedServer() == null) return null;
         return world.getServer().func_240776_a_(FolderName.LEVEL_DAT).toAbsolutePath().getParent();
     }
 
     public static TranslationTextComponent translateYN(boolean bool){
-        return bool ? yes : no;
+        return bool ? on : off;
     }
 
     public static TranslationTextComponent parseYN(String key, boolean onlineMode) {
         return new TranslationTextComponent(key,  Util.translateYN(onlineMode));
     }
+
+    public static void addChatMsg(ITextComponent text){
+        if (mc == null) return;
+        mc.ingameGUI.getChatGUI().printChatMessage(text);
+    }
+
+    @SuppressWarnings("unused")
+    public static void addChatMsg(String text){
+        addChatMsg(new StringTextComponent(text));
+    }
+
+    public static void atSuccessOpen(boolean successOpen){
+        TranslationTextComponent successWAN;
+        String ip = (OpenToPublic.upnpIp == null) ? "0.0.0.0" : OpenToPublic.upnpIp;
+        if (!OpenToPublic.cfg.isHideIps()) {
+            successWAN = new TranslationTextComponent("opentopublic.publish.started_wan", ip + ":" + OpenToPublic.customPort);
+        } else {
+            successWAN = new TranslationTextComponent("opentopublic.publish.started_wan_noIp", Integer.toString(OpenToPublic.customPort));
+        }
+        TranslationTextComponent text;
+        if (OpenToPublic.openPublic.isTrue() || OpenToPublic.openPublic.isThird()) text = successOpen ? successWAN : new TranslationTextComponent("opentopublic.publish.failed_wan");
+        else {
+            text = successOpen ? new TranslationTextComponent("commands.publish.started", OpenToPublic.customPort) : new TranslationTextComponent("commands.publish.failed");
+        }
+        if (mc == null) return;
+        Util.addChatMsg(text);
+    }
+
+    public static void displayToast(ITextComponent title, ITextComponent desc){
+        mc.getToastGui().add(SystemToast.func_238534_a_(mc, SystemToast.Type.TUTORIAL_HINT, title, desc));
+    }
+
 }

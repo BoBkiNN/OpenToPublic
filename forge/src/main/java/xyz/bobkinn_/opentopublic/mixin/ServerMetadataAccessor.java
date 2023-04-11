@@ -10,5 +10,5 @@ import org.spongepowered.asm.mixin.gen.Accessor;
 public interface ServerMetadataAccessor {
 
     @Mutable @Accessor("statusResponse")
-    ServerStatusResponse getMetadata();
+    ServerStatusResponse getStatusResponse();
 }

@@ -7,11 +7,12 @@
   "mixins": [
     "MixinIntegratedServer",
     "MixinServerNetworkIo",
-    "PlayerListAccessor",
+    "PlayerManagerAccessor",
     "ServerMetadataAccessor"
   ],
   "client": [
-    "MixinLanServerScreen"
+    "MixinLanServerScreen",
+    "MixinMinecraftClient"
   ],
   "injectors": {
     "defaultRequire": 1
