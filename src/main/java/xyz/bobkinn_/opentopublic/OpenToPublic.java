@@ -31,6 +31,14 @@ public class OpenToPublic implements ModInitializer {
     public static final Logger LOGGER = LogManager.getLogger("OpenToPublic");
 
     public static void updateConfig(Path path){
+        File folder = OpenToPublic.modConfigPath.toFile();
+        if (!folder.exists()){
+            boolean created = folder.mkdirs();
+            if (!created) {
+                LOGGER.error("Failed to create config folder");
+                return;
+            }
+        }
         File file = path.toFile();
         Gson gson = new GsonBuilder()
                 .setPrettyPrinting()
