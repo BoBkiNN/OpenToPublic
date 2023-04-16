@@ -3,9 +3,8 @@ package xyz.bobkinn_.opentopublic;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.toast.SystemToast;
 import net.minecraft.server.world.ServerWorld;
-import net.minecraft.text.LiteralText;
+import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
-import net.minecraft.text.TranslatableText;
 import net.minecraft.util.WorldSavePath;
 
 import java.nio.file.Path;
@@ -14,8 +13,8 @@ public class Util {
     static MinecraftClient mc = MinecraftClient.getInstance();
     public static Path savesFolder = MinecraftClient.getInstance().getLevelStorage().getSavesDirectory();
 
-    public static TranslatableText on = new TranslatableText("options.on");
-    public static TranslatableText off = new TranslatableText("options.off");
+    public static MutableText on = Text.translatable("options.on");
+    public static MutableText off = Text.translatable("options.off");
 
     /**
      * Get world folder name
@@ -42,12 +41,12 @@ public class Util {
         return world.getServer().getSavePath(WorldSavePath.LEVEL_DAT).toAbsolutePath().getParent();
     }
 
-    public static TranslatableText translateYN(boolean bool){
+    public static MutableText translateYN(boolean bool){
         return bool ? on : off;
     }
 
-    public static TranslatableText parseYN(String key, boolean onlineMode) {
-        return new TranslatableText(key,  Util.translateYN(onlineMode));
+    public static MutableText parseYN(String key, boolean onlineMode) {
+        return Text.translatable(key,  Util.translateYN(onlineMode));
     }
 
     public static void addChatMsg(Text text){
@@ -57,21 +56,21 @@ public class Util {
 
     @SuppressWarnings("unused")
     public static void addChatMsg(String text){
-        addChatMsg(new LiteralText(text));
+        addChatMsg(Text.literal(text));
     }
 
     public static void atSuccessOpen(boolean successOpen){
-        TranslatableText successWAN;
+        MutableText successWAN;
         String ip = (OpenToPublic.upnpIp == null) ? "0.0.0.0" : OpenToPublic.upnpIp;
         if (!OpenToPublic.cfg.isHideIps()) {
-            successWAN = new TranslatableText("opentopublic.publish.started_wan", ip + ":" + OpenToPublic.customPort);
+            successWAN = Text.translatable("opentopublic.publish.started_wan", ip + ":" + OpenToPublic.customPort);
         } else {
-            successWAN = new TranslatableText("opentopublic.publish.started_wan_noIp", Integer.toString(OpenToPublic.customPort));
+            successWAN = Text.translatable("opentopublic.publish.started_wan_noIp", Integer.toString(OpenToPublic.customPort));
         }
-        TranslatableText text;
-        if (OpenToPublic.openPublic.isTrue() || OpenToPublic.openPublic.isThird()) text = successOpen ? successWAN : new TranslatableText("opentopublic.publish.failed_wan");
+        MutableText text;
+        if (OpenToPublic.openPublic.isTrue() || OpenToPublic.openPublic.isThird()) text = successOpen ? successWAN : Text.translatable("opentopublic.publish.failed_wan");
         else {
-            text = successOpen ? new TranslatableText("commands.publish.started", OpenToPublic.customPort) : new TranslatableText("commands.publish.failed");
+            text = successOpen ? Text.translatable("commands.publish.started", OpenToPublic.customPort) : Text.translatable("commands.publish.failed");
         }
         if (mc == null) return;
         Util.addChatMsg(text);

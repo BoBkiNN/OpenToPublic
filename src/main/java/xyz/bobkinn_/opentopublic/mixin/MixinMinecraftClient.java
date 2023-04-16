@@ -40,8 +40,6 @@ public abstract class MixinMinecraftClient {
     @Shadow
     private @Nullable IntegratedServer server;
 
-    @Shadow public abstract boolean isModded();
-
     @Shadow public abstract boolean isConnectedToRealms();
 
     @Shadow public abstract @Nullable ClientPlayNetworkHandler getNetworkHandler();
@@ -53,7 +51,7 @@ public abstract class MixinMinecraftClient {
     @Overwrite
     private String getWindowTitle(){
         StringBuilder stringBuilder = new StringBuilder("Minecraft");
-        if (this.isModded()) {
+        if (MinecraftClient.getModStatus().isModded()) {
             stringBuilder.append("*");
         }
         stringBuilder.append(" ");

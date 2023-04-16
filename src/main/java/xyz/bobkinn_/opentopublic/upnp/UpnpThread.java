@@ -1,7 +1,7 @@
 package xyz.bobkinn_.opentopublic.upnp;
 
 import com.dosse.upnp.UPnP;
-import net.minecraft.text.TranslatableText;
+import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import xyz.bobkinn_.opentopublic.OpenToPublic;
 import xyz.bobkinn_.opentopublic.PortContainer;
@@ -32,13 +32,13 @@ public class UpnpThread extends Thread{
             }
             UpnpEx err = (UpnpEx) e;
             if (err.getType() == UpnpEnum.CHECK_AVAILABLE){
-                Util.addChatMsg(new TranslatableText("opentopublic.message.upnp_not_available").formatted(Formatting.RED));
+                Util.addChatMsg(Text.translatable("opentopublic.message.upnp_not_available").formatted(Formatting.RED));
                 OpenToPublic.LOGGER.error(err.getEx());
             } else if (err.getType() == UpnpEnum.FAIL_GET_IP) {
                 OpenToPublic.LOGGER.error("Failed to get ip:", e);
-                Util.addChatMsg(new TranslatableText("opentopublic.publish.failed_wan").formatted(Formatting.RED));
+                Util.addChatMsg(Text.translatable("opentopublic.publish.failed_wan").formatted(Formatting.RED));
             } else if (err.getType() == UpnpEnum.OPEN_PORT) {
-                Util.addChatMsg(new TranslatableText("opentopublic.publish.failed_wan").formatted(Formatting.RED));
+                Util.addChatMsg(Text.translatable("opentopublic.publish.failed_wan").formatted(Formatting.RED));
             }
         }
     }
@@ -104,7 +104,7 @@ public class UpnpThread extends Thread{
             available = UPnP.isUPnPAvailable();
             if (!available) throw new RuntimeException("not available");
         } catch (Exception e){
-            Util.addChatMsg(new TranslatableText("opentopublic.message.upnp_not_available").formatted(Formatting.RED));
+            Util.addChatMsg(Text.translatable("opentopublic.message.upnp_not_available").formatted(Formatting.RED));
             throw new UpnpEx(UpnpEnum.CHECK_AVAILABLE, e);
         }
 
@@ -129,14 +129,14 @@ public class UpnpThread extends Thread{
             try {
                 if (!UPnP.openPortTCP(port)) throw new RuntimeException();
             } catch (Exception e){
-                Util.addChatMsg(new TranslatableText("opentopublic.message.additional_open_fail", port +" [TCP]").formatted(Formatting.RED));
+                Util.addChatMsg(Text.translatable("opentopublic.message.additional_open_fail", port +" [TCP]").formatted(Formatting.RED));
             }
         }
         for (int port : PortContainer.self.getUdpPorts()){
             try {
                 if (!UPnP.openPortUDP(port)) throw new RuntimeException();
             } catch (Exception e){
-                Util.addChatMsg(new TranslatableText("opentopublic.message.additional_open_fail", port +" [UDP]").formatted(Formatting.RED));
+                Util.addChatMsg(Text.translatable("opentopublic.message.additional_open_fail", port +" [UDP]").formatted(Formatting.RED));
             }
         }
 

@@ -24,7 +24,7 @@
     "opentopublic.mixins.json"
   ],
   "depends": {
-    "fabricloader": ">=0.14.14",
-    "minecraft": "1.16.5"
+    "fabricloader": ">=0.14.19",
+    "minecraft": "1.19.2"
   }
 }
