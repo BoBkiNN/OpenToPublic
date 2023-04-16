@@ -15,7 +15,7 @@ public class OtpPersistentState extends PersistentState {
 
     private static final String DATA_NAME = "lanOptions";
     private NbtCompound data;
-    // i am lazy to register this to PersistentStateManager
+    // I am lazy to register this to PersistentStateManager
 
     public OtpPersistentState() {
         data = new NbtCompound();
@@ -63,6 +63,7 @@ public class OtpPersistentState extends PersistentState {
                 Files.createDirectory(dataFolder.toPath());
             }
             File outputFile = new File(dataFolder, DATA_NAME+".dat");
+            setDirty(true);
             save(outputFile);
         } catch (IOException e) {
             OpenToPublic.LOGGER.error("Could not save data", e);

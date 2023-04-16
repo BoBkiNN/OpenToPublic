@@ -43,7 +43,7 @@ public abstract class MixinLanServerScreen extends Screen {
     MotdInputTextField motdInput;
 
     @Shadow
-    private String gameMode = "survival";
+    private GameMode gameMode = GameMode.SURVIVAL;
     @Shadow
     private boolean allowCommands;
 
@@ -66,7 +66,7 @@ public abstract class MixinLanServerScreen extends Screen {
         ci.cancel();
     }
 
-    @Redirect(method = "init", at = @At(value = "INVOKE",ordinal = 0, target = "Lnet/minecraft/client/gui/screen/OpenToLanScreen;addDrawableChild(Lnet/minecraft/client/gui/Element;)Lnet/minecraft/client/gui/Element;"))
+    @Redirect(method = "init", at = @At(value = "INVOKE",ordinal = 2, target = "Lnet/minecraft/client/gui/screen/OpenToLanScreen;addDrawableChild(Lnet/minecraft/client/gui/Element;)Lnet/minecraft/client/gui/Element;"))
     private Element addButtonRedirect(OpenToLanScreen instance, Element element) {
         ClickableWidget newBtn = new ButtonWidget(this.width / 2 - 155, this.height - 28, 150, 20, Text.translatable("lanServer.start"), buttonWidget -> {
             if (this.client == null) return;
@@ -111,7 +111,7 @@ public abstract class MixinLanServerScreen extends Screen {
                 PortContainer.saveBackup(PortContainer.self, OpenToPublic.backupFile);
             }
 
-            boolean successOpen = server.openToLan(GameMode.byName(this.gameMode), this.allowCommands, OpenToPublic.customPort);
+            boolean successOpen = server.openToLan(this.gameMode, this.allowCommands, OpenToPublic.customPort);
             ((ServerMetadataAccessor) server).getMetadata().setDescription(Text.translatable(Util.parseValues(motd, playerName, worldName)));
 
             if (doUPnP) {
@@ -217,7 +217,7 @@ public abstract class MixinLanServerScreen extends Screen {
         // motd input
         motdInput = new MotdInputTextField(this.textRenderer, this.width / 2 -155, 215, 311, 20, Text.translatable("opentopublic.button.motd"), motd);
         this.addDrawableChild(motdInput);
-
+        updateButtonText();
     }
 
 
