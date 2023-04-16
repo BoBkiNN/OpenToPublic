@@ -31,7 +31,7 @@ import static xyz.bobkinn_.opentopublic.client.PortInputTextField.validatePort;
 
 @Mixin(value = OpenToLanScreen.class)
 public abstract class MixinLanServerScreen extends Screen {
-    Screen parent;
+    final Screen parent;
     protected MixinLanServerScreen(Text title, Screen parent) {
         super(title);
         this.parent=parent;

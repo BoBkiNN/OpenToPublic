@@ -10,7 +10,7 @@ import xyz.bobkinn_.opentopublic.Util;
 import java.util.ArrayList;
 
 public class UpnpThread extends Thread{
-    public boolean doSetup;
+    public final boolean doSetup;
     public UpnpThread(boolean doSetup){
         super("UpnpWorksThread");
         this.doSetup = doSetup;
