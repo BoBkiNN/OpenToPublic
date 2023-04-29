@@ -112,7 +112,9 @@ public abstract class MixinLanServerScreen extends Screen {
             }
 
             boolean successOpen = server.openToLan(this.gameMode, this.allowCommands, OpenToPublic.customPort);
-            ((ServerMetadataAccessor) server).getMetadata().setDescription(Text.translatable(Util.parseValues(motd, playerName, worldName)));
+
+            String parsedMotd = Util.parseValues(motd, playerName, worldName);
+            ((ServerMetadataAccessor) server).getMetadata().setDescription(Text.literal(parsedMotd));
 
             if (doUPnP) {
                 Util.displayToast(Text.translatable("opentopublic.toast.upnp_in_process.title"), Text.translatable("opentopublic.toast.upnp_in_process.desc"));

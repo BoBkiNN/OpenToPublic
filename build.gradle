@@ -106,28 +106,14 @@ def replaceText(String fileName, String targetText, String textToReplace) {
 
 jar {
 //    dependsOn fatJar
-    from files('libs/WaifUPnP.jar').collect {
+    List<Object> toTree = new ArrayList<>()
+    toTree.add('libs/WaifUPnP.jar')
+    duplicatesStrategy = DuplicatesStrategy.INCLUDE
+    from files(toTree).collect {
         zipTree(it)
     }
     from("LICENSE") {
         rename { "${it}_${project.archivesBaseName}" }
     }
 //    dependsOn fatJar
-}
-
-// configure the maven publication
-publishing {
-    publications {
-        mavenJava(MavenPublication) {
-            from components.java
-        }
-    }
-
-    // See https://docs.gradle.org/current/userguide/publishing_maven.html for information on how to set up publishing.
-    repositories {
-        // Add repositories to publish to here.
-        // Notice: This block does NOT have the same function as the block in the top level.
-        // The repositories here will be used for publishing your artifact, not for
-        // retrieving dependencies.
-    }
 }
