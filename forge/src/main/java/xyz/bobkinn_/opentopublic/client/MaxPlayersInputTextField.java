@@ -1,22 +1,22 @@
 package xyz.bobkinn_.opentopublic.client;
 
-import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.gui.widget.TextFieldWidget;
-import net.minecraft.util.text.TextComponent;
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.components.EditBox;
+import net.minecraft.network.chat.Component;
 
-public class MaxPlayersInputTextField extends TextFieldWidget {
+public class MaxPlayersInputTextField extends EditBox {
     private final int defaultVal;
 
-    public MaxPlayersInputTextField(FontRenderer textRenderer, int x, int y, int width, int height, TextComponent name, int defaultVal) {
+    public MaxPlayersInputTextField(Font textRenderer, int x, int y, int width, int height, Component name, int defaultVal) {
         super(textRenderer, x, y, width, height, name);
         this.defaultVal = defaultVal;
-        this.setText(String.valueOf(defaultVal));
+        this.setValue(String.valueOf(defaultVal));
         // Check the format, make sure the text is a valid integer
         this.setResponder((text) -> this.setTextColor(validateNum(text) >= 0 ? 0xFFFFFF : 0xFF5555));
     }
 
     public int getVal() {
-        int maxPlayers = validateNum(getText());
+        int maxPlayers = validateNum(getValue());
         return String.valueOf(maxPlayers).length() > 0 ? maxPlayers : defaultVal;
     }
 

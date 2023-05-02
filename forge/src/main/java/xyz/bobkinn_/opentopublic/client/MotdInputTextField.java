@@ -1,16 +1,16 @@
 package xyz.bobkinn_.opentopublic.client;
 
-import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.gui.widget.TextFieldWidget;
-import net.minecraft.util.text.TextComponent;
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.components.EditBox;
+import net.minecraft.network.chat.Component;
 
-public class MotdInputTextField extends TextFieldWidget {
+public class MotdInputTextField extends EditBox {
     private String entered;
 
-    public MotdInputTextField(FontRenderer textRenderer, int x, int y, int width, int height, TextComponent name, String defaultMotd) {
+    public MotdInputTextField(Font textRenderer, int x, int y, int width, int height, Component name, String defaultMotd) {
         super(textRenderer, x, y, width, height, name);
-        this.setMaxStringLength(80);
-        this.setText(defaultMotd);
+        this.setMaxLength(80);
+        this.setValue(defaultMotd);
         this.entered = defaultMotd;
         this.setResponder((text) -> {
             this.setTextColor(validate(text) != null ? 0xFFFFFF : 0xFF5555);

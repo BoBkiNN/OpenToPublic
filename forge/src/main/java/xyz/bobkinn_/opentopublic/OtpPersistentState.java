@@ -1,31 +1,30 @@
 package xyz.bobkinn_.opentopublic;
 
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.CompressedStreamTools;
-import net.minecraft.world.server.ServerWorld;
-import net.minecraft.util.SharedConstants;
-import net.minecraft.world.storage.WorldSavedData;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtIo;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.saveddata.SavedData;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-public class OtpPersistentState extends WorldSavedData {
+public class OtpPersistentState extends SavedData {
 
     private static final String DATA_NAME = "lanOptions";
-    private CompoundNBT data;
+    private CompoundTag data;
 
     public OtpPersistentState() {
-        super(DATA_NAME);
-        data = new CompoundNBT();
+        data = new CompoundTag();
     }
 
     /**
      * Get nbt stored in class
      * @return nbt
      */
-    public CompoundNBT getData() {
+    public CompoundTag getData() {
         return data;
     }
 
@@ -33,51 +32,37 @@ public class OtpPersistentState extends WorldSavedData {
      * Set nbt compound to class
      * @param data nbt
      */
-    public void setData(CompoundNBT data){
+    public void setData(CompoundTag data){
         this.data = data;
-    }
-
-    /**
-     * get class instance
-     * @param world integrated server world
-     * @return class instance
-     */
-    public static OtpPersistentState get(ServerWorld world) {
-        return world.getSavedData().getOrCreate(OtpPersistentState::new, DATA_NAME);
     }
 
     /**
      * Get nbt data from main container
      * @param tag file data
      */
-    @Override
-    public void read(CompoundNBT tag) {
+    public void fromNbt(@NotNull CompoundTag tag) {
         data = tag.getCompound("data");
     }
 
     @Override
-    public CompoundNBT write(CompoundNBT tag) {
-        tag.put("data", data);
-        return tag;
+    public @NotNull CompoundTag save(@NotNull CompoundTag tag) {
+        return data;
     }
 
     /**
      * Save nbt file to world 'data' folder
      * @param world integrated server world
      */
-    public void saveToFile(ServerWorld world) {
+    public void saveToFile(@NotNull ServerLevel world) {
         try {
-            Path worldDir = world.getServer().getDataDirectory().toPath().resolve(Util.savesFolder).resolve(Util.getLevelName(world));
+            Path worldDir = world.getServer().getServerDirectory().toPath().resolve(Util.savesFolder).resolve(Util.getLevelName(world));
             File dataFolder = new File(worldDir.toFile(), "data");
             if (!dataFolder.exists()) {
                 Files.createDirectory(dataFolder.toPath());
             }
             File outputFile = new File(dataFolder, DATA_NAME+".dat");
-            CompoundNBT tag = new CompoundNBT();
-            write(tag);
-            CompoundNBT compressedTag = tag.copy();
-            compressedTag.putInt("DataVersion", SharedConstants.getVersion().getWorldVersion());
-            CompressedStreamTools.writeCompressed(compressedTag, outputFile);
+            setDirty(true);
+            save(outputFile);
         } catch (IOException e) {
             OpenToPublic.LOGGER.error("Could not save data", e);
         }
@@ -87,9 +72,9 @@ public class OtpPersistentState extends WorldSavedData {
      * Load nbt from world 'data' folder
      * @param world integrated server world
      */
-    public void loadFromFile(ServerWorld world) {
+    public void loadFromFile(ServerLevel world) {
         try {
-            Path worldDir = world.getServer().getDataDirectory().toPath().resolve(Util.savesFolder).resolve(Util.getLevelName(world));
+            Path worldDir = world.getServer().getServerDirectory().toPath().resolve(Util.savesFolder).resolve(Util.getLevelName(world));
             File dataFolder = new File(worldDir.toFile(), "data");
             if (!dataFolder.exists()) {
                 return;
@@ -98,10 +83,10 @@ public class OtpPersistentState extends WorldSavedData {
             if (!inputFile.exists()) {
                 return;
             }
-            CompoundNBT compressedTag = CompressedStreamTools.readCompressed(inputFile);
-            CompoundNBT tag = compressedTag.copy();
+            CompoundTag compressedTag = NbtIo.readCompressed(inputFile);
+            CompoundTag tag = compressedTag.copy();
             tag.remove("DataVersion");
-            read(tag);
+            fromNbt(tag);
         } catch (IOException e) {
             OpenToPublic.LOGGER.error("Could not load data", e);
         }
