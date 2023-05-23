@@ -26,11 +26,10 @@ public class UpnpThread extends Thread{
     public static class Handler implements UncaughtExceptionHandler {
         @Override
         public void uncaughtException(Thread t, Throwable e) {
-            if (!(e instanceof UpnpEx)) {
+            if (!(e instanceof UpnpEx err)) {
                 OpenToPublic.LOGGER.error("Exception in UpnpWorksThread: ", e);
                 return;
             }
-            UpnpEx err = (UpnpEx) e;
             if (err.getType() == UpnpEnum.CHECK_AVAILABLE){
                 Util.addChatMsg(Text.translatable("opentopublic.message.upnp_not_available").formatted(Formatting.RED));
                 OpenToPublic.LOGGER.error(err.getEx());

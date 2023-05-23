@@ -3,8 +3,7 @@ package xyz.bobkinn_.opentopublic;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.toast.SystemToast;
 import net.minecraft.server.world.ServerWorld;
-import net.minecraft.text.MutableText;
-import net.minecraft.text.Text;
+import net.minecraft.text.*;
 import net.minecraft.util.WorldSavePath;
 
 import java.nio.file.Path;
@@ -13,8 +12,8 @@ public class Util {
     static MinecraftClient mc = MinecraftClient.getInstance();
     public static Path savesFolder = MinecraftClient.getInstance().getLevelStorage().getSavesDirectory();
 
-    public static MutableText on = Text.translatable("options.on");
-    public static MutableText off = Text.translatable("options.off");
+    public static final MutableText on = Text.translatable("options.on");
+    public static final MutableText off = Text.translatable("options.off");
 
     /**
      * Get world folder name
@@ -63,7 +62,15 @@ public class Util {
         MutableText successWAN;
         String ip = (OpenToPublic.upnpIp == null) ? "0.0.0.0" : OpenToPublic.upnpIp;
         if (!OpenToPublic.cfg.isHideIps()) {
-            successWAN = Text.translatable("opentopublic.publish.started_wan", ip + ":" + OpenToPublic.customPort);
+            successWAN = Text.translatable("opentopublic.publish.started_wan", ip + ":" + OpenToPublic.customPort)
+                    .styled(
+                            (style -> style.withClickEvent(
+                                    new ClickEvent(
+                                            ClickEvent.Action.COPY_TO_CLIPBOARD, ip + ":" + OpenToPublic.customPort
+                                    ))
+                            .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.translatable("chat.copy.click")))
+                            )
+                    );
         } else {
             successWAN = Text.translatable("opentopublic.publish.started_wan_noIp", Integer.toString(OpenToPublic.customPort));
         }

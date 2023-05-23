@@ -5,10 +5,11 @@ import net.minecraft.SharedConstants;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.client.resource.language.I18n;
+import net.minecraft.client.util.Window;
 import net.minecraft.server.integrated.IntegratedServer;
 import org.jetbrains.annotations.Nullable;
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -44,12 +45,14 @@ public abstract class MixinMinecraftClient {
 
     @Shadow public abstract @Nullable ClientPlayNetworkHandler getNetworkHandler();
 
-    /**
-     * @author BoBkiNN_
-     * @reason additional entries
-     */
-    @Overwrite
-    private String getWindowTitle(){
+    @Shadow @Final private Window window;
+
+    @Inject(method = "updateWindowTitle", at = @At("RETURN"))
+    public void onUpdateWindowTitle(CallbackInfo ci){
+        this.window.setTitle(getTitle());
+    }
+
+    public String getTitle(){
         StringBuilder stringBuilder = new StringBuilder("Minecraft");
         if (MinecraftClient.getModStatus().isModded()) {
             stringBuilder.append("*");

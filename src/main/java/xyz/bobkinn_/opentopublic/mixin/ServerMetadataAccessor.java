@@ -5,10 +5,15 @@ import net.minecraft.server.ServerMetadata;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Mutable;
 import org.spongepowered.asm.mixin.gen.Accessor;
+import org.spongepowered.asm.mixin.gen.Invoker;
 
 @Mixin(MinecraftServer.class)
 public interface ServerMetadataAccessor {
 
-    @Mutable @Accessor("metadata")
-    ServerMetadata getMetadata();
+    @Invoker("createMetadata")
+    ServerMetadata createMetadata();
+
+    @Mutable
+    @Accessor
+    void setMetadata(ServerMetadata metadata);
 }
