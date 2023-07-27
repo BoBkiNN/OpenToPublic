@@ -51,7 +51,7 @@ public abstract class MixinMinecraftClient {
      * @reason additional entries
      */
     @Overwrite
-    private String getWindowTitle(){
+    public String getWindowTitle(){
         StringBuilder stringBuilder = new StringBuilder("Minecraft");
         if (this.isModdedClient()) {
             stringBuilder.append("*");

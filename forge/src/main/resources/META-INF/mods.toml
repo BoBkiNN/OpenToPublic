@@ -20,7 +20,7 @@ modId = "opentopublic" #mandatory
 # ${file.jarVersion} will substitute the value of the Implementation-Version as read from the mod's JAR file metadata
 # see the associated build.gradle script for how to populate this completely automatically during a build
 #version = "${project.mod_version}" #mandatory idk why not working
-version = "1.1-b13-R-Forge_1.16.5"
+version = "1.1.14-Forge_1.16.5"
 # A display name for the mod
 displayName = "OpenToPublic" #mandatory
 # A URL to query for updates for this mod. See the JSON update specification <here>

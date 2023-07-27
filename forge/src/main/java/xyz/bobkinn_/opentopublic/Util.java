@@ -2,8 +2,11 @@ package xyz.bobkinn_.opentopublic;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.toasts.SystemToast;
+import net.minecraft.util.text.IFormattableTextComponent;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.util.text.event.ClickEvent;
+import net.minecraft.util.text.event.HoverEvent;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.storage.FolderName;
@@ -61,14 +64,18 @@ public class Util {
     }
 
     public static void atSuccessOpen(boolean successOpen){
-        TranslationTextComponent successWAN;
+        IFormattableTextComponent successWAN;
         String ip = (OpenToPublic.upnpIp == null) ? "0.0.0.0" : OpenToPublic.upnpIp;
         if (!OpenToPublic.cfg.isHideIps()) {
-            successWAN = new TranslationTextComponent("opentopublic.publish.started_wan", ip + ":" + OpenToPublic.customPort);
+            successWAN = new TranslationTextComponent("opentopublic.publish.started_wan", ip + ":" + OpenToPublic.customPort)
+                    .modifyStyle((style -> style.setClickEvent(new ClickEvent(
+                            ClickEvent.Action.COPY_TO_CLIPBOARD, ip+":"+OpenToPublic.customPort))
+                            .setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TranslationTextComponent("chat.copy.click"))
+                    )));
         } else {
             successWAN = new TranslationTextComponent("opentopublic.publish.started_wan_noIp", Integer.toString(OpenToPublic.customPort));
         }
-        TranslationTextComponent text;
+        IFormattableTextComponent text;
         if (OpenToPublic.openPublic.isTrue() || OpenToPublic.openPublic.isThird()) text = successOpen ? successWAN : new TranslationTextComponent("opentopublic.publish.failed_wan");
         else {
             text = successOpen ? new TranslationTextComponent("commands.publish.started", OpenToPublic.customPort) : new TranslationTextComponent("commands.publish.failed");
