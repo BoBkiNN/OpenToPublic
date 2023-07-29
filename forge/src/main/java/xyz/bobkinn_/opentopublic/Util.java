@@ -2,7 +2,9 @@ package xyz.bobkinn_.opentopublic;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.toasts.SystemToast;
+import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.HoverEvent;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.storage.LevelResource;
@@ -63,7 +65,15 @@ public class Util {
         MutableComponent successWAN;
         String ip = (OpenToPublic.upnpIp == null) ? "0.0.0.0" : OpenToPublic.upnpIp;
         if (!OpenToPublic.cfg.isHideIps()) {
-            successWAN = Component.translatable("opentopublic.publish.started_wan", ip + ":" + OpenToPublic.customPort);
+            successWAN = Component.translatable("opentopublic.publish.started_wan", ip + ":" + OpenToPublic.customPort)
+                    .withStyle(
+                            (style -> style.withClickEvent(
+                                    new ClickEvent(
+                                            ClickEvent.Action.COPY_TO_CLIPBOARD, ip + ":" + OpenToPublic.customPort
+                                    ))
+                            .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.translatable("chat.copy.click")))
+                            )
+                    );
         } else {
             successWAN = Component.translatable("opentopublic.publish.started_wan_noIp", Integer.toString(OpenToPublic.customPort));
         }
