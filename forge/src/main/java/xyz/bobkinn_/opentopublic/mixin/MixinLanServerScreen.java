@@ -1,7 +1,7 @@
 package xyz.bobkinn_.opentopublic.mixin;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.components.events.GuiEventListener;
@@ -49,22 +49,20 @@ public abstract class MixinLanServerScreen extends Screen {
     @Shadow
     private boolean commands;
 
-    @Shadow public abstract void render(@NotNull PoseStack matrices, int mouseX, int mouseY, float delta);
-
     int enteredPort = OpenToPublic.customPort;
     int enteredMaxPN = OpenToPublic.maxPlayers;
     String motd = null;
 
     @Inject(at = @At("HEAD"), method = "render", cancellable = true)
-    public void render(PoseStack matrices, int mouseX, int mouseY, float delta, CallbackInfo ci) {
-        this.renderBackground(matrices);
-        drawCenteredString(matrices, this.font, this.title, this.width / 2, 50, 0xFFFFFF);
-        drawCenteredString(matrices, this.font, Component.translatable("opentopublic.gui.new_player_settings"), this.width / 2, 82, 0xFFFFFF);
-        drawCenteredString(matrices, this.font, Component.translatable("opentopublic.gui.server_settings"), this.width / 2, 130, 0xFFFFFF);
-        drawString(matrices, this.font, Component.translatable("opentopublic.button.port"), this.width / 2 - 154, this.height - 48, 0xFFFFFF);
-        drawString(matrices, this.font, Component.translatable("opentopublic.button.max_players"), this.width / 2 - 154, 168, 0xFFFFFF);
-        drawString(matrices, this.font, Component.translatable("opentopublic.button.motd"), this.width / 2 - 154, 204, 0xFFFFFF);
-        super.render(matrices, mouseX, mouseY, delta);
+    public void render(GuiGraphics ctx, int mouseX, int mouseY, float delta, @NotNull CallbackInfo ci) {
+        this.renderBackground(ctx);
+        ctx.drawCenteredString(this.font, this.title, this.width / 2, 50, 0xFFFFFF);
+        ctx.drawCenteredString(this.font, Component.translatable("opentopublic.gui.new_player_settings"), this.width / 2, 82, 0xFFFFFF);
+        ctx.drawCenteredString(this.font, Component.translatable("opentopublic.gui.server_settings"), this.width / 2, 130, 0xFFFFFF);
+        ctx.drawString(this.font, Component.translatable("opentopublic.button.port"), this.width / 2 - 154, this.height - 48, 0xFFFFFF);
+        ctx.drawString(this.font, Component.translatable("opentopublic.button.max_players"), this.width / 2 - 154, 168, 0xFFFFFF);
+        ctx.drawString(this.font, Component.translatable("opentopublic.button.motd"), this.width / 2 - 154, 204, 0xFFFFFF);
+        super.render(ctx, mouseX, mouseY, delta);
         ci.cancel();
     }
 
