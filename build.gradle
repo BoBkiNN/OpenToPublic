@@ -6,7 +6,7 @@ plugins {
 }
 
 version = project.mod_version
-def semVer = version.split("-")[0]+".0"
+def semVer = version.split("-")[0]
 group = project.maven_group
 
 println("Fabric mod version: "+version+ " ("+semVer+")")

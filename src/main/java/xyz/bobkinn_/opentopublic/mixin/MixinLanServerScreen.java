@@ -1,6 +1,7 @@
 package xyz.bobkinn_.opentopublic.mixin;
 
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.screen.OpenToLanScreen;
 import net.minecraft.client.gui.screen.Screen;
@@ -8,7 +9,6 @@ import net.minecraft.client.gui.tooltip.Tooltip;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.ClickableWidget;
 import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.ServerMetadata;
 import net.minecraft.server.integrated.IntegratedServer;
@@ -49,26 +49,38 @@ public abstract class MixinLanServerScreen extends Screen {
     @Shadow
     private boolean allowCommands;
 
-    @Shadow public abstract void render(MatrixStack matrices, int mouseX, int mouseY, float delta);
-
     int enteredPort = OpenToPublic.customPort;
     int enteredMaxPN = OpenToPublic.maxPlayers;
     String motd = null;
 
     @Inject(at = @At("HEAD"), method = "render", cancellable = true)
-    public void render(MatrixStack matrices, int mouseX, int mouseY, float delta, CallbackInfo ci) {
-        this.renderBackground(matrices);
-        OpenToLanScreen.drawCenteredTextWithShadow(matrices, this.textRenderer, this.title.asOrderedText(), this.width / 2, 50, 0xFFFFFF);
-        OpenToLanScreen.drawCenteredTextWithShadow(matrices, this.textRenderer, Text.translatable("opentopublic.gui.new_player_settings").asOrderedText(), this.width / 2, 82, 0xFFFFFF);
-        OpenToLanScreen.drawCenteredTextWithShadow(matrices, this.textRenderer, Text.translatable("opentopublic.gui.server_settings").asOrderedText(), this.width / 2, 130, 0xFFFFFF);
-        OpenToLanScreen.drawTextWithShadow(matrices, this.textRenderer, Text.translatable("opentopublic.button.port"), this.width / 2 - 154, this.height - 48, 0xFFFFFF);
-        OpenToLanScreen.drawTextWithShadow(matrices, this.textRenderer, Text.translatable("opentopublic.button.max_players"), this.width / 2 - 154, 168, 0xFFFFFF);
-        OpenToLanScreen.drawTextWithShadow(matrices, this.textRenderer, Text.translatable("opentopublic.button.motd"), this.width / 2 - 154, 204, 0xFFFFFF);
-        super.render(matrices, mouseX, mouseY, delta);
+    public void render(DrawContext context, int mouseX, int mouseY, float delta, CallbackInfo ci) {
+        this.renderBackground(context);
+        context.drawCenteredTextWithShadow(this.textRenderer, this.title.asOrderedText(), this.width / 2, 50, 0xFFFFFF);
+        context.drawCenteredTextWithShadow(this.textRenderer, Text.translatable("opentopublic.gui.new_player_settings").asOrderedText(), this.width / 2, 82, 0xFFFFFF);
+        context.drawCenteredTextWithShadow(this.textRenderer, Text.translatable("opentopublic.gui.server_settings").asOrderedText(), this.width / 2, 130, 0xFFFFFF);
+        context.drawTextWithShadow(this.textRenderer, Text.translatable("opentopublic.button.port"), this.width / 2 - 154, this.height - 48, 0xFFFFFF);
+        context.drawTextWithShadow(this.textRenderer, Text.translatable("opentopublic.button.max_players"), this.width / 2 - 154, 168, 0xFFFFFF);
+        context.drawTextWithShadow(this.textRenderer, Text.translatable("opentopublic.button.motd"), this.width / 2 - 154, 204, 0xFFFFFF);
+        super.render(context, mouseX, mouseY, delta);
         ci.cancel();
     }
 
     @Redirect(method = "init", at = @At(value = "INVOKE",ordinal = 2, target = "Lnet/minecraft/client/gui/screen/OpenToLanScreen;addDrawableChild(Lnet/minecraft/client/gui/Element;)Lnet/minecraft/client/gui/Element;"))
+    private Element redirectPort(OpenToLanScreen instance, Element element) {
+        // port enter field
+        PortInputTextField portField = new PortInputTextField(textRenderer, this.width / 2 - 154 + 147/2,
+                this.height - 54,
+                147/2, 20,
+                Text.translatable("opentopublic.button.port"), OpenToPublic.customPort);
+        portField.setChangedListener((text) -> {
+            portField.setEditableColor(validatePort(text) >= 0 ? 0xFFFFFF : 0xFF5555);
+            enteredPort = portField.getServerPort();
+        });
+        return this.addDrawableChild(portField);
+    }
+
+    @Redirect(method = "init", at = @At(value = "INVOKE",ordinal = 3, target = "Lnet/minecraft/client/gui/screen/OpenToLanScreen;addDrawableChild(Lnet/minecraft/client/gui/Element;)Lnet/minecraft/client/gui/Element;"))
     private Element addButtonRedirect(OpenToLanScreen instance, Element element) {
         ButtonWidget.PressAction act = (w) -> {
             if (this.client == null) return;
@@ -179,17 +191,6 @@ public abstract class MixinLanServerScreen extends Screen {
                 .tooltip(wanTooltip)
                 .build();
         this.addDrawableChild(openToWan);
-
-        // port enter field
-        PortInputTextField portField = new PortInputTextField(textRenderer, this.width / 2 - 154 + 147/2,
-                this.height - 54,
-                147/2, 20,
-                Text.translatable("opentopublic.button.port"), OpenToPublic.customPort);
-        portField.setChangedListener((text) -> {
-            portField.setEditableColor(validatePort(text) >= 0 ? 0xFFFFFF : 0xFF5555);
-            enteredPort = portField.getServerPort();
-        });
-        this.addDrawableChild(portField);
 
         // online mode switch
         Tooltip onlineModeTooltip = Tooltip.of(Text.translatable("opentopublic.tooltip.online_mode_tooltip"));
