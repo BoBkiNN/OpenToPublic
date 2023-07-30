@@ -23,7 +23,7 @@ With this mod, you can make "Open to LAN" button open your world to outer networ
 If ON, then Minecraft will be check players for license, else players with cracked launchers can join
 
 ## More versions?
- \- yes, versions for 1.19.2 forge are planned
+ \- Currently versions for 1.20.1, 1.19.4/2, 1.16.5 are available. All for forge and fabric. If you want mod for other version, feel free to open new issue
 
 ## Credit
  - to ChatGPT for helping in development my first mod
