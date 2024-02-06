@@ -3,6 +3,7 @@ package xyz.bobkinn_.opentopublic.mixin;
 import net.minecraft.SharedConstants;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientPacketListener;
+import net.minecraft.client.multiplayer.ServerData;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.client.server.IntegratedServer;
 import net.minecraftforge.fml.loading.FMLPaths;
@@ -39,12 +40,11 @@ public abstract class MixinMinecraftClient {
         OpenToPublic.updateConfig(OpenToPublic.modConfigPath.resolve("config.json"));
     }
 
-    @Shadow public abstract boolean isConnectedToRealms();
-
     @Shadow @javax.annotation.Nullable public abstract ClientPacketListener getConnection();
 
     @Shadow @Nullable private IntegratedServer singleplayerServer;
 
+    @Shadow @Nullable public abstract ServerData getCurrentServer();
 
     /**
      * @author BoBkiNN_
@@ -61,9 +61,10 @@ public abstract class MixinMinecraftClient {
         ClientPacketListener clientPlayNetworkHandler = this.getConnection();
         if (clientPlayNetworkHandler != null && clientPlayNetworkHandler.getConnection().isConnected()) {
             stringBuilder.append(" - ");
+            var info = this.getCurrentServer();
             if (this.singleplayerServer != null && !this.singleplayerServer.isPublished() || OpenedStatus.current == null) {
                 stringBuilder.append(I18n.get("title.singleplayer"));
-            } else if (this.isConnectedToRealms()) {
+            } else if (info != null && info.isRealm()) {
                 stringBuilder.append(I18n.get("title.multiplayer.realms"));
             } else if (OpenedStatus.current == OpenedStatus.UPNP) {
                 stringBuilder.append(I18n.get("opentopublic.title.multiplayer.upnp"));

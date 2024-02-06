@@ -87,7 +87,7 @@ public class Util {
     }
 
     public static void displayToast(Component title, Component desc){
-        mc.getToasts().addToast(SystemToast.multiline(mc, SystemToast.SystemToastIds.TUTORIAL_HINT, title, desc));
+        mc.getToasts().addToast(SystemToast.multiline(mc, new SystemToast.SystemToastId(), title, desc));
     }
 
 }

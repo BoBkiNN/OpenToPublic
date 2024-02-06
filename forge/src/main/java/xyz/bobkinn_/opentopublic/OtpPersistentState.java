@@ -1,6 +1,7 @@
 package xyz.bobkinn_.opentopublic;
 
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtAccounter;
 import net.minecraft.nbt.NbtIo;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.saveddata.SavedData;
@@ -83,7 +84,7 @@ public class OtpPersistentState extends SavedData {
             if (!inputFile.exists()) {
                 return;
             }
-            CompoundTag compressedTag = NbtIo.readCompressed(inputFile);
+            CompoundTag compressedTag = NbtIo.readCompressed(inputFile.toPath(), NbtAccounter.unlimitedHeap());
             CompoundTag tag = compressedTag.copy();
             tag.remove("DataVersion");
             fromNbt(tag);

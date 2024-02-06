@@ -16,6 +16,7 @@ import net.minecraft.world.level.GameType;
 import org.jetbrains.annotations.NotNull;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
@@ -33,29 +34,31 @@ import static xyz.bobkinn_.opentopublic.client.PortInputTextField.validatePort;
 
 @Mixin(value = ShareToLanScreen.class)
 public abstract class MixinLanServerScreen extends Screen {
-    final Screen parent;
-    protected MixinLanServerScreen(Component title, Screen parent) {
+
+    protected MixinLanServerScreen(Component title) {
         super(title);
-        this.parent=parent;
     }
 
-    Button openToWan = null;
-    Button onlineModeButton = null;
-    Button pvpButton = null;
-    MotdInputTextField motdInput;
+    @Unique
+    private Button opentopublic$openToWan, opentopublic$onlineModeButton, opentopublic$pvpButton = null;
+    @Unique
+    private MotdInputTextField opentopublic$motdInput;
 
     @Shadow
     private GameType gameMode = GameType.SURVIVAL;
     @Shadow
     private boolean commands;
 
-    int enteredPort = OpenToPublic.customPort;
-    int enteredMaxPN = OpenToPublic.maxPlayers;
-    String motd = null;
+    @Unique
+    private int opentopublic$enteredPort = OpenToPublic.customPort;
+    @Unique
+    private int opentopublic$enteredMaxPN = OpenToPublic.maxPlayers;
+    @Unique
+    private String opentopublic$motd = null;
 
     @Inject(at = @At("HEAD"), method = "render", cancellable = true)
     public void render(GuiGraphics ctx, int mouseX, int mouseY, float delta, @NotNull CallbackInfo ci) {
-        this.renderBackground(ctx);
+        this.renderBackground(ctx, mouseX, mouseY, delta);
         ctx.drawCenteredString(this.font, this.title, this.width / 2, 50, 0xFFFFFF);
         ctx.drawCenteredString(this.font, Component.translatable("opentopublic.gui.new_player_settings"), this.width / 2, 82, 0xFFFFFF);
         ctx.drawCenteredString(this.font, Component.translatable("opentopublic.gui.server_settings"), this.width / 2, 130, 0xFFFFFF);
@@ -75,7 +78,7 @@ public abstract class MixinLanServerScreen extends Screen {
                 Component.translatable("opentopublic.button.port"), OpenToPublic.customPort);
         portField.setResponder((text) -> {
             portField.setTextColor(validatePort(text) >= 0 ? 0xFFFFFF : 0xFF5555);
-            enteredPort = portField.getServerPort();
+            opentopublic$enteredPort = portField.getServerPort();
         });
         this.addRenderableWidget(portField);
         return portField;
@@ -89,17 +92,17 @@ public abstract class MixinLanServerScreen extends Screen {
             String playerName = Minecraft.getInstance().getUser().getName();
             if (server == null) return;
 
-            if (validatePort(Integer.toString(enteredPort)) == -1) {
+            if (validatePort(Integer.toString(opentopublic$enteredPort)) == -1) {
                 return;
             }
-            if (MaxPlayersInputTextField.validateNum(Integer.toString(enteredMaxPN)) == -1) return;
-            String enteredMotd = motdInput.getMotd();
+            if (MaxPlayersInputTextField.validateNum(Integer.toString(opentopublic$enteredMaxPN)) == -1) return;
+            String enteredMotd = opentopublic$motdInput.getMotd();
             if (enteredMotd == null) return;
-            this.motd = enteredMotd;
+            this.opentopublic$motd = enteredMotd;
             String worldName = server.getWorldData().getLevelName();
 
-            OpenToPublic.customPort = enteredPort;
-            OpenToPublic.maxPlayers = enteredMaxPN;
+            OpenToPublic.customPort = opentopublic$enteredPort;
+            OpenToPublic.maxPlayers = opentopublic$enteredMaxPN;
 
             this.minecraft.setScreen(null);
 
@@ -109,12 +112,12 @@ public abstract class MixinLanServerScreen extends Screen {
 
             server.setPvpAllowed(OpenToPublic.enablePvp);
             server.setUsesAuthentication(OpenToPublic.onlineMode);
-            server.setMotd(Util.parseValues(motd, playerName, worldName));
+            server.setMotd(Util.parseValues(opentopublic$motd, playerName, worldName));
 
 //          OpenToPublic.LOGGER.info("Saving world custom data..");
             OtpPersistentState ps = new OtpPersistentState();
             CompoundTag nbt = ps.getData();
-            nbt.putString("motd", motd);
+            nbt.putString("motd", opentopublic$motd);
             nbt.putInt("maxPlayers", OpenToPublic.maxPlayers);
             nbt.putBoolean("enablePvp", OpenToPublic.enablePvp);
 //          OpenToPublic.LOGGER.info(nbt.toText().getString());
@@ -130,7 +133,7 @@ public abstract class MixinLanServerScreen extends Screen {
 
             boolean successOpen = server.publishServer(this.gameMode, this.commands, OpenToPublic.customPort);
 
-            String parsedMotd = Util.parseValues(motd, playerName, worldName);
+            String parsedMotd = Util.parseValues(opentopublic$motd, playerName, worldName);
             server.setMotd(parsedMotd);
             ServerStatus md = ((ServerMetadataAccessor) server).buildServerStatus();
             ((ServerMetadataAccessor) server).setStatus(md);
@@ -157,7 +160,7 @@ public abstract class MixinLanServerScreen extends Screen {
         if (player == null || server == null){
             return;
         }
-        this.motd = server.getMotd();
+        this.opentopublic$motd = server.getMotd();
 
         OpenToPublic.updateConfig(OpenToPublic.modConfigPath.resolve("config.json")); // update config
 
@@ -166,10 +169,10 @@ public abstract class MixinLanServerScreen extends Screen {
         OtpPersistentState ps = new OtpPersistentState();
         ps.loadFromFile(server.overworld());
         CompoundTag nbt = ps.getData();
-        if (nbt.contains("motd", 8)) this.motd = nbt.getString("motd");
-        if (nbt.contains("maxPlayers", 99)) this.enteredMaxPN = nbt.getInt("maxPlayers");
+        if (nbt.contains("motd", 8)) this.opentopublic$motd = nbt.getString("motd");
+        if (nbt.contains("maxPlayers", 99)) this.opentopublic$enteredMaxPN = nbt.getInt("maxPlayers");
         if (nbt.contains("enablePvp")) OpenToPublic.enablePvp = nbt.getBoolean("enablePvp");
-        OpenToPublic.maxPlayers = this.enteredMaxPN;
+        OpenToPublic.maxPlayers = this.opentopublic$enteredMaxPN;
 //      OpenToPublic.LOGGER.info("Loaded! "+ nbt);
 
 
@@ -184,59 +187,60 @@ public abstract class MixinLanServerScreen extends Screen {
         }
         Tooltip wanTooltip = Tooltip.create(Component.translatable(tooltipTextKey));
 
-        openToWan = Button.builder(
+        opentopublic$openToWan = Button.builder(
                         Component.translatable("opentopublic.button.open_public"),
                         (w) -> {
                             OpenToPublic.openPublic.next();
-                            updateButtonText();
+                            opentopublic$updateButtonText();
                         })
                 .bounds(this.width / 2 + 5, this.height - 54, 150, 20)
                 .tooltip(wanTooltip)
                 .build();
-        this.addRenderableWidget(openToWan);
+        this.addRenderableWidget(opentopublic$openToWan);
 
         // online mode switch
         Tooltip onlineModeTooltip = Tooltip.create(Component.translatable("opentopublic.tooltip.online_mode_tooltip"));
-        onlineModeButton = Button.builder(Util.parseYN("opentopublic.button.online_mode", OpenToPublic.onlineMode),
+        opentopublic$onlineModeButton = Button.builder(Util.parseYN("opentopublic.button.online_mode", OpenToPublic.onlineMode),
                         (w) -> {
                             OpenToPublic.onlineMode = !OpenToPublic.onlineMode;
-                            updateButtonText();
+                            opentopublic$updateButtonText();
                         })
                 .bounds(this.width / 2 - 155, 144, 150, 20)
                 .tooltip(onlineModeTooltip)
                 .build();
-        this.addRenderableWidget(onlineModeButton);
+        this.addRenderableWidget(opentopublic$onlineModeButton);
 
         // pvp on/off button
-        pvpButton = Button.builder(Util.parseYN("opentopublic.button.enable_pvp", OpenToPublic.enablePvp),
+        opentopublic$pvpButton = Button.builder(Util.parseYN("opentopublic.button.enable_pvp", OpenToPublic.enablePvp),
                         (w) -> {
                             OpenToPublic.enablePvp = ! OpenToPublic.enablePvp;
-                            updateButtonText();
+                            opentopublic$updateButtonText();
                         })
                 .bounds(this.width / 2 + 5, 144, 150, 20)
                 .build();
-        this.addRenderableWidget(pvpButton);
+        this.addRenderableWidget(opentopublic$pvpButton);
 
         // max player input field
         MaxPlayersInputTextField maxPlayers = new MaxPlayersInputTextField(this.font, this.width / 2 -155, 180, 150,20, Component.translatable("opentopublic.button.max_players"), OpenToPublic.maxPlayers);
         maxPlayers.setResponder((text) -> {
             maxPlayers.setTextColor(MaxPlayersInputTextField.validateNum(text) >= 0 ? 0xFFFFFF : 0xFF5555);
-            enteredMaxPN = maxPlayers.getVal();
+            opentopublic$enteredMaxPN = maxPlayers.getVal();
 //            player.sendMessage(new LiteralText("max players change: "+enteredMaxPN), false);
         });
         this.addRenderableWidget(maxPlayers);
 
         // motd input
-        motdInput = new MotdInputTextField(this.font, this.width / 2 -155, 215, 311, 20, Component.translatable("opentopublic.button.motd"), motd);
-        this.addRenderableWidget(motdInput);
-        updateButtonText();
+        opentopublic$motdInput = new MotdInputTextField(this.font, this.width / 2 -155, 215, 311, 20, Component.translatable("opentopublic.button.motd"), opentopublic$motd);
+        this.addRenderableWidget(opentopublic$motdInput);
+        opentopublic$updateButtonText();
     }
 
 
-    private void updateButtonText(){
-        if (OpenToPublic.openPublic.isTrue()) this.openToWan.setMessage(Component.translatable("opentopublic.button.open_public", Component.translatable("opentopublic.text.manual")));
-        else if (OpenToPublic.openPublic.isFalse()) this.openToWan.setMessage(Component.translatable("opentopublic.button.open_public", Util.off));
-        else if (OpenToPublic.openPublic.isThird()) this.openToWan.setMessage(Component.translatable("opentopublic.button.open_public", "UPnP"));
+    @Unique
+    private void opentopublic$updateButtonText(){
+        if (OpenToPublic.openPublic.isTrue()) this.opentopublic$openToWan.setMessage(Component.translatable("opentopublic.button.open_public", Component.translatable("opentopublic.text.manual")));
+        else if (OpenToPublic.openPublic.isFalse()) this.opentopublic$openToWan.setMessage(Component.translatable("opentopublic.button.open_public", Util.off));
+        else if (OpenToPublic.openPublic.isThird()) this.opentopublic$openToWan.setMessage(Component.translatable("opentopublic.button.open_public", "UPnP"));
         String wanTooltip;
         if (OpenToPublic.openPublic.isTrue()){
             wanTooltip = "opentopublic.tooltip.wan_tooltip.manual";
@@ -245,8 +249,8 @@ public abstract class MixinLanServerScreen extends Screen {
         } else {
             wanTooltip = "opentopublic.tooltip.wan_tooltip.upnp";
         }
-        this.openToWan.setTooltip(Tooltip.create(Component.translatable(wanTooltip)));
-        this.onlineModeButton.setMessage(Util.parseYN("opentopublic.button.online_mode", OpenToPublic.onlineMode));
-        this.pvpButton.setMessage(Util.parseYN("opentopublic.button.enable_pvp",  OpenToPublic.enablePvp));
+        this.opentopublic$openToWan.setTooltip(Tooltip.create(Component.translatable(wanTooltip)));
+        this.opentopublic$onlineModeButton.setMessage(Util.parseYN("opentopublic.button.online_mode", OpenToPublic.onlineMode));
+        this.opentopublic$pvpButton.setMessage(Util.parseYN("opentopublic.button.enable_pvp",  OpenToPublic.enablePvp));
     }
 }

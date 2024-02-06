@@ -13,6 +13,7 @@ import xyz.bobkinn_.opentopublic.upnp.UpnpThread;
 
 @Mixin(IntegratedServer.class)
 public abstract class MixinIntegratedServer {
+
     @Inject(method = "publishServer", at = @At("HEAD"))
     private void onLanStart(GameType p_120041_, boolean p_120042_, int p_120043_, CallbackInfoReturnable<Boolean> cir) {
         OpenToPublic.lanOpening = true;
@@ -26,9 +27,10 @@ public abstract class MixinIntegratedServer {
     @Inject(at = @At("HEAD"), method = "halt")
     private void atServerStop(boolean bl, CallbackInfo ci) {
         OpenedStatus.current = null;
+        var wasOpen = OpenToPublic.upnpIp != null;
         OpenToPublic.upnpIp = null;
         OpenToPublic.serverStopped = true;
-        if (OpenToPublic.openPublic.isThird()) UpnpThread.runClose();
+        if (OpenToPublic.openPublic.isThird() && wasOpen) UpnpThread.runClose();
     }
 }
 

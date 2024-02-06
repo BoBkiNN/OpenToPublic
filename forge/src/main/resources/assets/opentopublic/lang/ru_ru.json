@@ -18,7 +18,7 @@
   "opentopublic.message.additional_open_fail": "Дополнительный порт %s не был успешно открыт",
   "opentopublic.title.multiplayer.wan": "Сетевая игра (публичная)",
   "opentopublic.title.multiplayer.upnp": "Сетевая игра (публичная - UPnP)",
-  "opentopublic.toast.upnp_in_process.title": "Пожалйуста подождите",
+  "opentopublic.toast.upnp_in_process.title": "Пожалуйста подождите",
   "opentopublic.toast.upnp_in_process.desc": "Открытие игры с помощью UPnP в процессе..",
   "opentopublic.text.manual": "Вручную"
 }
