@@ -2,6 +2,7 @@ package xyz.bobkinn_.opentopublic;
 
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtIo;
+import net.minecraft.nbt.NbtSizeTracker;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.world.PersistentState;
 import org.jetbrains.annotations.NotNull;
@@ -86,7 +87,7 @@ public class OtpPersistentState extends PersistentState {
             if (!inputFile.exists()) {
                 return;
             }
-            NbtCompound compressedTag = NbtIo.readCompressed(inputFile);
+            NbtCompound compressedTag = NbtIo.readCompressed(inputFile.toPath(), NbtSizeTracker.ofUnlimitedBytes());
             NbtCompound tag = compressedTag.copy();
             tag.remove("DataVersion");
             fromNbt(tag);

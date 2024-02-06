@@ -16,6 +16,7 @@ import net.minecraft.text.Text;
 import net.minecraft.world.GameMode;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
@@ -33,29 +34,31 @@ import static xyz.bobkinn_.opentopublic.client.PortInputTextField.validatePort;
 
 @Mixin(value = OpenToLanScreen.class)
 public abstract class MixinLanServerScreen extends Screen {
-    final Screen parent;
-    protected MixinLanServerScreen(Text title, Screen parent) {
+
+    protected MixinLanServerScreen(Text title) {
         super(title);
-        this.parent=parent;
     }
 
-    ButtonWidget openToWan = null;
-    ButtonWidget onlineModeButton = null;
-    ButtonWidget pvpButton = null;
-    MotdInputTextField motdInput;
+    @Unique
+    private ButtonWidget openToWan, onlineModeButton, pvpButton = null;
+    @Unique
+    private MotdInputTextField motdInput;
 
     @Shadow
     private GameMode gameMode = GameMode.SURVIVAL;
     @Shadow
     private boolean allowCommands;
 
-    int enteredPort = OpenToPublic.customPort;
-    int enteredMaxPN = OpenToPublic.maxPlayers;
-    String motd = null;
+    @Unique
+    private int enteredPort = OpenToPublic.customPort;
+    @Unique
+    private int enteredMaxPN = OpenToPublic.maxPlayers;
+    @Unique
+    private String motd = null;
 
     @Inject(at = @At("HEAD"), method = "render", cancellable = true)
     public void render(DrawContext context, int mouseX, int mouseY, float delta, CallbackInfo ci) {
-        this.renderBackground(context);
+        this.renderBackground(context, mouseX, mouseY, delta);
         context.drawCenteredTextWithShadow(this.textRenderer, this.title.asOrderedText(), this.width / 2, 50, 0xFFFFFF);
         context.drawCenteredTextWithShadow(this.textRenderer, Text.translatable("opentopublic.gui.new_player_settings").asOrderedText(), this.width / 2, 82, 0xFFFFFF);
         context.drawCenteredTextWithShadow(this.textRenderer, Text.translatable("opentopublic.gui.server_settings").asOrderedText(), this.width / 2, 130, 0xFFFFFF);
@@ -230,6 +233,7 @@ public abstract class MixinLanServerScreen extends Screen {
     }
 
 
+    @Unique
     private void updateButtonText(){
         if (OpenToPublic.openPublic.isTrue()) this.openToWan.setMessage(Text.translatable("opentopublic.button.open_public", Text.translatable("opentopublic.text.manual")));
         else if (OpenToPublic.openPublic.isFalse()) this.openToWan.setMessage(Text.translatable("opentopublic.button.open_public", Util.off));

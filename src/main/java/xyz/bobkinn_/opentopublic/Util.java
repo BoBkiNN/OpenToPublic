@@ -3,7 +3,10 @@ package xyz.bobkinn_.opentopublic;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.toast.SystemToast;
 import net.minecraft.server.world.ServerWorld;
-import net.minecraft.text.*;
+import net.minecraft.text.ClickEvent;
+import net.minecraft.text.HoverEvent;
+import net.minecraft.text.MutableText;
+import net.minecraft.text.Text;
 import net.minecraft.util.WorldSavePath;
 
 import java.nio.file.Path;
@@ -84,7 +87,7 @@ public class Util {
     }
 
     public static void displayToast(Text title, Text desc){
-        mc.getToastManager().add(SystemToast.create(mc, SystemToast.Type.TUTORIAL_HINT, title, desc));
+        mc.getToastManager().add(SystemToast.create(mc, new SystemToast.Type(), title, desc));
     }
 
 }
