@@ -27,7 +27,7 @@ If ON, then Minecraft will be check players for license, else players with crack
 
 ## Credit
  - to ChatGPT for helping in development my first mod
- - to [Excal](https://github.com/ae7er) for testing
+ - to Excal for testing
  - to FasT1k (Discord ID: 631850581580972106) for testing
 
 ## config.json explanation
