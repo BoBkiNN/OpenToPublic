@@ -27,9 +27,10 @@ public abstract class MixinIntegratedServer {
     @Inject(at = @At("HEAD"), method = "stop")
     private void atServerStop(boolean bl, CallbackInfo ci) {
         OpenedStatus.current = null;
+        var wasOpen = OpenToPublic.upnpIp != null;
         OpenToPublic.upnpIp = null;
         OpenToPublic.serverStopped = true;
-        if (OpenToPublic.openPublic.isThird()) UpnpThread.runClose();
+        if (OpenToPublic.openPublic.isThird() && wasOpen) UpnpThread.runClose();
     }
 }
 

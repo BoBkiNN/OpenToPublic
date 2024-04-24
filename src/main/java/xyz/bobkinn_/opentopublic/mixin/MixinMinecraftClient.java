@@ -4,12 +4,15 @@ import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.SharedConstants;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
+import net.minecraft.client.network.ServerInfo;
 import net.minecraft.client.resource.language.I18n;
+import net.minecraft.client.util.Window;
 import net.minecraft.server.integrated.IntegratedServer;
 import org.jetbrains.annotations.Nullable;
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -40,20 +43,21 @@ public abstract class MixinMinecraftClient {
     @Shadow
     private @Nullable IntegratedServer server;
 
-    @Shadow public abstract boolean isModded();
-
-    @Shadow public abstract boolean isConnectedToRealms();
-
     @Shadow public abstract @Nullable ClientPlayNetworkHandler getNetworkHandler();
 
-    /**
-     * @author BoBkiNN_
-     * @reason additional entries
-     */
-    @Overwrite
-    private String getWindowTitle(){
+    @Shadow @Final private Window window;
+
+    @Shadow @Nullable public abstract ServerInfo getCurrentServerEntry();
+
+    @Inject(method = "updateWindowTitle", at = @At("RETURN"))
+    public void onUpdateWindowTitle(CallbackInfo ci){
+        this.window.setTitle(getTitle());
+    }
+
+    @Unique
+    public String getTitle(){
         StringBuilder stringBuilder = new StringBuilder("Minecraft");
-        if (this.isModded()) {
+        if (MinecraftClient.getModStatus().isModded()) {
             stringBuilder.append("*");
         }
         stringBuilder.append(" ");
@@ -61,9 +65,10 @@ public abstract class MixinMinecraftClient {
         ClientPlayNetworkHandler clientPlayNetworkHandler = this.getNetworkHandler();
         if (clientPlayNetworkHandler != null && clientPlayNetworkHandler.getConnection().isOpen()) {
             stringBuilder.append(" - ");
+            var info = this.getCurrentServerEntry();
             if (this.server != null && !this.server.isRemote() || OpenedStatus.current == null) {
                 stringBuilder.append(I18n.translate("title.singleplayer"));
-            } else if (this.isConnectedToRealms()) {
+            } else if (info != null && info.isRealm()) {
                 stringBuilder.append(I18n.translate("title.multiplayer.realms"));
             } else if (OpenedStatus.current == OpenedStatus.UPNP) {
                 stringBuilder.append(I18n.translate("opentopublic.title.multiplayer.upnp"));

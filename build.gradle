@@ -6,9 +6,10 @@ plugins {
 }
 
 version = project.mod_version
+def semVer = version.split("-")[0]
 group = project.maven_group
 
-println("Fabric mod version: "+version)
+println("Fabric mod version: "+version+ " ("+semVer+")")
 
 build.doLast(() -> {
     println "Build output directory: ${project.buildDir}"+"\\libs"
@@ -35,17 +36,17 @@ dependencies {
 }
 
 processResources {
-    inputs.property "version", project.version
+    inputs.property "version", semVer
     filteringCharset "UTF-8"
 
     filesMatching("fabric.mod.json") {
-        expand "version": project.version
+        expand "version": semVer
     }
-    from(replaceText("fabric.mod.json", '$version', version))
+    from(replaceText("fabric.mod.json", '$version', semVer))
     outputs.upToDateWhen { false }
 }
 
-def targetJavaVersion = 8
+def targetJavaVersion = 17
 tasks.withType(JavaCompile).configureEach {
     // ensure that the encoding is set to UTF-8, no matter what the system default is
     // this fixes some edge cases with special characters not displaying correctly
@@ -105,28 +106,14 @@ def replaceText(String fileName, String targetText, String textToReplace) {
 
 jar {
 //    dependsOn fatJar
-    from files('libs/WaifUPnP.jar').collect {
+    List<Object> toTree = new ArrayList<>()
+    toTree.add('libs/WaifUPnP.jar')
+    duplicatesStrategy = DuplicatesStrategy.INCLUDE
+    from files(toTree).collect {
         zipTree(it)
     }
     from("LICENSE") {
         rename { "${it}_${project.archivesBaseName}" }
     }
 //    dependsOn fatJar
-}
-
-// configure the maven publication
-publishing {
-    publications {
-        mavenJava(MavenPublication) {
-            from components.java
-        }
-    }
-
-    // See https://docs.gradle.org/current/userguide/publishing_maven.html for information on how to set up publishing.
-    repositories {
-        // Add repositories to publish to here.
-        // Notice: This block does NOT have the same function as the block in the top level.
-        // The repositories here will be used for publishing your artifact, not for
-        // retrieving dependencies.
-    }
 }

@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class PortContainer implements Serializable {
+    @Serial
     private static final long serialVersionUID = 42L;
 
     public final Map<String, ArrayList<Integer>> upnpPorts;

@@ -17,7 +17,7 @@ public class ThreeLean<A, B, C>{
      * @param c state three
      */
     public ThreeLean(A a, B b, C c){
-        list = new ArrayList<>();
+        list = new ArrayList<>(3);
         list.add(a);
         list.add(b);
         list.add(c);

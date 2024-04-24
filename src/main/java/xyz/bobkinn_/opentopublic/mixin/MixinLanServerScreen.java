@@ -1,20 +1,22 @@
 package xyz.bobkinn_.opentopublic.mixin;
 
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.screen.OpenToLanScreen;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.tooltip.Tooltip;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.ClickableWidget;
 import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.server.ServerMetadata;
 import net.minecraft.server.integrated.IntegratedServer;
-import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
-import net.minecraft.text.TranslatableText;
 import net.minecraft.world.GameMode;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
@@ -32,46 +34,58 @@ import static xyz.bobkinn_.opentopublic.client.PortInputTextField.validatePort;
 
 @Mixin(value = OpenToLanScreen.class)
 public abstract class MixinLanServerScreen extends Screen {
-    Screen parent;
-    protected MixinLanServerScreen(Text title, Screen parent) {
+
+    protected MixinLanServerScreen(Text title) {
         super(title);
-        this.parent=parent;
     }
 
-    @Shadow protected abstract void updateButtonText();
-
-    ButtonWidget openToWan = null;
-    ButtonWidget onlineModeButton = null;
-    ButtonWidget pvpButton = null;
-    MotdInputTextField motdInput;
+    @Unique
+    private ButtonWidget openToWan, onlineModeButton, pvpButton = null;
+    @Unique
+    private MotdInputTextField motdInput;
 
     @Shadow
-    private String gameMode = "survival";
+    private GameMode gameMode = GameMode.SURVIVAL;
     @Shadow
     private boolean allowCommands;
 
-    @Shadow public abstract void render(MatrixStack matrices, int mouseX, int mouseY, float delta);
-
-    int enteredPort = OpenToPublic.customPort;
-    int enteredMaxPN = OpenToPublic.maxPlayers;
-    String motd = null;
+    @Unique
+    private int enteredPort = OpenToPublic.customPort;
+    @Unique
+    private int enteredMaxPN = OpenToPublic.maxPlayers;
+    @Unique
+    private String motd = null;
 
     @Inject(at = @At("HEAD"), method = "render", cancellable = true)
-    public void render(MatrixStack matrices, int mouseX, int mouseY, float delta, CallbackInfo ci) {
-        this.renderBackground(matrices);
-        OpenToLanScreen.drawCenteredText(matrices, this.textRenderer, this.title, this.width / 2, 50, 0xFFFFFF);
-        OpenToLanScreen.drawCenteredText(matrices, this.textRenderer, new TranslatableText("opentopublic.gui.new_player_settings"), this.width / 2, 82, 0xFFFFFF);
-        OpenToLanScreen.drawCenteredText(matrices, this.textRenderer, new TranslatableText("opentopublic.gui.server_settings"), this.width / 2, 130, 0xFFFFFF);
-        OpenToLanScreen.drawTextWithShadow(matrices, this.textRenderer, new TranslatableText("opentopublic.button.port"), this.width / 2 - 154, this.height - 48, 0xFFFFFF);
-        OpenToLanScreen.drawTextWithShadow(matrices, this.textRenderer, new TranslatableText("opentopublic.button.max_players"), this.width / 2 - 154, 168, 0xFFFFFF);
-        OpenToLanScreen.drawTextWithShadow(matrices, this.textRenderer, new TranslatableText("opentopublic.button.motd"), this.width / 2 - 154, 204, 0xFFFFFF);
-        super.render(matrices, mouseX, mouseY, delta);
+    public void render(DrawContext context, int mouseX, int mouseY, float delta, CallbackInfo ci) {
+        this.renderBackground(context, mouseX, mouseY, delta);
+        context.drawCenteredTextWithShadow(this.textRenderer, this.title.asOrderedText(), this.width / 2, 50, 0xFFFFFF);
+        context.drawCenteredTextWithShadow(this.textRenderer, Text.translatable("opentopublic.gui.new_player_settings").asOrderedText(), this.width / 2, 82, 0xFFFFFF);
+        context.drawCenteredTextWithShadow(this.textRenderer, Text.translatable("opentopublic.gui.server_settings").asOrderedText(), this.width / 2, 130, 0xFFFFFF);
+        context.drawTextWithShadow(this.textRenderer, Text.translatable("opentopublic.button.port"), this.width / 2 - 154, this.height - 48, 0xFFFFFF);
+        context.drawTextWithShadow(this.textRenderer, Text.translatable("opentopublic.button.max_players"), this.width / 2 - 154, 168, 0xFFFFFF);
+        context.drawTextWithShadow(this.textRenderer, Text.translatable("opentopublic.button.motd"), this.width / 2 - 154, 204, 0xFFFFFF);
+        super.render(context, mouseX, mouseY, delta);
         ci.cancel();
     }
 
-    @Redirect(method = "init", at = @At(value = "INVOKE",ordinal = 0, target = "Lnet/minecraft/client/gui/screen/OpenToLanScreen;addButton(Lnet/minecraft/client/gui/widget/ClickableWidget;)Lnet/minecraft/client/gui/widget/ClickableWidget;"))
-    private ClickableWidget addButtonRedirect(OpenToLanScreen instance, ClickableWidget btn) {
-        ClickableWidget newBtn = new ButtonWidget(this.width / 2 - 155, this.height - 28, 150, 20, new TranslatableText("lanServer.start"), buttonWidget -> {
+    @Redirect(method = "init", at = @At(value = "INVOKE",ordinal = 2, target = "Lnet/minecraft/client/gui/screen/OpenToLanScreen;addDrawableChild(Lnet/minecraft/client/gui/Element;)Lnet/minecraft/client/gui/Element;"))
+    private Element redirectPort(OpenToLanScreen instance, Element element) {
+        // port enter field
+        PortInputTextField portField = new PortInputTextField(textRenderer, this.width / 2 - 154 + 147/2,
+                this.height - 54,
+                147/2, 20,
+                Text.translatable("opentopublic.button.port"), OpenToPublic.customPort);
+        portField.setChangedListener((text) -> {
+            portField.setEditableColor(validatePort(text) >= 0 ? 0xFFFFFF : 0xFF5555);
+            enteredPort = portField.getServerPort();
+        });
+        return this.addDrawableChild(portField);
+    }
+
+    @Redirect(method = "init", at = @At(value = "INVOKE",ordinal = 3, target = "Lnet/minecraft/client/gui/screen/OpenToLanScreen;addDrawableChild(Lnet/minecraft/client/gui/Element;)Lnet/minecraft/client/gui/Element;"))
+    private Element addButtonRedirect(OpenToLanScreen instance, Element element) {
+        ButtonWidget.PressAction act = (w) -> {
             if (this.client == null) return;
             IntegratedServer server = this.client.getServer();
             String playerName = MinecraftClient.getInstance().getSession().getUsername();
@@ -87,7 +101,7 @@ public abstract class MixinLanServerScreen extends Screen {
             OpenToPublic.customPort = enteredPort;
             OpenToPublic.maxPlayers = enteredMaxPN;
 
-            this.client.openScreen(null);
+            this.client.setScreen(null);
 
             if (OpenToPublic.maxPlayers != 8){
                 ((PlayerManagerAccessor) server.getPlayerManager()).setMaxPlayers(OpenToPublic.maxPlayers);
@@ -98,7 +112,7 @@ public abstract class MixinLanServerScreen extends Screen {
             server.setMotd(Util.parseValues(motd, playerName, worldName));
 
 //          OpenToPublic.LOGGER.info("Saving world custom data..");
-            OtpPersistentState ps = OtpPersistentState.get(server.getOverworld());
+            OtpPersistentState ps = new OtpPersistentState();
             NbtCompound nbt = ps.getData();
             nbt.putString("motd", motd);
             nbt.putInt("maxPlayers", OpenToPublic.maxPlayers);
@@ -114,18 +128,24 @@ public abstract class MixinLanServerScreen extends Screen {
                 PortContainer.saveBackup(PortContainer.self, OpenToPublic.backupFile);
             }
 
-            boolean successOpen = server.openToLan(GameMode.byName(this.gameMode), this.allowCommands, OpenToPublic.customPort);
-            ((ServerMetadataAccessor) server).getMetadata().setDescription(new LiteralText(Util.parseValues(motd, playerName, worldName)));
+            boolean successOpen = server.openToLan(this.gameMode, this.allowCommands, OpenToPublic.customPort);
+
+            String parsedMotd = Util.parseValues(motd, playerName, worldName);
+            server.setMotd(parsedMotd);
+            ServerMetadata md = ((ServerMetadataAccessor) server).createMetadata();
+            ((ServerMetadataAccessor) server).setMetadata(md);
 
             if (doUPnP) {
-                Util.displayToast(new TranslatableText("opentopublic.toast.upnp_in_process.title"), new TranslatableText("opentopublic.toast.upnp_in_process.desc"));
+                Util.displayToast(Text.translatable("opentopublic.toast.upnp_in_process.title"), Text.translatable("opentopublic.toast.upnp_in_process.desc"));
                 UpnpThread.runSetup();
             } else {
                 Util.atSuccessOpen(successOpen);
             }
             this.client.updateWindowTitle();
-        });
-        this.addButton(newBtn);
+        };
+        ClickableWidget newBtn = ButtonWidget.builder(Text.translatable("lanServer.start"), act)
+                .dimensions(this.width / 2 - 155, this.height - 28, 150, 20).build();
+        this.addDrawableChild(newBtn);
         return newBtn;
     }
 
@@ -137,14 +157,13 @@ public abstract class MixinLanServerScreen extends Screen {
         if (player == null || server == null){
             return;
         }
-        Screen self = this;
         this.motd = server.getServerMotd();
 
         OpenToPublic.updateConfig(OpenToPublic.modConfigPath.resolve("config.json")); // update config
 
         // load data
 //      OpenToPublic.LOGGER.info("Loading world custom data..");
-        OtpPersistentState ps = OtpPersistentState.get(server.getOverworld());
+        OtpPersistentState ps = new OtpPersistentState();
         ps.loadFromFile(server.getOverworld());
         NbtCompound nbt = ps.getData();
         if (nbt.contains("motd", 8)) this.motd = nbt.getString("motd");
@@ -155,80 +174,79 @@ public abstract class MixinLanServerScreen extends Screen {
 
 
         // open to wan button
-        ButtonWidget.TooltipSupplier wanTooltip = (button, matrices, mouseX, mouseY) -> {
-            String tooltipTextKey;
-            if (OpenToPublic.openPublic.isTrue()){
-                tooltipTextKey = "opentopublic.tooltip.wan_tooltip.manual";
-            } else if (OpenToPublic.openPublic.isFalse()) {
-                tooltipTextKey = "opentopublic.tooltip.wan_tooltip.lan";
-            } else {
-                tooltipTextKey = "opentopublic.tooltip.wan_tooltip.upnp";
-            }
-            self.renderTooltip(matrices, new TranslatableText(tooltipTextKey), mouseX, mouseY);
-        };
-        openToWan = new ButtonWidget(this.width / 2 + 5,
-                this.height - 54, 150, 20,
-                new TranslatableText("opentopublic.button.open_public"), button -> {
+        String tooltipTextKey;
+        if (OpenToPublic.openPublic.isTrue()){
+            tooltipTextKey = "opentopublic.tooltip.wan_tooltip.manual";
+        } else if (OpenToPublic.openPublic.isFalse()) {
+            tooltipTextKey = "opentopublic.tooltip.wan_tooltip.lan";
+        } else {
+            tooltipTextKey = "opentopublic.tooltip.wan_tooltip.upnp";
+        }
+        Tooltip wanTooltip = Tooltip.of(Text.translatable(tooltipTextKey));
+
+        openToWan = ButtonWidget.builder(
+                Text.translatable("opentopublic.button.open_public"),
+                (w) -> {
                     OpenToPublic.openPublic.next();
                     updateButtonText();
-                }, wanTooltip);
-        this.addButton(openToWan);
-
-        // port enter field
-        PortInputTextField portField = new PortInputTextField(textRenderer, this.width / 2 - 154 + 147/2,
-                this.height - 54,
-                147/2, 20,
-                new TranslatableText("opentopublic.button.port"), OpenToPublic.customPort);
-        portField.setChangedListener((text) -> {
-            portField.setEditableColor(validatePort(text) >= 0 ? 0xFFFFFF : 0xFF5555);
-            enteredPort = portField.getServerPort();
-        });
-        this.addButton(portField);
+                })
+                .dimensions(this.width / 2 + 5, this.height - 54, 150, 20)
+                .tooltip(wanTooltip)
+                .build();
+        this.addDrawableChild(openToWan);
 
         // online mode switch
-        ButtonWidget.TooltipSupplier onlineModeTooltip = (button, matrices, mouseX, mouseY) ->
-                self.renderTooltip(matrices,
-                        new TranslatableText("opentopublic.tooltip.online_mode_tooltip"), mouseX, mouseY);
-        onlineModeButton =
-                new ButtonWidget(this.width / 2 - 155, 144, 150, 20,
-                        Util.parseYN("opentopublic.button.online_mode", OpenToPublic.onlineMode),
-                        button -> {
-                            OpenToPublic.onlineMode = !OpenToPublic.onlineMode;
-                            updateButtonText();
-                        },
-                        onlineModeTooltip
-                );
-        this.addButton(onlineModeButton);
+        Tooltip onlineModeTooltip = Tooltip.of(Text.translatable("opentopublic.tooltip.online_mode_tooltip"));
+        onlineModeButton = ButtonWidget.builder(Util.parseYN("opentopublic.button.online_mode", OpenToPublic.onlineMode),
+                (w) -> {
+                    OpenToPublic.onlineMode = !OpenToPublic.onlineMode;
+                    updateButtonText();
+                })
+                .dimensions(this.width / 2 - 155, 144, 150, 20)
+                .tooltip(onlineModeTooltip)
+                .build();
+        this.addDrawableChild(onlineModeButton);
 
         // pvp on/off button
-        pvpButton =
-                new ButtonWidget(this.width / 2 + 5, 144, 150, 20, Util.parseYN("opentopublic.button.enable_pvp", OpenToPublic.enablePvp), button -> {
+        pvpButton = ButtonWidget.builder(Util.parseYN("opentopublic.button.enable_pvp", OpenToPublic.enablePvp),
+                (w) -> {
                     OpenToPublic.enablePvp = ! OpenToPublic.enablePvp;
                     updateButtonText();
-                });
-        this.addButton(pvpButton);
+                })
+                .dimensions(this.width / 2 + 5, 144, 150, 20)
+                .build();
+        this.addDrawableChild(pvpButton);
 
         // max player input field
-        MaxPlayersInputTextField maxPlayers = new MaxPlayersInputTextField(this.textRenderer, this.width / 2 -155, 180, 150,20, new TranslatableText("opentopublic.button.max_players"), OpenToPublic.maxPlayers);
+        MaxPlayersInputTextField maxPlayers = new MaxPlayersInputTextField(this.textRenderer, this.width / 2 -155, 180, 150,20, Text.translatable("opentopublic.button.max_players"), OpenToPublic.maxPlayers);
         maxPlayers.setChangedListener((text) -> {
             maxPlayers.setEditableColor(MaxPlayersInputTextField.validateNum(text) >= 0 ? 0xFFFFFF : 0xFF5555);
             enteredMaxPN = maxPlayers.getVal();
 //            player.sendMessage(new LiteralText("max players change: "+enteredMaxPN), false);
         });
-        this.addButton(maxPlayers);
+        this.addDrawableChild(maxPlayers);
 
         // motd input
-        motdInput = new MotdInputTextField(this.textRenderer, this.width / 2 -155, 215, 311, 20, new TranslatableText("opentopublic.button.motd"), motd);
-        this.addButton(motdInput);
-
+        motdInput = new MotdInputTextField(this.textRenderer, this.width / 2 -155, 215, 311, 20, Text.translatable("opentopublic.button.motd"), motd);
+        this.addDrawableChild(motdInput);
+        updateButtonText();
     }
 
 
-    @Inject(method = "updateButtonText", at = @At("TAIL"))
-    private void updateText(CallbackInfo ci){
-        if (OpenToPublic.openPublic.isTrue()) this.openToWan.setMessage(new TranslatableText("opentopublic.button.open_public", new TranslatableText("opentopublic.text.manual")));
-        else if (OpenToPublic.openPublic.isFalse()) this.openToWan.setMessage(new TranslatableText("opentopublic.button.open_public", Util.off));
-        else if (OpenToPublic.openPublic.isThird()) this.openToWan.setMessage(new TranslatableText("opentopublic.button.open_public", "UPnP"));
+    @Unique
+    private void updateButtonText(){
+        if (OpenToPublic.openPublic.isTrue()) this.openToWan.setMessage(Text.translatable("opentopublic.button.open_public", Text.translatable("opentopublic.text.manual")));
+        else if (OpenToPublic.openPublic.isFalse()) this.openToWan.setMessage(Text.translatable("opentopublic.button.open_public", Util.off));
+        else if (OpenToPublic.openPublic.isThird()) this.openToWan.setMessage(Text.translatable("opentopublic.button.open_public", "UPnP"));
+        String wanTooltip;
+        if (OpenToPublic.openPublic.isTrue()){
+            wanTooltip = "opentopublic.tooltip.wan_tooltip.manual";
+        } else if (OpenToPublic.openPublic.isFalse()) {
+            wanTooltip = "opentopublic.tooltip.wan_tooltip.lan";
+        } else {
+            wanTooltip = "opentopublic.tooltip.wan_tooltip.upnp";
+        }
+        this.openToWan.setTooltip(Tooltip.of(Text.translatable(wanTooltip)));
         this.onlineModeButton.setMessage(Util.parseYN("opentopublic.button.online_mode", OpenToPublic.onlineMode));
         this.pvpButton.setMessage(Util.parseYN("opentopublic.button.enable_pvp",  OpenToPublic.enablePvp));
     }

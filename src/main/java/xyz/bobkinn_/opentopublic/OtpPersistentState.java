@@ -1,8 +1,8 @@
 package xyz.bobkinn_.opentopublic;
 
-import net.minecraft.SharedConstants;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtIo;
+import net.minecraft.nbt.NbtSizeTracker;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.world.PersistentState;
 import org.jetbrains.annotations.NotNull;
@@ -16,9 +16,9 @@ public class OtpPersistentState extends PersistentState {
 
     private static final String DATA_NAME = "lanOptions";
     private NbtCompound data;
+    // I am lazy to register this to PersistentStateManager
 
     public OtpPersistentState() {
-        super(DATA_NAME);
         data = new NbtCompound();
     }
 
@@ -39,27 +39,16 @@ public class OtpPersistentState extends PersistentState {
     }
 
     /**
-     * get class instance
-     * @param world integrated server world
-     * @return class instance
-     */
-    public static OtpPersistentState get(@NotNull ServerWorld world) {
-        return world.getPersistentStateManager().getOrCreate(OtpPersistentState::new, DATA_NAME);
-    }
-
-    /**
      * Get nbt data from main container
      * @param tag file data
      */
-    @Override
-    public void fromTag(@NotNull NbtCompound tag) {
+    public void fromNbt(@NotNull NbtCompound tag) {
         data = tag.getCompound("data");
     }
 
     @Override
     public NbtCompound writeNbt(@NotNull NbtCompound tag) {
-        tag.put("data", data);
-        return tag;
+        return data;
     }
 
     /**
@@ -75,11 +64,8 @@ public class OtpPersistentState extends PersistentState {
                 Files.createDirectory(dataFolder.toPath());
             }
             File outputFile = new File(dataFolder, DATA_NAME+".dat");
-            NbtCompound tag = new NbtCompound();
-            writeNbt(tag);
-            NbtCompound compressedTag = tag.copy();
-            compressedTag.putInt("DataVersion", SharedConstants.getGameVersion().getWorldVersion());
-            NbtIo.writeCompressed(compressedTag, outputFile);
+            setDirty(true);
+            save(outputFile);
         } catch (IOException e) {
             OpenToPublic.LOGGER.error("Could not save data", e);
         }
@@ -101,10 +87,10 @@ public class OtpPersistentState extends PersistentState {
             if (!inputFile.exists()) {
                 return;
             }
-            NbtCompound compressedTag = NbtIo.readCompressed(inputFile);
+            NbtCompound compressedTag = NbtIo.readCompressed(inputFile.toPath(), NbtSizeTracker.ofUnlimitedBytes());
             NbtCompound tag = compressedTag.copy();
             tag.remove("DataVersion");
-            fromTag(tag);
+            fromNbt(tag);
         } catch (IOException e) {
             OpenToPublic.LOGGER.error("Could not load data", e);
         }
