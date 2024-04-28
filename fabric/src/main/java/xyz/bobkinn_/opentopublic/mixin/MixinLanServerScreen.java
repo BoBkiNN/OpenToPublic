@@ -59,14 +59,13 @@ public abstract class MixinLanServerScreen extends Screen {
 
     @Inject(at = @At("HEAD"), method = "render", cancellable = true)
     public void render(DrawContext context, int mouseX, int mouseY, float delta, CallbackInfo ci) {
-        this.renderBackground(context, mouseX, mouseY, delta);
+        super.render(context, mouseX, mouseY, delta);
         context.drawCenteredTextWithShadow(this.textRenderer, this.title.asOrderedText(), this.width / 2, 50, 0xFFFFFF);
         context.drawCenteredTextWithShadow(this.textRenderer, Text.translatable("opentopublic.gui.new_player_settings").asOrderedText(), this.width / 2, 82, 0xFFFFFF);
         context.drawCenteredTextWithShadow(this.textRenderer, Text.translatable("opentopublic.gui.server_settings").asOrderedText(), this.width / 2, 130, 0xFFFFFF);
         context.drawTextWithShadow(this.textRenderer, Text.translatable("opentopublic.button.port"), this.width / 2 - 154, this.height - 48, 0xFFFFFF);
         context.drawTextWithShadow(this.textRenderer, Text.translatable("opentopublic.button.max_players"), this.width / 2 - 154, 168, 0xFFFFFF);
         context.drawTextWithShadow(this.textRenderer, Text.translatable("opentopublic.button.motd"), this.width / 2 - 154, 204, 0xFFFFFF);
-        super.render(context, mouseX, mouseY, delta);
         ci.cancel();
     }
 
