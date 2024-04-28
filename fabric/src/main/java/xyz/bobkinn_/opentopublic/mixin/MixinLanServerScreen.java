@@ -14,6 +14,7 @@ import net.minecraft.server.ServerMetadata;
 import net.minecraft.server.integrated.IntegratedServer;
 import net.minecraft.text.Text;
 import net.minecraft.world.GameMode;
+import org.jetbrains.annotations.NotNull;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
@@ -119,6 +120,7 @@ public abstract class MixinLanServerScreen extends Screen {
             nbt.putBoolean("enablePvp", OpenToPublic.enablePvp);
 //          OpenToPublic.LOGGER.info(nbt.toText().getString());
             ps.setData(nbt);
+            server.getReloadableRegistries().createRegistryLookup();
             ps.saveToFile(server.getOverworld());
 //          OpenToPublic.LOGGER.info("Saved");
 
@@ -162,7 +164,7 @@ public abstract class MixinLanServerScreen extends Screen {
         OpenToPublic.updateConfig(OpenToPublic.modConfigPath.resolve("config.json")); // update config
 
         // load data
-//      OpenToPublic.LOGGER.info("Loading world custom data..");
+        // OpenToPublic.LOGGER.info("Loading world custom data...");
         OtpPersistentState ps = new OtpPersistentState();
         ps.loadFromFile(server.getOverworld());
         NbtCompound nbt = ps.getData();
@@ -170,19 +172,11 @@ public abstract class MixinLanServerScreen extends Screen {
         if (nbt.contains("maxPlayers", 99)) this.enteredMaxPN = nbt.getInt("maxPlayers");
         if (nbt.contains("enablePvp")) OpenToPublic.enablePvp = nbt.getBoolean("enablePvp");
         OpenToPublic.maxPlayers = this.enteredMaxPN;
-//      OpenToPublic.LOGGER.info("Loaded! "+ nbt);
+        // OpenToPublic.LOGGER.info("Loaded! "+ nbt);
 
 
         // open to wan button
-        String tooltipTextKey;
-        if (OpenToPublic.openPublic.isTrue()){
-            tooltipTextKey = "opentopublic.tooltip.wan_tooltip.manual";
-        } else if (OpenToPublic.openPublic.isFalse()) {
-            tooltipTextKey = "opentopublic.tooltip.wan_tooltip.lan";
-        } else {
-            tooltipTextKey = "opentopublic.tooltip.wan_tooltip.upnp";
-        }
-        Tooltip wanTooltip = Tooltip.of(Text.translatable(tooltipTextKey));
+        Tooltip wanTooltip = getWanTooltip();
 
         openToWan = ButtonWidget.builder(
                 Text.translatable("opentopublic.button.open_public"),
@@ -218,18 +212,37 @@ public abstract class MixinLanServerScreen extends Screen {
         this.addDrawableChild(pvpButton);
 
         // max player input field
-        MaxPlayersInputTextField maxPlayers = new MaxPlayersInputTextField(this.textRenderer, this.width / 2 -155, 180, 150,20, Text.translatable("opentopublic.button.max_players"), OpenToPublic.maxPlayers);
-        maxPlayers.setChangedListener((text) -> {
-            maxPlayers.setEditableColor(MaxPlayersInputTextField.validateNum(text) >= 0 ? 0xFFFFFF : 0xFF5555);
-            enteredMaxPN = maxPlayers.getVal();
-//            player.sendMessage(new LiteralText("max players change: "+enteredMaxPN), false);
-        });
+        MaxPlayersInputTextField maxPlayers = getMaxPlayersInputTextField();
         this.addDrawableChild(maxPlayers);
 
         // motd input
         motdInput = new MotdInputTextField(this.textRenderer, this.width / 2 -155, 215, 311, 20, Text.translatable("opentopublic.button.motd"), motd);
         this.addDrawableChild(motdInput);
         updateButtonText();
+    }
+
+    @Unique
+    private @NotNull MaxPlayersInputTextField getMaxPlayersInputTextField() {
+        MaxPlayersInputTextField maxPlayers = new MaxPlayersInputTextField(this.textRenderer, this.width / 2 -155, 180, 150,20, Text.translatable("opentopublic.button.max_players"), OpenToPublic.maxPlayers);
+        maxPlayers.setChangedListener((text) -> {
+            maxPlayers.setEditableColor(MaxPlayersInputTextField.validateNum(text) >= 0 ? 0xFFFFFF : 0xFF5555);
+            enteredMaxPN = maxPlayers.getVal();
+//            player.sendMessage(new LiteralText("max players change: "+enteredMaxPN), false);
+        });
+        return maxPlayers;
+    }
+
+    @Unique
+    private static @NotNull Tooltip getWanTooltip() {
+        String tooltipTextKey;
+        if (OpenToPublic.openPublic.isTrue()){
+            tooltipTextKey = "opentopublic.tooltip.wan_tooltip.manual";
+        } else if (OpenToPublic.openPublic.isFalse()) {
+            tooltipTextKey = "opentopublic.tooltip.wan_tooltip.lan";
+        } else {
+            tooltipTextKey = "opentopublic.tooltip.wan_tooltip.upnp";
+        }
+        return Tooltip.of(Text.translatable(tooltipTextKey));
     }
 
 

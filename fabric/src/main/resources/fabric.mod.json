@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "opentopublic",
-  "version": "$version",
+  "version": "${semVer}",
   "name": "OpenToPublic",
   "description": "Allows you to open LAN world to WAN and set server settings",
   "authors": [
@@ -14,7 +14,7 @@
   },
   "license": "MIT",
   "icon": "assets/opentopublic/icon.png",
-  "environment": "*",
+  "environment": "client",
   "entrypoints": {
     "main": [
       "xyz.bobkinn_.opentopublic.OpenToPublic"
@@ -24,7 +24,7 @@
     "opentopublic.mixins.json"
   ],
   "depends": {
-    "fabricloader": ">=0.14.21",
-    "minecraft": "1.20.4"
+    "fabricloader": ">=${loader_version}",
+    "minecraft": "${minecraft_version}"
   }
 }

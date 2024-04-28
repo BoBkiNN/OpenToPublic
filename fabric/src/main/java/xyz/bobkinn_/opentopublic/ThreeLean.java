@@ -82,7 +82,7 @@ public class ThreeLean<A, B, C>{
      */
     @SuppressWarnings({"unused", "unchecked"})
     public A getA(){
-        return (A) list.get(0);
+        return (A) list.getFirst();
     }
 
     /**

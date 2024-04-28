@@ -3,6 +3,7 @@ package xyz.bobkinn_.opentopublic;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtIo;
 import net.minecraft.nbt.NbtSizeTracker;
+import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.world.PersistentState;
 import org.jetbrains.annotations.NotNull;
@@ -47,7 +48,7 @@ public class OtpPersistentState extends PersistentState {
     }
 
     @Override
-    public NbtCompound writeNbt(@NotNull NbtCompound tag) {
+    public NbtCompound writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
         return data;
     }
 
@@ -65,7 +66,7 @@ public class OtpPersistentState extends PersistentState {
             }
             File outputFile = new File(dataFolder, DATA_NAME+".dat");
             setDirty(true);
-            save(outputFile);
+            save(outputFile, world.getRegistryManager());
         } catch (IOException e) {
             OpenToPublic.LOGGER.error("Could not save data", e);
         }

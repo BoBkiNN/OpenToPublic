@@ -55,7 +55,7 @@ public class OpenToPublic implements ModInitializer {
                 bw.write(gson.toJson(new Config(), Config.class));
                 bw.close();
             } catch (IOException e) {
-                e.printStackTrace();
+                LOGGER.error("Failed to write config file", e);
             }
             return;
         }
