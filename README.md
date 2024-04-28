@@ -25,10 +25,11 @@ If ON, then Minecraft will be check players for license, else players with crack
 ## More versions?
  \- If mod for your version doesn't exist, create an issue with request
 
-## Credit
+## Credits
  - to ChatGPT for helping in development my first mod
  - to Excal for testing
- - to FasT1k (Discord ID: 631850581580972106) for testing
+ - to FasT1k for testing
+ - to @nicer06 for translate
 
 ## config.json explanation
 Config path: `.minecraft/config/opentopublic/config.json`\
