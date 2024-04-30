@@ -20,6 +20,14 @@
       "xyz.bobkinn_.opentopublic.OpenToPublic"
     ]
   },
+  "custom": {
+    "modmenu": {
+      "links": {
+        "modmenu.github_releases": "https://github.com/BoBkiNN/OpenToPublic/releases",
+        "modmenu.modrinth": "https://modrinth.com/mod/opentopublic"
+      }
+    }
+  },
   "mixins": [
     "opentopublic.mixins.json"
   ],
