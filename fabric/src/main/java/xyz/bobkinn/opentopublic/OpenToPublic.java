@@ -1,4 +1,4 @@
-package xyz.bobkinn_.opentopublic;
+package xyz.bobkinn.opentopublic;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -6,7 +6,7 @@ import com.google.gson.InstanceCreator;
 import net.fabricmc.api.ModInitializer;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import xyz.bobkinn_.opentopublic.upnp.UpnpThread;
+import xyz.bobkinn.opentopublic.upnp.UpnpThread;
 
 import java.io.*;
 import java.nio.file.Path;

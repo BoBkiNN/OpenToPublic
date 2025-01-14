@@ -1,4 +1,4 @@
-package xyz.bobkinn_.opentopublic;
+package xyz.bobkinn.opentopublic;
 
 import java.io.*;
 import java.nio.file.Files;

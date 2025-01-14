@@ -1,4 +1,4 @@
-package xyz.bobkinn_.opentopublic;
+package xyz.bobkinn.opentopublic;
 
 import java.util.ArrayList;
 import java.util.List;

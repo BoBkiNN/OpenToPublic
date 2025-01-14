@@ -1,4 +1,4 @@
-package xyz.bobkinn_.opentopublic.upnp;
+package xyz.bobkinn.opentopublic.upnp;
 
 public class UpnpEx extends RuntimeException{
     private final UpnpEnum type;

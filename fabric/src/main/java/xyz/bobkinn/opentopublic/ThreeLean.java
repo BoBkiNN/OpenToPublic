@@ -1,4 +1,4 @@
-package xyz.bobkinn_.opentopublic;
+package xyz.bobkinn.opentopublic;
 
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;

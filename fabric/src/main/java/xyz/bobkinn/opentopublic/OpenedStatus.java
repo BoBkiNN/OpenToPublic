@@ -1,4 +1,4 @@
-package xyz.bobkinn_.opentopublic;
+package xyz.bobkinn.opentopublic;
 
 public enum OpenedStatus {
     MANUAL,

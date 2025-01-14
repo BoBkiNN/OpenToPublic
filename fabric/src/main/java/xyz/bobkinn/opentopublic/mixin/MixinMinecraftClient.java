@@ -1,4 +1,4 @@
-package xyz.bobkinn_.opentopublic.mixin;
+package xyz.bobkinn.opentopublic.mixin;
 
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.SharedConstants;
@@ -16,10 +16,10 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import xyz.bobkinn_.opentopublic.OpenToPublic;
-import xyz.bobkinn_.opentopublic.OpenedStatus;
-import xyz.bobkinn_.opentopublic.PortContainer;
-import xyz.bobkinn_.opentopublic.upnp.UpnpThread;
+import xyz.bobkinn.opentopublic.OpenedStatus;
+import xyz.bobkinn.opentopublic.PortContainer;
+import xyz.bobkinn.opentopublic.OpenToPublic;
+import xyz.bobkinn.opentopublic.upnp.UpnpThread;
 
 import java.io.File;
 

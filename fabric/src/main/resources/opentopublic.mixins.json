@@ -4,14 +4,14 @@
   "package": "xyz.bobkinn_.opentopublic.mixin",
   "compatibilityLevel": "JAVA_17",
   "mixins": [
-    "MixinIntegratedServer",
-    "MixinServerNetworkIo",
-    "PlayerManagerAccessor",
-    "ServerMetadataAccessor"
+    "xyz.bobkinn.opentopublic.mixin.MixinIntegratedServer",
+    "xyz.bobkinn.opentopublic.mixin.MixinServerNetworkIo",
+    "xyz.bobkinn.opentopublic.mixin.PlayerManagerAccessor",
+    "xyz.bobkinn.opentopublic.mixin.ServerMetadataAccessor"
   ],
   "client": [
-    "MixinMinecraftClient",
-    "MixinLanServerScreen"
+    "xyz.bobkinn.opentopublic.mixin.MixinMinecraftClient",
+    "xyz.bobkinn.opentopublic.mixin.MixinLanServerScreen"
   ],
   "injectors": {
     "defaultRequire": 1

@@ -1,4 +1,4 @@
-package xyz.bobkinn_.opentopublic.client;
+package xyz.bobkinn.opentopublic.client;
 
 // code by https://github.com/rikka0w0/LanServerProperties/
 

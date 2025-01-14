@@ -1,4 +1,4 @@
-package xyz.bobkinn_.opentopublic.mixin;
+package xyz.bobkinn.opentopublic.mixin;
 
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.ServerMetadata;

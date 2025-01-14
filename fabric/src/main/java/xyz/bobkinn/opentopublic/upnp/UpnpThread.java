@@ -1,11 +1,11 @@
-package xyz.bobkinn_.opentopublic.upnp;
+package xyz.bobkinn.opentopublic.upnp;
 
 import com.dosse.upnp.UPnP;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
-import xyz.bobkinn_.opentopublic.OpenToPublic;
-import xyz.bobkinn_.opentopublic.PortContainer;
-import xyz.bobkinn_.opentopublic.Util;
+import xyz.bobkinn.opentopublic.OpenToPublic;
+import xyz.bobkinn.opentopublic.PortContainer;
+import xyz.bobkinn.opentopublic.Util;
 
 import java.util.ArrayList;
 

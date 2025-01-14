@@ -1,4 +1,4 @@
-package xyz.bobkinn_.opentopublic.mixin;
+package xyz.bobkinn.opentopublic.mixin;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
@@ -22,16 +22,16 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import xyz.bobkinn_.opentopublic.OpenToPublic;
-import xyz.bobkinn_.opentopublic.OtpPersistentState;
-import xyz.bobkinn_.opentopublic.PortContainer;
-import xyz.bobkinn_.opentopublic.Util;
-import xyz.bobkinn_.opentopublic.client.MaxPlayersInputTextField;
-import xyz.bobkinn_.opentopublic.client.MotdInputTextField;
-import xyz.bobkinn_.opentopublic.client.PortInputTextField;
-import xyz.bobkinn_.opentopublic.upnp.UpnpThread;
+import xyz.bobkinn.opentopublic.OtpPersistentState;
+import xyz.bobkinn.opentopublic.PortContainer;
+import xyz.bobkinn.opentopublic.Util;
+import xyz.bobkinn.opentopublic.OpenToPublic;
+import xyz.bobkinn.opentopublic.client.MaxPlayersInputTextField;
+import xyz.bobkinn.opentopublic.client.MotdInputTextField;
+import xyz.bobkinn.opentopublic.client.PortInputTextField;
+import xyz.bobkinn.opentopublic.upnp.UpnpThread;
 
-import static xyz.bobkinn_.opentopublic.client.PortInputTextField.validatePort;
+import static xyz.bobkinn.opentopublic.client.PortInputTextField.validatePort;
 
 @Mixin(value = OpenToLanScreen.class)
 public abstract class MixinLanServerScreen extends Screen {

@@ -1,4 +1,4 @@
-package xyz.bobkinn_.opentopublic.mixin;
+package xyz.bobkinn.opentopublic.mixin;
 
 import net.minecraft.server.integrated.IntegratedServer;
 import net.minecraft.world.GameMode;
@@ -7,9 +7,9 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import xyz.bobkinn_.opentopublic.OpenToPublic;
-import xyz.bobkinn_.opentopublic.OpenedStatus;
-import xyz.bobkinn_.opentopublic.upnp.UpnpThread;
+import xyz.bobkinn.opentopublic.OpenToPublic;
+import xyz.bobkinn.opentopublic.OpenedStatus;
+import xyz.bobkinn.opentopublic.upnp.UpnpThread;
 
 @Mixin(IntegratedServer.class)
 public abstract class MixinIntegratedServer {
