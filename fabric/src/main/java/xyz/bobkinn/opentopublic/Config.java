@@ -1,8 +1,11 @@
 package xyz.bobkinn.opentopublic;
 
+import lombok.Getter;
+
 import java.util.ArrayList;
 import java.util.List;
 
+@Getter
 public class Config {
     private final List<Integer> tcp;
     private final List<Integer> udp;
@@ -14,17 +17,6 @@ public class Config {
         this.hideIps = false;
     }
 
-    public List<Integer> getTcp() {
-        return tcp;
-    }
-
-    public List<Integer> getUdp() {
-        return udp;
-    }
-
-    public boolean isHideIps() {
-        return hideIps;
-    }
 }
 
 

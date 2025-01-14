@@ -9,7 +9,6 @@ import net.minecraft.client.gui.tooltip.Tooltip;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.ClickableWidget;
 import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.ServerMetadata;
 import net.minecraft.server.integrated.IntegratedServer;
 import net.minecraft.text.Text;
@@ -113,14 +112,12 @@ public abstract class MixinLanServerScreen extends Screen {
 
 //          OpenToPublic.LOGGER.info("Saving world custom data..");
             OtpPersistentState ps = new OtpPersistentState();
-            NbtCompound nbt = ps.getData();
-            nbt.putString("motd", motd);
-            nbt.putInt("maxPlayers", OpenToPublic.maxPlayers);
-            nbt.putBoolean("enablePvp", OpenToPublic.enablePvp);
+            ps.setMotd(motd);
+            ps.setMaxPlayers(OpenToPublic.maxPlayers);
+            ps.setEnablePvp(OpenToPublic.enablePvp);
 //          OpenToPublic.LOGGER.info(nbt.toText().getString());
-            ps.setData(nbt);
-            server.getReloadableRegistries().createRegistryLookup();
-            ps.saveToFile(server.getOverworld());
+            var psm = server.getOverworld().getPersistentStateManager();
+            psm.set(OtpPersistentState.DATA_NAME, ps);
 //          OpenToPublic.LOGGER.info("Saved");
 
             boolean doUPnP = OpenToPublic.openPublic.isThird();
@@ -164,12 +161,12 @@ public abstract class MixinLanServerScreen extends Screen {
 
         // load data
         // OpenToPublic.LOGGER.info("Loading world custom data...");
-        OtpPersistentState ps = new OtpPersistentState();
-        ps.loadFromFile(server.getOverworld());
-        NbtCompound nbt = ps.getData();
-        if (nbt.contains("motd", 8)) this.motd = nbt.getString("motd");
-        if (nbt.contains("maxPlayers", 99)) this.enteredMaxPN = nbt.getInt("maxPlayers");
-        if (nbt.contains("enablePvp")) OpenToPublic.enablePvp = nbt.getBoolean("enablePvp");
+        var psm = server.getOverworld().getPersistentStateManager();
+        var loaded = psm.get(OtpPersistentState.TYPE, OtpPersistentState.DATA_NAME);
+        OtpPersistentState ps = loaded != null ? loaded : new OtpPersistentState();
+        if (ps.getMotd() != null) this.motd = ps.getMotd();
+        if (ps.getMaxPlayers() != null) this.enteredMaxPN = ps.getMaxPlayers();
+        if (ps.getMaxPlayers() != null) OpenToPublic.enablePvp = ps.getEnablePvp();
         OpenToPublic.maxPlayers = this.enteredMaxPN;
         // OpenToPublic.LOGGER.info("Loaded! "+ nbt);
 

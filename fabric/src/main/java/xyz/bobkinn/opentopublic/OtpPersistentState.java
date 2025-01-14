@@ -1,100 +1,43 @@
 package xyz.bobkinn.opentopublic;
 
+import lombok.Getter;
+import lombok.Setter;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtIo;
-import net.minecraft.nbt.NbtSizeTracker;
 import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.server.world.ServerWorld;
 import net.minecraft.world.PersistentState;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-
+@Getter
+@Setter
 public class OtpPersistentState extends PersistentState {
 
-    private static final String DATA_NAME = "lanOptions";
-    private NbtCompound data;
-    // I am lazy to register this to PersistentStateManager
+    public static final String DATA_NAME = "lanOptions";
 
-    public OtpPersistentState() {
-        data = new NbtCompound();
-    }
+    private String motd = null;
+    private Integer maxPlayers = null;
+    private Boolean enablePvp = null;
 
-    /**
-     * Get nbt stored in class
-     * @return nbt
-     */
-    public NbtCompound getData() {
-        return data;
-    }
+    public static final Type<OtpPersistentState> TYPE = new Type<>(
+            OtpPersistentState::new,
+            OtpPersistentState::fromNbt,
+            null
+    );
 
-    /**
-     * Set nbt compound to class
-     * @param data nbt
-     */
-    public void setData(NbtCompound data){
-        this.data = data;
-    }
-
-    /**
-     * Get nbt data from main container
-     * @param tag file data
-     */
-    public void fromNbt(@NotNull NbtCompound tag) {
-        data = tag.getCompound("data");
+    public static @NotNull OtpPersistentState fromNbt(@NotNull NbtCompound tag, RegistryWrapper.WrapperLookup lookup) {
+        var otp = new OtpPersistentState();
+        if (tag.contains("motd")) otp.motd = tag.getString("motd");
+        if (tag.contains("maxPlayers")) otp.maxPlayers = tag.getInt("maxPlayers");
+        if (tag.contains("enablePvp")) otp.enablePvp = tag.getBoolean("enablePvp");
+        return otp;
     }
 
     @Override
     public NbtCompound writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
-        return data;
+        if (motd != null) nbt.putString("motd", motd);
+        if (maxPlayers != null) nbt.putInt("maxPlayers", maxPlayers);
+        if (enablePvp != null) nbt.putBoolean("enablePvp", enablePvp);
+        return nbt;
     }
 
-    /**
-     * Save nbt file to world 'data' folder
-     * @param world integrated server world
-     */
-    public void saveToFile(@NotNull ServerWorld world) {
-        try {
-            if (world.getServer().getRunDirectory() == null) return;
-            Path worldDir = world.getServer().getRunDirectory().toPath().resolve(Util.savesFolder).resolve(Util.getLevelName(world));
-            File dataFolder = new File(worldDir.toFile(), "data");
-            if (!dataFolder.exists()) {
-                Files.createDirectory(dataFolder.toPath());
-            }
-            File outputFile = new File(dataFolder, DATA_NAME+".dat");
-            setDirty(true);
-            save(outputFile, world.getRegistryManager());
-        } catch (IOException e) {
-            OpenToPublic.LOGGER.error("Could not save data", e);
-        }
-    }
-
-    /**
-     * Load nbt from world 'data' folder
-     * @param world integrated server world
-     */
-    public void loadFromFile(@NotNull ServerWorld world) {
-        try {
-            if (world.getServer().getRunDirectory() == null) return;
-            Path worldDir = world.getServer().getRunDirectory().toPath().resolve(Util.savesFolder).resolve(Util.getLevelName(world));
-            File dataFolder = new File(worldDir.toFile(), "data");
-            if (!dataFolder.exists()) {
-                return;
-            }
-            File inputFile = new File(dataFolder, DATA_NAME+".dat");
-            if (!inputFile.exists()) {
-                return;
-            }
-            NbtCompound compressedTag = NbtIo.readCompressed(inputFile.toPath(), NbtSizeTracker.ofUnlimitedBytes());
-            NbtCompound tag = compressedTag.copy();
-            tag.remove("DataVersion");
-            fromNbt(tag);
-        } catch (IOException e) {
-            OpenToPublic.LOGGER.error("Could not load data", e);
-        }
-    }
 }
 

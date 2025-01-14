@@ -1,6 +1,7 @@
 plugins {
     id("fabric-loom") version "1.9-SNAPSHOT"
     `java-library`
+    id("io.freefair.lombok") version "8.11"
 }
 
 version = properties["mod_version"]!! as String
@@ -23,11 +24,11 @@ java {
 
 println("Fabric mod version: $version ($semVer)")
 
-loom.mods {
-    create("opentopublic") {
-        sourceSet(sourceSets.getByName("main"))
-    }
-}
+//loom.mods {
+//    create("opentopublic") {
+//        sourceSet(sourceSets.getByName("main"))
+//    }
+//}
 
 dependencies {
     val includeJar = configurations.create("includeJar")
@@ -36,6 +37,9 @@ dependencies {
     minecraft("com.mojang:minecraft:${properties["minecraft_version"]}")
     mappings("net.fabricmc:yarn:${properties["yarn_mappings"]}:v2")
     modImplementation("net.fabricmc:fabric-loader:${properties["loader_version"]}")
+
+    compileOnly("org.projectlombok:lombok:1.18.32")
+    annotationProcessor("org.projectlombok:lombok:1.18.32")
 
     configurations.implementation.configure{extendsFrom(configurations.getByName("includeJar"))}
 }
