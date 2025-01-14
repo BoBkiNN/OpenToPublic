@@ -8,7 +8,7 @@ val semVer = (version as String).split("-")[0]
 group = properties["maven_group"]!!
 
 
-project.ext.set("archivesBaseName", properties["archives_base_name"]);
+project.ext.set("archivesBaseName", properties["archives_base_name"])
 
 tasks.withType(JavaCompile::class) {
     options.release = 21
