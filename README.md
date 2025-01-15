@@ -23,7 +23,12 @@ With this mod, you can make "Open to LAN" button open your world to outer networ
 If ON, then Minecraft will be check players for license, else players with cracked launchers can join
 
 ## More versions?
- \- If mod for your version doesn't exist, create an issue with request
+ \- If mod for your version doesn't exist, create an issue with request 
+ 
+Planned versions:
+ - 1.21.1 for Forge
+ - 1.20.6 for Forge
+ - 1.21.4 for Fabric & Forge
 
 ## Credits
  - to ChatGPT for helping in development my first mod
@@ -43,6 +48,6 @@ Example config:
   "hideIps": false
 }
 ```
- - `tcp` - list of TCP ports to open if Open to WAN button set to UPnP
- - `udp` - list of UDP ports to open if Open to WAN button set to UPnP
+ - `tcp` - list of additional TCP ports to open if Open to WAN button set to UPnP
+ - `udp` - list of additional UDP ports to open if Open to WAN button set to UPnP
  - `hideIps` - hide IP addresses when opening to WAN? (`true` or `false`)
