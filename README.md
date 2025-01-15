@@ -29,6 +29,7 @@ Planned versions:
  - 1.21.1 for Forge
  - 1.20.6 for Forge
  - 1.21.4 for Fabric & Forge
+ - 1.18.2 for Fabric & Forge ([#6](https://github.com/BoBkiNN/OpenToPublic/issues/6))
 
 ## Credits
  - to ChatGPT for helping in development my first mod
