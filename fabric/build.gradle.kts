@@ -7,9 +7,7 @@ plugins {
 version = properties["mod_version"]!! as String
 val semVer = (version as String).split("-")[0]
 group = properties["maven_group"]!!
-
-
-project.ext.set("archivesBaseName", properties["archives_base_name"])
+val baseName = properties["archives_base_name"] as String
 
 tasks.withType(JavaCompile::class) {
     options.release = 21
@@ -39,10 +37,16 @@ dependencies {
     configurations.implementation.configure{extendsFrom(configurations.getByName("includeJar"))}
 }
 
+base {
+    archivesName = baseName
+}
+
 tasks.jar {
     val dependencies = configurations.getByName("includeJar").map {
         if (it.isDirectory) return@map it else return@map zipTree(it)
     }
+
+    archiveBaseName = baseName
 
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 
