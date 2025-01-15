@@ -24,11 +24,6 @@ java {
 
 println("Fabric mod version: $version ($semVer)")
 
-//loom.mods {
-//    create("opentopublic") {
-//        sourceSet(sourceSets.getByName("main"))
-//    }
-//}
 
 dependencies {
     val includeJar = configurations.create("includeJar")
@@ -67,3 +62,61 @@ tasks.processResources {
         expand(props + properties)
     }
 }
+
+val assetsDir = layout.projectDirectory.dir("src/main/resources/assets")
+val resourcePacksDir = layout.projectDirectory.dir("run/resourcepacks")
+
+tasks {
+    val generatePackMcMeta by creating {
+        group = "other"
+        description = "Generates the pack.mcmeta file."
+
+        val packMcMetaContent = """
+            {
+                "pack": {
+                    "pack_format": 34,
+                    "description": "Fix to runIde missing resources"
+                }
+            }
+        """.trimIndent()
+
+        val outputDir = layout.buildDirectory.dir("generated/packmcmeta")
+
+        doLast {
+            val packMcMetaFile = outputDir.get().file("pack.mcmeta").asFile
+            packMcMetaFile.parentFile.mkdirs()
+            packMcMetaFile.writeText(packMcMetaContent)
+            println("Generated pack.mcmeta at: ${packMcMetaFile.absolutePath}")
+        }
+
+        outputs.file(outputDir.get().file("pack.mcmeta"))
+    }
+
+    val createResourcePack by creating(Zip::class) {
+        group = "other"
+        description = "Creates a resource pack archive from the assets folder and pack.mcmeta."
+
+        from(assetsDir) {
+            into("assets")
+        }
+
+        dependsOn(generatePackMcMeta)
+        from(generatePackMcMeta.outputs.files.singleFile) {
+            into("") // Place `pack.mcmeta` at the root of the ZIP
+        }
+
+        archiveFileName.set("mod-resources.zip")
+        destinationDirectory.set(resourcePacksDir)
+
+        doLast {
+            val resultFile = File(destinationDirectory.get().asFile, archiveFileName.get())
+            println("Resource pack created at: $resultFile")
+        }
+    }
+
+    runClient {
+        dependsOn(createResourcePack)
+    }
+}
+
+

@@ -1,18 +1,15 @@
 package xyz.bobkinn.opentopublic.upnp;
 
+import lombok.Getter;
+
+@Getter
 public class UpnpEx extends RuntimeException{
     private final UpnpEnum type;
-    private final Exception e;
-    public UpnpEx(UpnpEnum type, Exception e){
+    private final Exception ex;
+
+    public UpnpEx(UpnpEnum type, Exception ex){
         this.type = type;
-        this.e = e;
+        this.ex = ex;
     }
 
-    public UpnpEnum getType() {
-        return type;
-    }
-
-    public Exception getEx() {
-        return e;
-    }
 }

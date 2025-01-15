@@ -13,6 +13,8 @@ import java.net.UnknownHostException;
 
 @Mixin(ServerNetworkIo.class)
 public abstract class MixinServerNetworkIo {
+
+    @SuppressWarnings("ParameterCanBeLocal")
     @Inject(method = "bind", at = @At("HEAD"))
     public void onBind(InetAddress address, int port, CallbackInfo ci){
         if (OpenToPublic.lanOpening) {

@@ -9,7 +9,6 @@ import net.minecraft.client.gui.tooltip.Tooltip;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.ClickableWidget;
 import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.server.ServerMetadata;
 import net.minecraft.server.integrated.IntegratedServer;
 import net.minecraft.text.Text;
 import net.minecraft.world.GameMode;
@@ -110,11 +109,12 @@ public abstract class MixinLanServerScreen extends Screen {
             server.setOnlineMode(OpenToPublic.onlineMode);
             server.setMotd(Util.parseValues(motd, playerName, worldName));
 
-//          OpenToPublic.LOGGER.info("Saving world custom data..");
+//          OpenToPublic.LOGGER.info("Saving world custom data...");
             OtpPersistentState ps = new OtpPersistentState();
             ps.setMotd(motd);
             ps.setMaxPlayers(OpenToPublic.maxPlayers);
             ps.setEnablePvp(OpenToPublic.enablePvp);
+            ps.markDirty();
 //          OpenToPublic.LOGGER.info(nbt.toText().getString());
             var psm = server.getOverworld().getPersistentStateManager();
             psm.set(OtpPersistentState.DATA_NAME, ps);
@@ -130,8 +130,6 @@ public abstract class MixinLanServerScreen extends Screen {
 
             String parsedMotd = Util.parseValues(motd, playerName, worldName);
             server.setMotd(parsedMotd);
-            ServerMetadata md = ((ServerMetadataAccessor) server).createMetadata();
-            ((ServerMetadataAccessor) server).setMetadata(md);
 
             if (doUPnP) {
                 Util.displayToast(Text.translatable("opentopublic.toast.upnp_in_process.title"), Text.translatable("opentopublic.toast.upnp_in_process.desc"));

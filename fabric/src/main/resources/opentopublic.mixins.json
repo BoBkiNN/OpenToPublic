@@ -1,17 +1,17 @@
 {
   "required": true,
   "minVersion": "0.8",
-  "package": "xyz.bobkinn_.opentopublic.mixin",
+  "package": "xyz.bobkinn.opentopublic.mixin",
   "compatibilityLevel": "JAVA_17",
   "mixins": [
-    "xyz.bobkinn.opentopublic.mixin.MixinIntegratedServer",
-    "xyz.bobkinn.opentopublic.mixin.MixinServerNetworkIo",
-    "xyz.bobkinn.opentopublic.mixin.PlayerManagerAccessor",
-    "xyz.bobkinn.opentopublic.mixin.ServerMetadataAccessor"
+    "MixinIntegratedServer",
+    "MixinPersistentStateManager",
+    "MixinServerNetworkIo",
+    "PlayerManagerAccessor"
   ],
   "client": [
-    "xyz.bobkinn.opentopublic.mixin.MixinMinecraftClient",
-    "xyz.bobkinn.opentopublic.mixin.MixinLanServerScreen"
+    "MixinLanServerScreen",
+    "MixinMinecraftClient"
   ],
   "injectors": {
     "defaultRequire": 1
