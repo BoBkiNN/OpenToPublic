@@ -1,25 +1,23 @@
 package xyz.bobkinn.opentopublic.client;
 
-// code by https://github.com/rikka0w0/LanServerProperties/
-
-import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.gui.widget.TextFieldWidget;
-import net.minecraft.text.Text;
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.components.EditBox;
+import net.minecraft.network.chat.Component;
 
 /**
  * @author <a href="https://github.com/rikka0w0/LanServerProperties/">rikka0w0</a>
  */
-public class MotdInputTextField extends TextFieldWidget {
+public class MotdInputTextField extends EditBox {
     private String entered;
 
-    public MotdInputTextField(TextRenderer textRenderer, int x, int y, int width, int height, Text name, String defaultMotd) {
+    public MotdInputTextField(Font textRenderer, int x, int y, int width, int height, Component name, String defaultMotd) {
         super(textRenderer, x, y, width, height, name);
         this.setMaxLength(80);
-        this.setText(defaultMotd);
+        this.setValue(defaultMotd);
         this.entered = defaultMotd;
 
-        this.setChangedListener((text) -> {
-            this.setEditableColor(validate(text) != null ? 0xFFFFFF : 0xFF5555);
+        this.setResponder((text) -> {
+            this.setTextColor(validate(text) != null ? 0xFFFFFF : 0xFF5555);
             this.entered = text;
         });
     }

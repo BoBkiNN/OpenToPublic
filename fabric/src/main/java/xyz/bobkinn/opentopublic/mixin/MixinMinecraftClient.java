@@ -2,12 +2,11 @@ package xyz.bobkinn.opentopublic.mixin;
 
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.SharedConstants;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.network.ClientPlayNetworkHandler;
-import net.minecraft.client.network.ServerInfo;
-import net.minecraft.client.resource.language.I18n;
-import net.minecraft.client.util.Window;
-import net.minecraft.server.integrated.IntegratedServer;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.ClientPacketListener;
+import net.minecraft.client.multiplayer.ServerData;
+import net.minecraft.client.resources.language.I18n;
+import net.minecraft.client.server.IntegratedServer;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -20,10 +19,10 @@ import xyz.bobkinn.opentopublic.OpenedStatus;
 import xyz.bobkinn.opentopublic.PortContainer;
 import xyz.bobkinn.opentopublic.OpenToPublic;
 import xyz.bobkinn.opentopublic.upnp.UpnpThread;
-
+import com.mojang.blaze3d.platform.Window;
 import java.io.File;
 
-@Mixin(MinecraftClient.class)
+@Mixin(Minecraft.class)
 public abstract class MixinMinecraftClient {
 
     @Inject(method = "run", at = @At("HEAD"))
@@ -41,15 +40,15 @@ public abstract class MixinMinecraftClient {
     }
 
     @Shadow
-    private @Nullable IntegratedServer server;
+    private @Nullable IntegratedServer singleplayerServer;
 
-    @Shadow public abstract @Nullable ClientPlayNetworkHandler getNetworkHandler();
+    @Shadow public abstract @Nullable ClientPacketListener getConnection();
 
     @Shadow @Final private Window window;
 
-    @Shadow @Nullable public abstract ServerInfo getCurrentServerEntry();
+    @Shadow @Nullable public abstract ServerData getCurrentServer();
 
-    @Inject(method = "updateWindowTitle", at = @At("RETURN"))
+    @Inject(method = "updateTitle", at = @At("RETURN"))
     public void onUpdateWindowTitle(CallbackInfo ci){
         this.window.setTitle(getTitle());
     }
@@ -57,27 +56,27 @@ public abstract class MixinMinecraftClient {
     @Unique
     public String getTitle(){
         StringBuilder stringBuilder = new StringBuilder("Minecraft");
-        if (MinecraftClient.getModStatus().isModded()) {
+        if (Minecraft.checkModStatus().shouldReportAsModified()) {
             stringBuilder.append("*");
         }
         stringBuilder.append(" ");
-        stringBuilder.append(SharedConstants.getGameVersion().getName());
-        ClientPlayNetworkHandler clientPlayNetworkHandler = this.getNetworkHandler();
-        if (clientPlayNetworkHandler != null && clientPlayNetworkHandler.getConnection().isOpen()) {
+        stringBuilder.append(SharedConstants.getCurrentVersion().getName());
+        ClientPacketListener clientPlayNetworkHandler = this.getConnection();
+        if (clientPlayNetworkHandler != null && clientPlayNetworkHandler.getConnection().isConnected()) {
             stringBuilder.append(" - ");
-            var info = this.getCurrentServerEntry();
-            if (this.server != null && !this.server.isRemote() || OpenedStatus.current == null) {
-                stringBuilder.append(I18n.translate("title.singleplayer"));
+            var info = this.getCurrentServer();
+            if (this.singleplayerServer != null && !this.singleplayerServer.isPublished() || OpenedStatus.current == null) {
+                stringBuilder.append(I18n.get("title.singleplayer"));
             } else if (info != null && info.isRealm()) {
-                stringBuilder.append(I18n.translate("title.multiplayer.realms"));
+                stringBuilder.append(I18n.get("title.multiplayer.realms"));
             } else if (OpenedStatus.current == OpenedStatus.UPNP) {
-                stringBuilder.append(I18n.translate("opentopublic.title.multiplayer.upnp"));
+                stringBuilder.append(I18n.get("opentopublic.title.multiplayer.upnp"));
             } else if (OpenedStatus.current == OpenedStatus.MANUAL) {
-                stringBuilder.append(I18n.translate("opentopublic.title.multiplayer.wan"));
+                stringBuilder.append(I18n.get("opentopublic.title.multiplayer.wan"));
             } else if (OpenedStatus.current == OpenedStatus.LAN) {
-                stringBuilder.append(I18n.translate("title.multiplayer.lan"));
+                stringBuilder.append(I18n.get("title.multiplayer.lan"));
             } else {
-                stringBuilder.append(I18n.translate("title.multiplayer.other"));
+                stringBuilder.append(I18n.get("title.multiplayer.other"));
             }
         }
         return stringBuilder.toString();

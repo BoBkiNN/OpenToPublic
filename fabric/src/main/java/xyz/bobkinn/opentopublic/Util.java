@@ -1,29 +1,28 @@
 package xyz.bobkinn.opentopublic;
 
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.toast.SystemToast;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.text.ClickEvent;
-import net.minecraft.text.HoverEvent;
-import net.minecraft.text.MutableText;
-import net.minecraft.text.Text;
-import net.minecraft.util.WorldSavePath;
-
 import java.nio.file.Path;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.components.toasts.SystemToast;
+import net.minecraft.network.chat.ClickEvent;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.HoverEvent;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.storage.LevelResource;
 
 public class Util {
-    static MinecraftClient mc = MinecraftClient.getInstance();
-    public static Path savesFolder = MinecraftClient.getInstance().getLevelStorage().getSavesDirectory();
+    static Minecraft mc = Minecraft.getInstance();
+    public static Path savesFolder = Minecraft.getInstance().getLevelSource().getBaseDir();
 
-    public static final MutableText on = Text.translatable("options.on");
-    public static final MutableText off = Text.translatable("options.off");
+    public static final MutableComponent on = Component.translatable("options.on");
+    public static final MutableComponent off = Component.translatable("options.off");
 
     /**
      * Get world folder name
      * @param world world
      * @return world folder name
      */
-    public static String getLevelName(ServerWorld world){
+    public static String getLevelName(ServerLevel world){
         Path folder = getWorldFolder(world);
         if (folder == null) return "";
         return folder.getName(folder.getNameCount()-1).toString();
@@ -38,56 +37,56 @@ public class Util {
      * @param world integrated server world
      * @return folder
      */
-    public static Path getWorldFolder(ServerWorld world){
-        if (mc.getServer() == null) return null;
-        return world.getServer().getSavePath(WorldSavePath.LEVEL_DAT).toAbsolutePath().getParent();
+    public static Path getWorldFolder(ServerLevel world){
+        if (mc.getSingleplayerServer() == null) return null;
+        return world.getServer().getWorldPath(LevelResource.LEVEL_DATA_FILE).toAbsolutePath().getParent();
     }
 
-    public static MutableText translateYN(boolean bool){
+    public static MutableComponent translateYN(boolean bool){
         return bool ? on : off;
     }
 
-    public static MutableText parseYN(String key, boolean onlineMode) {
-        return Text.translatable(key,  Util.translateYN(onlineMode));
+    public static MutableComponent parseYN(String key, boolean onlineMode) {
+        return Component.translatable(key,  Util.translateYN(onlineMode));
     }
 
-    public static void addChatMsg(Text text){
+    public static void addChatMsg(Component text){
         if (mc == null) return;
-        mc.inGameHud.getChatHud().addMessage(text);
+        mc.gui.getChat().addMessage(text);
     }
 
     @SuppressWarnings("unused")
     public static void addChatMsg(String text){
-        addChatMsg(Text.literal(text));
+        addChatMsg(Component.literal(text));
     }
 
     public static void atSuccessOpen(boolean successOpen){
-        MutableText successWAN;
+        MutableComponent successWAN;
         String ip = (OpenToPublic.upnpIp == null) ? "0.0.0.0" : OpenToPublic.upnpIp;
         if (!OpenToPublic.cfg.isHideIps()) {
-            successWAN = Text.translatable("opentopublic.publish.started_wan", ip + ":" + OpenToPublic.customPort)
-                    .styled(
+            successWAN = Component.translatable("opentopublic.publish.started_wan", ip + ":" + OpenToPublic.customPort)
+                    .withStyle(
                             (style -> style.withClickEvent(
                                     new ClickEvent(
                                             ClickEvent.Action.COPY_TO_CLIPBOARD, ip + ":" + OpenToPublic.customPort
                                     ))
-                            .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.translatable("chat.copy.click")))
+                            .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.translatable("chat.copy.click")))
                             )
                     );
         } else {
-            successWAN = Text.translatable("opentopublic.publish.started_wan_noIp", Integer.toString(OpenToPublic.customPort));
+            successWAN = Component.translatable("opentopublic.publish.started_wan_noIp", Integer.toString(OpenToPublic.customPort));
         }
-        MutableText text;
-        if (OpenToPublic.openPublic.isTrue() || OpenToPublic.openPublic.isThird()) text = successOpen ? successWAN : Text.translatable("opentopublic.publish.failed_wan");
+        MutableComponent text;
+        if (OpenToPublic.openPublic.isTrue() || OpenToPublic.openPublic.isThird()) text = successOpen ? successWAN : Component.translatable("opentopublic.publish.failed_wan");
         else {
-            text = successOpen ? Text.translatable("commands.publish.started", OpenToPublic.customPort) : Text.translatable("commands.publish.failed");
+            text = successOpen ? Component.translatable("commands.publish.started", OpenToPublic.customPort) : Component.translatable("commands.publish.failed");
         }
         if (mc == null) return;
         Util.addChatMsg(text);
     }
 
-    public static void displayToast(Text title, Text desc){
-        mc.getToastManager().add(SystemToast.create(mc, new SystemToast.Type(), title, desc));
+    public static void displayToast(Component title, Component desc){
+        mc.getToasts().addToast(SystemToast.multiline(mc, new SystemToast.SystemToastId(), title, desc));
     }
 
 }

@@ -1,21 +1,21 @@
 package xyz.bobkinn.opentopublic.mixin;
 
 import com.mojang.datafixers.DataFixer;
-import net.minecraft.datafixer.DataFixTypes;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.world.PersistentStateManager;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.util.datafix.DataFixTypes;
+import net.minecraft.world.level.storage.DimensionDataStorage;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
-@Mixin(PersistentStateManager.class)
+@Mixin(DimensionDataStorage.class)
 public class MixinPersistentStateManager {
 
     /**
      * Allows null DataFixTypes
      */
-    @Redirect(method = "readNbt", at = @At(value = "INVOKE", target = "Lnet/minecraft/datafixer/DataFixTypes;update(Lcom/mojang/datafixers/DataFixer;Lnet/minecraft/nbt/NbtCompound;II)Lnet/minecraft/nbt/NbtCompound;"))
-    private NbtCompound onTryDataFix(DataFixTypes instance, DataFixer dataFixer, NbtCompound nbt, int oldVersion, int newVersion) {
+    @Redirect(method = "readTagFromDisk", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/datafix/DataFixTypes;update(Lcom/mojang/datafixers/DataFixer;Lnet/minecraft/nbt/CompoundTag;II)Lnet/minecraft/nbt/CompoundTag;"))
+    private CompoundTag onTryDataFix(DataFixTypes instance, DataFixer dataFixer, CompoundTag nbt, int oldVersion, int newVersion) {
         if (instance == null) return nbt;
         return instance.update(dataFixer, nbt, oldVersion, newVersion);
     }

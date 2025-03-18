@@ -1,6 +1,5 @@
 package xyz.bobkinn.opentopublic.mixin;
 
-import net.minecraft.server.ServerNetworkIo;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -10,12 +9,13 @@ import xyz.bobkinn.opentopublic.OpenedStatus;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import net.minecraft.server.network.ServerConnectionListener;
 
-@Mixin(ServerNetworkIo.class)
+@Mixin(ServerConnectionListener.class)
 public abstract class MixinServerNetworkIo {
 
     @SuppressWarnings("ParameterCanBeLocal")
-    @Inject(method = "bind", at = @At("HEAD"))
+    @Inject(method = "startTcpServerListener", at = @At("HEAD"))
     public void onBind(InetAddress address, int port, CallbackInfo ci){
         if (OpenToPublic.lanOpening) {
             if (OpenToPublic.openPublic.isTrue() || OpenToPublic.openPublic.isThird()) {

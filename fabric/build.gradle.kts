@@ -1,3 +1,5 @@
+@file:Suppress("UnstableApiUsage")
+
 plugins {
     id("fabric-loom") version "1.9-SNAPSHOT"
     `java-library`
@@ -23,12 +25,22 @@ java {
 println("Fabric mod version: $version ($semVer)")
 
 
+repositories {
+    maven("https://maven.parchmentmc.org") {
+        name = "ParchmentMC"
+    }
+}
+
 dependencies {
     val includeJar = configurations.create("includeJar")
     includeJar(files("../libs/WaifUPnP-1.2.0.jar"))
     // To change the versions see the gradle.properties file
     minecraft("com.mojang:minecraft:${properties["minecraft_version"]}")
-    mappings("net.fabricmc:yarn:${properties["yarn_mappings"]}:v2")
+    val maps = loom.layered() {
+        officialMojangMappings()
+        parchment("org.parchmentmc.data:parchment-1.21.1:2024.11.17@zip")
+    }
+    mappings(maps)
     modImplementation("net.fabricmc:fabric-loader:${properties["loader_version"]}")
 
     compileOnly("org.projectlombok:lombok:1.18.32")

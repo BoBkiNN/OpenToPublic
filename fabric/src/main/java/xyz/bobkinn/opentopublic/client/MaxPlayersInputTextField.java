@@ -1,27 +1,25 @@
 package xyz.bobkinn.opentopublic.client;
 
-// code by https://github.com/rikka0w0/LanServerProperties/
-
-import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.gui.widget.TextFieldWidget;
-import net.minecraft.text.Text;
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.components.EditBox;
+import net.minecraft.network.chat.Component;
 
 /**
  * @author <a href="https://github.com/rikka0w0/LanServerProperties/">rikka0w0</a>
  */
-public class MaxPlayersInputTextField extends TextFieldWidget {
+public class MaxPlayersInputTextField extends EditBox {
     private final int defaultVal;
 
-    public MaxPlayersInputTextField(TextRenderer textRenderer, int x, int y, int width, int height, Text name, int defaultVal) {
+    public MaxPlayersInputTextField(Font textRenderer, int x, int y, int width, int height, Component name, int defaultVal) {
         super(textRenderer, x, y, width, height, name);
         this.defaultVal = defaultVal;
-        this.setText(String.valueOf(defaultVal));
+        this.setValue(String.valueOf(defaultVal));
         // Check the format, make sure the text is a valid integer
-        this.setChangedListener((text) -> this.setEditableColor(validateNum(text) >= 0 ? 0xFFFFFF : 0xFF5555));
+        this.setResponder((text) -> this.setTextColor(validateNum(text) >= 0 ? 0xFFFFFF : 0xFF5555));
     }
 
     public int getVal() {
-        int maxPlayers = validateNum(getText());
+        int maxPlayers = validateNum(getValue());
         return String.valueOf(maxPlayers).length() > 0 ? maxPlayers : defaultVal;
     }
 
