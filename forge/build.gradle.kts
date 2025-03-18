@@ -3,43 +3,42 @@ plugins {
     id("com.gradleup.shadow")
 }
 
-architectury {
-    platformSetupLoomIde()
-    fabric()
+loom {
+    forge {
+        mixinConfig("opentopublic.mixins.json")
+    }
 }
 
-val fabric_loader_version = properties["fabric_loader_version"] as String
+architectury {
+    platformSetupLoomIde()
+    forge()
+}
+
+val forge_version = properties["forge_version"] as String
+val minecraft_version = properties["minecraft_version"] as String
 val shadowCommon = configurations.register("shadowCommon").get()
 val common = configurations.register("common").get()
 
 configurations.apply {
     compileClasspath.configure { extendsFrom(common) }
     runtimeClasspath.configure { extendsFrom(common) }
-    named("developmentFabric").configure { extendsFrom(common) }
-}
-
-repositories {
-    maven("https://maven.terraformersmc.com/")
+    named("developmentForge").configure { extendsFrom(common) }
 }
 
 dependencies {
-    modImplementation("net.fabricmc:fabric-loader:${fabric_loader_version}")
+    configurations.getByName("forge")("net.minecraftforge:forge:$minecraft_version-$forge_version")
 
     common(project(path = ":common", configuration = "namedElements")) { isTransitive = false }
-    shadowCommon(project(path = ":common", configuration = "transformProductionFabric")) {
+    shadowCommon(project(path = ":common", configuration = "transformProductionForge")) {
         isTransitive = false
     }
-    shadowCommon(project(path = ":common", configuration = "includeJar"))
-
-    // for runtime
-    modRuntimeOnly("com.terraformersmc:modmenu:11.0.3") // ModMenu for runtime
-    modRuntimeOnly(fabricApi.module("fabric-api", "0.115.2+1.21.1"))
+    shadowCommon(files("../libs/WaifUPnP-1.2.0.jar"))
 }
 
 version = properties["mod_version"]!! as String
 val semVer = (version as String).split("-")[0]
 
-println("Fabric mod version: $version ($semVer)")
+println("Forge mod version: $version ($semVer)")
 
 tasks.jar {
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
@@ -62,7 +61,7 @@ tasks.processResources {
     filteringCharset = "UTF-8"
     val props = properties.filterValues { it is String }
     inputs.properties(props)
-    filesMatching("fabric.mod.json") {
+    filesMatching("META-INF/mods.toml") {
         expand(props)
     }
 }
