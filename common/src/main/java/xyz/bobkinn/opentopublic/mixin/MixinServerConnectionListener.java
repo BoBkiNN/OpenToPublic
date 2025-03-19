@@ -14,7 +14,7 @@ import java.net.UnknownHostException;
 import net.minecraft.server.network.ServerConnectionListener;
 
 @Mixin(ServerConnectionListener.class)
-public abstract class MixinServerNetworkIo {
+public abstract class MixinServerConnectionListener {
 
     @Redirect(method = "startTcpServerListener", at = @At(value = "INVOKE", target = "Lio/netty/bootstrap/ServerBootstrap;localAddress(Ljava/net/InetAddress;I)Lio/netty/bootstrap/AbstractBootstrap;"))
     public AbstractBootstrap<ServerBootstrap, ServerChannel> onSetAddress(ServerBootstrap instance, InetAddress inetAddress, int port) {

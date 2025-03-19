@@ -22,7 +22,7 @@ import com.mojang.blaze3d.platform.Window;
 import java.io.File;
 
 @Mixin(Minecraft.class)
-public abstract class MixinMinecraftClient {
+public abstract class MixinMinecraft {
 
     @Inject(method = "run", at = @At("HEAD"))
     public void run(CallbackInfo ci){

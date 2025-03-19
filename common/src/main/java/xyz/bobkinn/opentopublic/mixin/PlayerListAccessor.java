@@ -6,7 +6,7 @@ import org.spongepowered.asm.mixin.Mutable;
 import org.spongepowered.asm.mixin.gen.Accessor;
 
 @Mixin(PlayerList.class)
-public interface PlayerManagerAccessor {
+public interface PlayerListAccessor {
     @Mutable @Accessor("maxPlayers")
     void setMaxPlayers(int maxPlayers);
 }

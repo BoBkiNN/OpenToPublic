@@ -5,13 +5,13 @@
   "compatibilityLevel": "JAVA_17",
   "mixins": [
     "MixinIntegratedServer",
-    "MixinPersistentStateManager",
-    "MixinServerNetworkIo",
-    "PlayerManagerAccessor"
+    "MixinDimensionDataStorage",
+    "MixinServerConnectionListener",
+    "PlayerListAccessor"
   ],
   "client": [
-    "MixinLanServerScreen",
-    "MixinMinecraftClient"
+    "MixinShareToLanScreen",
+    "MixinMinecraft"
   ],
   "injectors": {
     "defaultRequire": 1

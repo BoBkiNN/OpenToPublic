@@ -33,9 +33,9 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.level.GameType;
 
 @Mixin(value = ShareToLanScreen.class)
-public abstract class MixinLanServerScreen extends Screen {
+public abstract class MixinShareToLanScreen extends Screen {
 
-    protected MixinLanServerScreen(Component title) {
+    protected MixinShareToLanScreen(Component title) {
         super(title);
     }
 
@@ -103,7 +103,7 @@ public abstract class MixinLanServerScreen extends Screen {
             this.minecraft.setScreen(null);
 
             if (OpenToPublic.maxPlayers != 8){
-                ((PlayerManagerAccessor) server.getPlayerList()).setMaxPlayers(OpenToPublic.maxPlayers);
+                ((PlayerListAccessor) server.getPlayerList()).setMaxPlayers(OpenToPublic.maxPlayers);
             }
 
             server.setPvpAllowed(OpenToPublic.enablePvp);

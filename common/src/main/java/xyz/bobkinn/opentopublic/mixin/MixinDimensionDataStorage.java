@@ -9,7 +9,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
 @Mixin(DimensionDataStorage.class)
-public class MixinPersistentStateManager {
+public class MixinDimensionDataStorage {
 
     /**
      * Allows null DataFixTypes
