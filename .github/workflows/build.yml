@@ -5,9 +5,8 @@ on:
   workflow_dispatch:
 
 jobs:
-  build_fabric:
-    if: startsWith(github.event.head_commit.message, '[fabric]')
-    runs-on: ubuntu-20.04
+  build:
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
       - name: Set up JDK 21
@@ -22,12 +21,14 @@ jobs:
           gradle-version: wrapper
 
       - name: Make gradlew executable
-        run: cd fabric; chmod +x ./gradlew
+        run: chmod +x ./gradlew
 
       - name: Build with Gradle
-        run: cd fabric; ./gradlew build
+        run: ./gradlew build
 
       - uses: actions/upload-artifact@v4
         with:
           name: Fabric Build
-          path: fabric/build/libs/*.jar
+          path: |
+            fabric/build/libs/*.jar
+            forge/build/libs/*.jar
