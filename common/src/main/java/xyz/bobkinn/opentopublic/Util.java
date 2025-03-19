@@ -2,59 +2,25 @@ package xyz.bobkinn.opentopublic;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.toasts.SystemToast;
-import net.minecraft.network.chat.ClickEvent;
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.HoverEvent;
-import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.level.storage.LevelResource;
-
-import java.nio.file.Path;
+import net.minecraft.network.chat.*;
 
 public class Util {
-    public static final MutableComponent on = Component.translatable("options.on");
-    public static final MutableComponent off = Component.translatable("options.off");
-    public static Path savesFolder = Minecraft.getInstance().getLevelSource().getBaseDir();
-    static Minecraft mc = Minecraft.getInstance();
-
-    /**
-     * Get world folder name
-     *
-     * @param world world
-     * @return world folder name
-     */
-    public static String getLevelName(ServerLevel world) {
-        Path folder = getWorldFolder(world);
-        if (folder == null) return "";
-        return folder.getName(folder.getNameCount() - 1).toString();
-    }
+    private static final Minecraft MC = Minecraft.getInstance();
 
     public static String parseValues(String text, String playerName, String worldName) {
         return text.replace("%owner%", playerName).replace("%world%", worldName).replace("&", "§");
     }
 
-    /**
-     * Get world folder
-     *
-     * @param world integrated server world
-     * @return folder
-     */
-    public static Path getWorldFolder(ServerLevel world) {
-        if (mc.getSingleplayerServer() == null) return null;
-        return world.getServer().getWorldPath(LevelResource.LEVEL_DATA_FILE).toAbsolutePath().getParent();
+    public static Component translateYN(boolean bool) {
+        return bool ? CommonComponents.OPTION_ON : CommonComponents.OPTION_OFF;
     }
 
-    public static MutableComponent translateYN(boolean bool) {
-        return bool ? on : off;
-    }
-
-    public static MutableComponent parseYN(String key, boolean onlineMode) {
+    public static Component parseYN(String key, boolean onlineMode) {
         return Component.translatable(key, Util.translateYN(onlineMode));
     }
 
     public static void addChatMsg(Component text) {
-        if (mc == null) return;
-        mc.gui.getChat().addMessage(text);
+        MC.gui.getChat().addMessage(text);
     }
 
     @SuppressWarnings("unused")
@@ -76,12 +42,11 @@ public class Util {
         else {
             text = successOpen ? Component.translatable("commands.publish.started", OpenToPublic.customPort) : Component.translatable("commands.publish.failed");
         }
-        if (mc == null) return;
         Util.addChatMsg(text);
     }
 
     public static void displayToast(Component title, Component desc) {
-        mc.getToasts().addToast(SystemToast.multiline(mc, new SystemToast.SystemToastId(), title, desc));
+        MC.getToasts().addToast(SystemToast.multiline(MC, new SystemToast.SystemToastId(), title, desc));
     }
 
 }

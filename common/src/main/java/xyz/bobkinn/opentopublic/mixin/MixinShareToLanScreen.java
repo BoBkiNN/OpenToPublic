@@ -10,6 +10,7 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.ShareToLanScreen;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.server.IntegratedServer;
+import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.level.GameType;
 import org.jetbrains.annotations.NotNull;
@@ -230,7 +231,7 @@ public abstract class MixinShareToLanScreen extends Screen {
         if (OpenToPublic.openPublic.isTrue())
             this.openToPublic$openToWan.setMessage(Component.translatable("opentopublic.button.open_public", Component.translatable("opentopublic.text.manual")));
         else if (OpenToPublic.openPublic.isFalse())
-            this.openToPublic$openToWan.setMessage(Component.translatable("opentopublic.button.open_public", Util.off));
+            this.openToPublic$openToWan.setMessage(Component.translatable("opentopublic.button.open_public", CommonComponents.OPTION_OFF));
         else if (OpenToPublic.openPublic.isThird())
             this.openToPublic$openToWan.setMessage(Component.translatable("opentopublic.button.open_public", "UPnP"));
         String wanTooltip;
