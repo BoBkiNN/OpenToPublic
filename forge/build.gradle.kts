@@ -88,7 +88,7 @@ publishMods {
         accessToken = providers.environmentVariable("CURSEFORGE_TOKEN")
         projectId = providers.gradleProperty("curseforge_id")
         changelogType = "markdown"
-        displayName = "${project.version}+$minecraftVersion-forge"
+        displayName = "${project.version} for Forge $minecraftVersion"
         minecraftVersions.add(minecraftVersion)
     }
 }
