@@ -1,0 +1,3 @@
+* Updated buildscript
+* Update to 1.21.4
+* Add auto mod publishing
