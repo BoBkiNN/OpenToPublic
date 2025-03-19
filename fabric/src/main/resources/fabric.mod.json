@@ -33,6 +33,6 @@
   ],
   "depends": {
     "fabricloader": ">=${fabric_loader_version}",
-    "minecraft": ["1.21.1", "1.21"]
+    "minecraft": ["1.21.4"]
   }
 }

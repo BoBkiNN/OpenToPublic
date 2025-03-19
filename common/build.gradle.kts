@@ -3,8 +3,6 @@ plugins {
     id("com.gradleup.shadow")
 }
 
-val minecraft_version = properties["minecraft_version"] as String
-val parchment_version = properties["parchment_version"] as String
 val fabric_loader_version = properties["fabric_loader_version"] as String
 
 architectury {

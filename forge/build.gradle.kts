@@ -35,11 +35,6 @@ dependencies {
     shadowCommon(files("../libs/WaifUPnP-1.2.0.jar"))
 }
 
-version = properties["mod_version"]!! as String
-val semVer = (version as String).split("-")[0]
-
-println("Forge mod version: $version ($semVer)")
-
 tasks.jar {
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 

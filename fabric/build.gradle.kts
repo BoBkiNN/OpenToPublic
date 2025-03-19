@@ -33,14 +33,9 @@ dependencies {
     implementation(project(path = ":common", configuration = "includeJar"))
 
     // for runtime
-    modRuntimeOnly("com.terraformersmc:modmenu:11.0.3") // ModMenu for runtime
-    modRuntimeOnly(fabricApi.module("fabric-api", "0.115.2+1.21.1"))
+    modRuntimeOnly("com.terraformersmc:modmenu:13.0.3") // ModMenu for runtime
+    modRuntimeOnly(fabricApi.module("fabric-api", "0.119.0+1.21.4"))
 }
-
-version = properties["mod_version"]!! as String
-val semVer = (version as String).split("-")[0]
-
-println("Fabric mod version: $version ($semVer)")
 
 tasks.jar {
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
