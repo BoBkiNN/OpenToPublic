@@ -14,7 +14,7 @@ import xyz.bobkinn.opentopublic.upnp.UpnpThread;
 @Mixin(IntegratedServer.class)
 public abstract class MixinIntegratedServer {
 
-    @Inject(method = "publishServer", at = @At("HEAD"))
+    @Inject(method = "publishServer", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/network/ServerConnectionListener;startTcpServerListener(Ljava/net/InetAddress;I)V"))
     private void onLanStart(GameType gameMode, boolean cheatsAllowed, int port, CallbackInfoReturnable<Boolean> cir) {
         OpenToPublic.lanOpening = true;
     }

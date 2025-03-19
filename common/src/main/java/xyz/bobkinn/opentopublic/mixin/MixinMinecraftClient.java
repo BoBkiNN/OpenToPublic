@@ -52,11 +52,11 @@ public abstract class MixinMinecraftClient {
 
     @Inject(method = "updateTitle", at = @At("RETURN"))
     public void onUpdateWindowTitle(CallbackInfo ci){
-        this.window.setTitle(getTitle());
+        this.window.setTitle(openToPublic$getTitle());
     }
 
     @Unique
-    public String getTitle(){
+    public String openToPublic$getTitle(){
         StringBuilder stringBuilder = new StringBuilder("Minecraft");
         if (Minecraft.checkModStatus().shouldReportAsModified()) {
             stringBuilder.append("*");

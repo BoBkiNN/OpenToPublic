@@ -23,7 +23,6 @@ public abstract class OpenToPublic {
     public static boolean enablePvp = true;
     public static boolean upnpSuccess = false;
     public static String upnpIp = null;
-    public static boolean isLan = false;
     public static boolean serverStopped = false;
     public static Config cfg = null;
 

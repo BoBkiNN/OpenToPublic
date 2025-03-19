@@ -40,9 +40,9 @@ public abstract class MixinLanServerScreen extends Screen {
     }
 
     @Unique
-    private Button openToWan, onlineModeButton, pvpButton = null;
+    private Button openToPublic$openToWan, openToPublic$onlineModeButton, openToPublic$pvpButton = null;
     @Unique
-    private MotdInputTextField motdInput;
+    private MotdInputTextField openToPublic$motdInput;
 
     @Shadow
     private GameType gameMode = GameType.SURVIVAL;
@@ -50,11 +50,11 @@ public abstract class MixinLanServerScreen extends Screen {
     private boolean commands;
 
     @Unique
-    private int enteredPort = OpenToPublic.customPort;
+    private int openToPublic$enteredPort = OpenToPublic.customPort;
     @Unique
-    private int enteredMaxPN = OpenToPublic.maxPlayers;
+    private int openToPublic$enteredMaxPN = OpenToPublic.maxPlayers;
     @Unique
-    private String motd = null;
+    private String openToPublic$motd = null;
 
     @Inject(at = @At("HEAD"), method = "render", cancellable = true)
     public void render(GuiGraphics context, int mouseX, int mouseY, float delta, CallbackInfo ci) {
@@ -77,7 +77,7 @@ public abstract class MixinLanServerScreen extends Screen {
                 Component.translatable("opentopublic.button.port"), OpenToPublic.customPort);
         portField.setResponder((text) -> {
             portField.setTextColor(validatePort(text) >= 0 ? 0xFFFFFF : 0xFF5555);
-            enteredPort = portField.getServerPort();
+            openToPublic$enteredPort = portField.getServerPort();
         });
         return this.addRenderableWidget(portField);
     }
@@ -90,15 +90,15 @@ public abstract class MixinLanServerScreen extends Screen {
             String playerName = Minecraft.getInstance().getUser().getName();
             if (server == null) return;
 
-            if (validatePort(Integer.toString(enteredPort)) == -1) return;
-            if (MaxPlayersInputTextField.validateNum(Integer.toString(enteredMaxPN)) == -1) return;
-            String enteredMotd = motdInput.getMotd();
+            if (validatePort(Integer.toString(openToPublic$enteredPort)) == -1) return;
+            if (MaxPlayersInputTextField.validateNum(Integer.toString(openToPublic$enteredMaxPN)) == -1) return;
+            String enteredMotd = openToPublic$motdInput.getMotd();
             if (enteredMotd == null) return;
-            this.motd = enteredMotd;
+            this.openToPublic$motd = enteredMotd;
             String worldName = server.getWorldData().getLevelName();
 
-            OpenToPublic.customPort = enteredPort;
-            OpenToPublic.maxPlayers = enteredMaxPN;
+            OpenToPublic.customPort = openToPublic$enteredPort;
+            OpenToPublic.maxPlayers = openToPublic$enteredMaxPN;
 
             this.minecraft.setScreen(null);
 
@@ -108,11 +108,11 @@ public abstract class MixinLanServerScreen extends Screen {
 
             server.setPvpAllowed(OpenToPublic.enablePvp);
             server.setUsesAuthentication(OpenToPublic.onlineMode);
-            server.setMotd(Util.parseValues(motd, playerName, worldName));
+            server.setMotd(Util.parseValues(openToPublic$motd, playerName, worldName));
 
 //          OpenToPublic.LOGGER.info("Saving world custom data...");
             OtpPersistentState ps = new OtpPersistentState();
-            ps.setMotd(motd);
+            ps.setMotd(openToPublic$motd);
             ps.setMaxPlayers(OpenToPublic.maxPlayers);
             ps.setEnablePvp(OpenToPublic.enablePvp);
             ps.setDirty();
@@ -129,7 +129,7 @@ public abstract class MixinLanServerScreen extends Screen {
 
             boolean successOpen = server.publishServer(this.gameMode, this.commands, OpenToPublic.customPort);
 
-            String parsedMotd = Util.parseValues(motd, playerName, worldName);
+            String parsedMotd = Util.parseValues(openToPublic$motd, playerName, worldName);
             server.setMotd(parsedMotd);
 
             if (doUPnP) {
@@ -154,7 +154,7 @@ public abstract class MixinLanServerScreen extends Screen {
         if (player == null || server == null){
             return;
         }
-        this.motd = server.getMotd();
+        this.openToPublic$motd = server.getMotd();
 
         OpenToPublic.updateConfig(OpenToPublic.modConfigPath.resolve("config.json")); // update config
 
@@ -163,72 +163,72 @@ public abstract class MixinLanServerScreen extends Screen {
         var psm = server.overworld().getDataStorage();
         var loaded = psm.get(OtpPersistentState.TYPE, OtpPersistentState.DATA_NAME);
         OtpPersistentState ps = loaded != null ? loaded : new OtpPersistentState();
-        if (ps.getMotd() != null) this.motd = ps.getMotd();
-        if (ps.getMaxPlayers() != null) this.enteredMaxPN = ps.getMaxPlayers();
+        if (ps.getMotd() != null) this.openToPublic$motd = ps.getMotd();
+        if (ps.getMaxPlayers() != null) this.openToPublic$enteredMaxPN = ps.getMaxPlayers();
         if (ps.getMaxPlayers() != null) OpenToPublic.enablePvp = ps.getEnablePvp();
-        OpenToPublic.maxPlayers = this.enteredMaxPN;
+        OpenToPublic.maxPlayers = this.openToPublic$enteredMaxPN;
         // OpenToPublic.LOGGER.info("Loaded! "+ nbt);
 
 
         // open to wan button
-        Tooltip wanTooltip = getWanTooltip();
+        Tooltip wanTooltip = openToPublic$getWanTooltip();
 
-        openToWan = Button.builder(
+        openToPublic$openToWan = Button.builder(
                 Component.translatable("opentopublic.button.open_public"),
                 (w) -> {
                     OpenToPublic.openPublic.next();
-                    updateButtonText();
+                    openToPublic$updateButtonText();
                 })
                 .bounds(this.width / 2 + 5, this.height - 54, 150, 20)
                 .tooltip(wanTooltip)
                 .build();
-        this.addRenderableWidget(openToWan);
+        this.addRenderableWidget(openToPublic$openToWan);
 
         // online mode switch
         Tooltip onlineModeTooltip = Tooltip.create(Component.translatable("opentopublic.tooltip.online_mode_tooltip"));
-        onlineModeButton = Button.builder(Util.parseYN("opentopublic.button.online_mode", OpenToPublic.onlineMode),
+        openToPublic$onlineModeButton = Button.builder(Util.parseYN("opentopublic.button.online_mode", OpenToPublic.onlineMode),
                 (w) -> {
                     OpenToPublic.onlineMode = !OpenToPublic.onlineMode;
-                    updateButtonText();
+                    openToPublic$updateButtonText();
                 })
                 .bounds(this.width / 2 - 155, 144, 150, 20)
                 .tooltip(onlineModeTooltip)
                 .build();
-        this.addRenderableWidget(onlineModeButton);
+        this.addRenderableWidget(openToPublic$onlineModeButton);
 
         // pvp on/off button
-        pvpButton = Button.builder(Util.parseYN("opentopublic.button.enable_pvp", OpenToPublic.enablePvp),
+        openToPublic$pvpButton = Button.builder(Util.parseYN("opentopublic.button.enable_pvp", OpenToPublic.enablePvp),
                 (w) -> {
                     OpenToPublic.enablePvp = ! OpenToPublic.enablePvp;
-                    updateButtonText();
+                    openToPublic$updateButtonText();
                 })
                 .bounds(this.width / 2 + 5, 144, 150, 20)
                 .build();
-        this.addRenderableWidget(pvpButton);
+        this.addRenderableWidget(openToPublic$pvpButton);
 
         // max player input field
-        MaxPlayersInputTextField maxPlayers = getMaxPlayersInputTextField();
+        MaxPlayersInputTextField maxPlayers = openToPublic$getMaxPlayersInputTextField();
         this.addRenderableWidget(maxPlayers);
 
         // motd input
-        motdInput = new MotdInputTextField(this.font, this.width / 2 -155, 215, 311, 20, Component.translatable("opentopublic.button.motd"), motd);
-        this.addRenderableWidget(motdInput);
-        updateButtonText();
+        openToPublic$motdInput = new MotdInputTextField(this.font, this.width / 2 -155, 215, 311, 20, Component.translatable("opentopublic.button.motd"), openToPublic$motd);
+        this.addRenderableWidget(openToPublic$motdInput);
+        openToPublic$updateButtonText();
     }
 
     @Unique
-    private @NotNull MaxPlayersInputTextField getMaxPlayersInputTextField() {
+    private @NotNull MaxPlayersInputTextField openToPublic$getMaxPlayersInputTextField() {
         MaxPlayersInputTextField maxPlayers = new MaxPlayersInputTextField(this.font, this.width / 2 -155, 180, 150,20, Component.translatable("opentopublic.button.max_players"), OpenToPublic.maxPlayers);
         maxPlayers.setResponder((text) -> {
             maxPlayers.setTextColor(MaxPlayersInputTextField.validateNum(text) >= 0 ? 0xFFFFFF : 0xFF5555);
-            enteredMaxPN = maxPlayers.getVal();
+            openToPublic$enteredMaxPN = maxPlayers.getVal();
 //            player.sendMessage(new LiteralText("max players change: "+enteredMaxPN), false);
         });
         return maxPlayers;
     }
 
     @Unique
-    private static @NotNull Tooltip getWanTooltip() {
+    private static @NotNull Tooltip openToPublic$getWanTooltip() {
         String tooltipTextKey;
         if (OpenToPublic.openPublic.isTrue()){
             tooltipTextKey = "opentopublic.tooltip.wan_tooltip.manual";
@@ -242,10 +242,10 @@ public abstract class MixinLanServerScreen extends Screen {
 
 
     @Unique
-    private void updateButtonText(){
-        if (OpenToPublic.openPublic.isTrue()) this.openToWan.setMessage(Component.translatable("opentopublic.button.open_public", Component.translatable("opentopublic.text.manual")));
-        else if (OpenToPublic.openPublic.isFalse()) this.openToWan.setMessage(Component.translatable("opentopublic.button.open_public", Util.off));
-        else if (OpenToPublic.openPublic.isThird()) this.openToWan.setMessage(Component.translatable("opentopublic.button.open_public", "UPnP"));
+    private void openToPublic$updateButtonText(){
+        if (OpenToPublic.openPublic.isTrue()) this.openToPublic$openToWan.setMessage(Component.translatable("opentopublic.button.open_public", Component.translatable("opentopublic.text.manual")));
+        else if (OpenToPublic.openPublic.isFalse()) this.openToPublic$openToWan.setMessage(Component.translatable("opentopublic.button.open_public", Util.off));
+        else if (OpenToPublic.openPublic.isThird()) this.openToPublic$openToWan.setMessage(Component.translatable("opentopublic.button.open_public", "UPnP"));
         String wanTooltip;
         if (OpenToPublic.openPublic.isTrue()){
             wanTooltip = "opentopublic.tooltip.wan_tooltip.manual";
@@ -254,8 +254,8 @@ public abstract class MixinLanServerScreen extends Screen {
         } else {
             wanTooltip = "opentopublic.tooltip.wan_tooltip.upnp";
         }
-        this.openToWan.setTooltip(Tooltip.create(Component.translatable(wanTooltip)));
-        this.onlineModeButton.setMessage(Util.parseYN("opentopublic.button.online_mode", OpenToPublic.onlineMode));
-        this.pvpButton.setMessage(Util.parseYN("opentopublic.button.enable_pvp",  OpenToPublic.enablePvp));
+        this.openToPublic$openToWan.setTooltip(Tooltip.create(Component.translatable(wanTooltip)));
+        this.openToPublic$onlineModeButton.setMessage(Util.parseYN("opentopublic.button.online_mode", OpenToPublic.onlineMode));
+        this.openToPublic$pvpButton.setMessage(Util.parseYN("opentopublic.button.enable_pvp",  OpenToPublic.enablePvp));
     }
 }
