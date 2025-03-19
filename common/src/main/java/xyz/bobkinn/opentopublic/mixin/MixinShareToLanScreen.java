@@ -1,24 +1,5 @@
 package xyz.bobkinn.opentopublic.mixin;
 
-import org.jetbrains.annotations.NotNull;
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.Unique;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.Redirect;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import xyz.bobkinn.opentopublic.OtpPersistentState;
-import xyz.bobkinn.opentopublic.PortContainer;
-import xyz.bobkinn.opentopublic.Util;
-import xyz.bobkinn.opentopublic.OpenToPublic;
-import xyz.bobkinn.opentopublic.client.MaxPlayersInputTextField;
-import xyz.bobkinn.opentopublic.client.MotdInputTextField;
-import xyz.bobkinn.opentopublic.client.PortInputTextField;
-import xyz.bobkinn.opentopublic.upnp.UpnpThread;
-
-import static xyz.bobkinn.opentopublic.client.PortInputTextField.validatePort;
-
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
@@ -31,26 +12,27 @@ import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.server.IntegratedServer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.level.GameType;
+import org.jetbrains.annotations.NotNull;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.Redirect;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import xyz.bobkinn.opentopublic.OpenToPublic;
+import xyz.bobkinn.opentopublic.OtpPersistentState;
+import xyz.bobkinn.opentopublic.PortContainer;
+import xyz.bobkinn.opentopublic.Util;
+import xyz.bobkinn.opentopublic.client.MaxPlayersInputTextField;
+import xyz.bobkinn.opentopublic.client.MotdInputTextField;
+import xyz.bobkinn.opentopublic.client.PortInputTextField;
+import xyz.bobkinn.opentopublic.upnp.UpnpThread;
+
+import static xyz.bobkinn.opentopublic.client.PortInputTextField.validatePort;
 
 @Mixin(value = ShareToLanScreen.class)
 public abstract class MixinShareToLanScreen extends Screen {
-
-    protected MixinShareToLanScreen(Component title) {
-        super(title);
-    }
-
-    @Unique
-    private Button openToPublic$openToWan, openToPublic$onlineModeButton, openToPublic$pvpButton = null;
-    @Unique
-    private MotdInputTextField openToPublic$motdInput;
-
-    @Shadow
-    private GameType gameMode = GameType.SURVIVAL;
-    @Shadow
-    private boolean commands;
-
-    @Unique
-    private int openToPublic$enteredPort = OpenToPublic.customPort;
 
     @Unique
     public boolean openToPublic$onlineMode = true;
@@ -59,9 +41,36 @@ public abstract class MixinShareToLanScreen extends Screen {
     @Unique
     public boolean openToPublic$enablePvp = true;
     @Unique
+    private Button openToPublic$openToWan, openToPublic$onlineModeButton, openToPublic$pvpButton = null;
+    @Unique
+    private MotdInputTextField openToPublic$motdInput;
+    @Shadow
+    private GameType gameMode = GameType.SURVIVAL;
+    @Shadow
+    private boolean commands;
+    @Unique
+    private int openToPublic$enteredPort = OpenToPublic.customPort;
+    @Unique
     private int openToPublic$enteredMaxPN = openToPublic$maxPlayers;
     @Unique
     private String openToPublic$motd = null;
+
+    protected MixinShareToLanScreen(Component title) {
+        super(title);
+    }
+
+    @Unique
+    private static @NotNull Tooltip openToPublic$getWanTooltip() {
+        String tooltipTextKey;
+        if (OpenToPublic.openPublic.isTrue()) {
+            tooltipTextKey = "opentopublic.tooltip.wan_tooltip.manual";
+        } else if (OpenToPublic.openPublic.isFalse()) {
+            tooltipTextKey = "opentopublic.tooltip.wan_tooltip.lan";
+        } else {
+            tooltipTextKey = "opentopublic.tooltip.wan_tooltip.upnp";
+        }
+        return Tooltip.create(Component.translatable(tooltipTextKey));
+    }
 
     @Inject(at = @At("HEAD"), method = "render", cancellable = true)
     public void render(GuiGraphics context, int mouseX, int mouseY, float delta, CallbackInfo ci) {
@@ -75,13 +84,9 @@ public abstract class MixinShareToLanScreen extends Screen {
         ci.cancel();
     }
 
-    @Redirect(method = "init", at = @At(value = "INVOKE",ordinal = 2, target = "Lnet/minecraft/client/gui/screens/ShareToLanScreen;addRenderableWidget(Lnet/minecraft/client/gui/components/events/GuiEventListener;)Lnet/minecraft/client/gui/components/events/GuiEventListener;"))
+    @Redirect(method = "init", at = @At(value = "INVOKE", ordinal = 2, target = "Lnet/minecraft/client/gui/screens/ShareToLanScreen;addRenderableWidget(Lnet/minecraft/client/gui/components/events/GuiEventListener;)Lnet/minecraft/client/gui/components/events/GuiEventListener;"))
     private GuiEventListener redirectPort(ShareToLanScreen instance, GuiEventListener element) {
-        // port enter field
-        PortInputTextField portField = new PortInputTextField(font, this.width / 2 - 154 + 147/2,
-                this.height - 54,
-                147/2, 20,
-                Component.translatable("opentopublic.button.port"), OpenToPublic.customPort);
+        PortInputTextField portField = new PortInputTextField(font, this.width / 2 - 154 + 147 / 2, this.height - 54, 147 / 2, 20, Component.translatable("opentopublic.button.port"), OpenToPublic.customPort);
         portField.setResponder((text) -> {
             portField.setTextColor(validatePort(text) >= 0 ? 0xFFFFFF : 0xFF5555);
             openToPublic$enteredPort = portField.getServerPort();
@@ -89,7 +94,7 @@ public abstract class MixinShareToLanScreen extends Screen {
         return this.addRenderableWidget(portField);
     }
 
-    @Redirect(method = "init", at = @At(value = "INVOKE",ordinal = 3, target = "Lnet/minecraft/client/gui/screens/ShareToLanScreen;addRenderableWidget(Lnet/minecraft/client/gui/components/events/GuiEventListener;)Lnet/minecraft/client/gui/components/events/GuiEventListener;"))
+    @Redirect(method = "init", at = @At(value = "INVOKE", ordinal = 3, target = "Lnet/minecraft/client/gui/screens/ShareToLanScreen;addRenderableWidget(Lnet/minecraft/client/gui/components/events/GuiEventListener;)Lnet/minecraft/client/gui/components/events/GuiEventListener;"))
     private GuiEventListener addButtonRedirect(ShareToLanScreen instance, GuiEventListener element) {
         Button.OnPress act = (w) -> {
             if (this.minecraft == null) return;
@@ -109,7 +114,7 @@ public abstract class MixinShareToLanScreen extends Screen {
 
             this.minecraft.setScreen(null);
 
-            if (openToPublic$maxPlayers != 8){
+            if (openToPublic$maxPlayers != 8) {
                 ((PlayerListAccessor) server.getPlayerList()).setMaxPlayers(openToPublic$maxPlayers);
             }
 
@@ -147,18 +152,17 @@ public abstract class MixinShareToLanScreen extends Screen {
             }
             this.minecraft.updateTitle();
         };
-        AbstractWidget newBtn = Button.builder(Component.translatable("lanServer.start"), act)
-                .bounds(this.width / 2 - 155, this.height - 28, 150, 20).build();
+        AbstractWidget newBtn = Button.builder(Component.translatable("lanServer.start"), act).bounds(this.width / 2 - 155, this.height - 28, 150, 20).build();
         this.addRenderableWidget(newBtn);
         return newBtn;
     }
 
     @Inject(method = "init", at = @At("HEAD"))
-    private void onInit(CallbackInfo ci){
+    private void onInit(CallbackInfo ci) {
         LocalPlayer player = Minecraft.getInstance().player;
         if (this.minecraft == null) return;
         IntegratedServer server = this.minecraft.getSingleplayerServer();
-        if (player == null || server == null){
+        if (player == null || server == null) {
             return;
         }
         this.openToPublic$motd = server.getMotd();
@@ -180,37 +184,25 @@ public abstract class MixinShareToLanScreen extends Screen {
         // open to wan button
         Tooltip wanTooltip = openToPublic$getWanTooltip();
 
-        openToPublic$openToWan = Button.builder(
-                Component.translatable("opentopublic.button.open_public"),
-                (w) -> {
-                    OpenToPublic.openPublic.next();
-                    openToPublic$updateButtonText();
-                })
-                .bounds(this.width / 2 + 5, this.height - 54, 150, 20)
-                .tooltip(wanTooltip)
-                .build();
+        openToPublic$openToWan = Button.builder(Component.translatable("opentopublic.button.open_public"), (w) -> {
+            OpenToPublic.openPublic.next();
+            openToPublic$updateButtonText();
+        }).bounds(this.width / 2 + 5, this.height - 54, 150, 20).tooltip(wanTooltip).build();
         this.addRenderableWidget(openToPublic$openToWan);
 
         // online mode switch
         Tooltip onlineModeTooltip = Tooltip.create(Component.translatable("opentopublic.tooltip.online_mode_tooltip"));
-        openToPublic$onlineModeButton = Button.builder(Util.parseYN("opentopublic.button.online_mode", openToPublic$onlineMode),
-                (w) -> {
-                    openToPublic$onlineMode = !openToPublic$onlineMode;
-                    openToPublic$updateButtonText();
-                })
-                .bounds(this.width / 2 - 155, 144, 150, 20)
-                .tooltip(onlineModeTooltip)
-                .build();
+        openToPublic$onlineModeButton = Button.builder(Util.parseYN("opentopublic.button.online_mode", openToPublic$onlineMode), (w) -> {
+            openToPublic$onlineMode = !openToPublic$onlineMode;
+            openToPublic$updateButtonText();
+        }).bounds(this.width / 2 - 155, 144, 150, 20).tooltip(onlineModeTooltip).build();
         this.addRenderableWidget(openToPublic$onlineModeButton);
 
         // pvp on/off button
-        openToPublic$pvpButton = Button.builder(Util.parseYN("opentopublic.button.enable_pvp", openToPublic$enablePvp),
-                (w) -> {
-                    openToPublic$enablePvp = !openToPublic$enablePvp;
-                    openToPublic$updateButtonText();
-                })
-                .bounds(this.width / 2 + 5, 144, 150, 20)
-                .build();
+        openToPublic$pvpButton = Button.builder(Util.parseYN("opentopublic.button.enable_pvp", openToPublic$enablePvp), (w) -> {
+            openToPublic$enablePvp = !openToPublic$enablePvp;
+            openToPublic$updateButtonText();
+        }).bounds(this.width / 2 + 5, 144, 150, 20).build();
         this.addRenderableWidget(openToPublic$pvpButton);
 
         // max player input field
@@ -218,43 +210,31 @@ public abstract class MixinShareToLanScreen extends Screen {
         this.addRenderableWidget(maxPlayersField);
 
         // motd input
-        openToPublic$motdInput = new MotdInputTextField(this.font, this.width / 2 -155, 215, 311, 20, Component.translatable("opentopublic.button.motd"), openToPublic$motd);
+        openToPublic$motdInput = new MotdInputTextField(this.font, this.width / 2 - 155, 215, 311, 20, Component.translatable("opentopublic.button.motd"), openToPublic$motd);
         this.addRenderableWidget(openToPublic$motdInput);
         openToPublic$updateButtonText();
     }
 
     @Unique
     private @NotNull MaxPlayersInputTextField openToPublic$getMaxPlayersInputTextField() {
-        MaxPlayersInputTextField maxPlayersField = new MaxPlayersInputTextField(this.font, this.width / 2 -155, 180, 150,20, Component.translatable("opentopublic.button.max_players"), openToPublic$maxPlayers);
+        MaxPlayersInputTextField maxPlayersField = new MaxPlayersInputTextField(this.font, this.width / 2 - 155, 180, 150, 20, Component.translatable("opentopublic.button.max_players"), openToPublic$maxPlayers);
         maxPlayersField.setResponder((text) -> {
             maxPlayersField.setTextColor(MaxPlayersInputTextField.validateNum(text) >= 0 ? 0xFFFFFF : 0xFF5555);
-            openToPublic$enteredMaxPN = maxPlayersField.getVal();
-//            player.sendMessage(new LiteralText("max players change: "+enteredMaxPN), false);
+            openToPublic$enteredMaxPN = maxPlayersField.getValidValue();
         });
         return maxPlayersField;
     }
 
     @Unique
-    private static @NotNull Tooltip openToPublic$getWanTooltip() {
-        String tooltipTextKey;
-        if (OpenToPublic.openPublic.isTrue()){
-            tooltipTextKey = "opentopublic.tooltip.wan_tooltip.manual";
-        } else if (OpenToPublic.openPublic.isFalse()) {
-            tooltipTextKey = "opentopublic.tooltip.wan_tooltip.lan";
-        } else {
-            tooltipTextKey = "opentopublic.tooltip.wan_tooltip.upnp";
-        }
-        return Tooltip.create(Component.translatable(tooltipTextKey));
-    }
-
-
-    @Unique
-    private void openToPublic$updateButtonText(){
-        if (OpenToPublic.openPublic.isTrue()) this.openToPublic$openToWan.setMessage(Component.translatable("opentopublic.button.open_public", Component.translatable("opentopublic.text.manual")));
-        else if (OpenToPublic.openPublic.isFalse()) this.openToPublic$openToWan.setMessage(Component.translatable("opentopublic.button.open_public", Util.off));
-        else if (OpenToPublic.openPublic.isThird()) this.openToPublic$openToWan.setMessage(Component.translatable("opentopublic.button.open_public", "UPnP"));
+    private void openToPublic$updateButtonText() {
+        if (OpenToPublic.openPublic.isTrue())
+            this.openToPublic$openToWan.setMessage(Component.translatable("opentopublic.button.open_public", Component.translatable("opentopublic.text.manual")));
+        else if (OpenToPublic.openPublic.isFalse())
+            this.openToPublic$openToWan.setMessage(Component.translatable("opentopublic.button.open_public", Util.off));
+        else if (OpenToPublic.openPublic.isThird())
+            this.openToPublic$openToWan.setMessage(Component.translatable("opentopublic.button.open_public", "UPnP"));
         String wanTooltip;
-        if (OpenToPublic.openPublic.isTrue()){
+        if (OpenToPublic.openPublic.isTrue()) {
             wanTooltip = "opentopublic.tooltip.wan_tooltip.manual";
         } else if (OpenToPublic.openPublic.isFalse()) {
             wanTooltip = "opentopublic.tooltip.wan_tooltip.lan";

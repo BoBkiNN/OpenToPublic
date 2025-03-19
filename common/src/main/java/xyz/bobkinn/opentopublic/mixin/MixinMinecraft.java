@@ -1,5 +1,6 @@
 package xyz.bobkinn.opentopublic.mixin;
 
+import com.mojang.blaze3d.platform.Window;
 import net.minecraft.SharedConstants;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientPacketListener;
@@ -14,18 +15,24 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import xyz.bobkinn.opentopublic.OpenToPublic;
 import xyz.bobkinn.opentopublic.OpenedStatus;
 import xyz.bobkinn.opentopublic.PortContainer;
-import xyz.bobkinn.opentopublic.OpenToPublic;
 import xyz.bobkinn.opentopublic.upnp.UpnpThread;
-import com.mojang.blaze3d.platform.Window;
+
 import java.io.File;
 
 @Mixin(Minecraft.class)
 public abstract class MixinMinecraft {
 
+    @Shadow
+    private @Nullable IntegratedServer singleplayerServer;
+    @Shadow
+    @Final
+    private Window window;
+
     @Inject(method = "run", at = @At("HEAD"))
-    public void run(CallbackInfo ci){
+    public void run(CallbackInfo ci) {
         if (OpenToPublic.modConfigPath == null) {
             OpenToPublic.LOGGER.error("Failed to get modConfigPath for loading");
             return;
@@ -42,21 +49,19 @@ public abstract class MixinMinecraft {
     }
 
     @Shadow
-    private @Nullable IntegratedServer singleplayerServer;
+    public abstract @Nullable ClientPacketListener getConnection();
 
-    @Shadow public abstract @Nullable ClientPacketListener getConnection();
-
-    @Shadow @Final private Window window;
-
-    @Shadow @Nullable public abstract ServerData getCurrentServer();
+    @Shadow
+    @Nullable
+    public abstract ServerData getCurrentServer();
 
     @Inject(method = "updateTitle", at = @At("RETURN"))
-    public void onUpdateWindowTitle(CallbackInfo ci){
+    public void onUpdateWindowTitle(CallbackInfo ci) {
         this.window.setTitle(openToPublic$getTitle());
     }
 
     @Unique
-    public String openToPublic$getTitle(){
+    public String openToPublic$getTitle() {
         StringBuilder stringBuilder = new StringBuilder("Minecraft");
         if (Minecraft.checkModStatus().shouldReportAsModified()) {
             stringBuilder.append("*");

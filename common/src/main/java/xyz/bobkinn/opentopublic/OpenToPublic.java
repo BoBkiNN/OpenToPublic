@@ -12,21 +12,34 @@ import java.nio.file.Path;
 
 public abstract class OpenToPublic {
     public static final String MOD_ID = "opentopublic";
+    public static final ThreeLean<Boolean, Boolean, String> openPublic = ThreeLean.newBBS("upnp");
+    public static final Logger LOGGER = LogManager.getLogger("OpenToPublic");
+
     public static Path modConfigPath = null;
     public static File backupFile = null;
-
     public static boolean lanOpening = false;
-    public static final ThreeLean<Boolean, Boolean, String> openPublic = ThreeLean.newBBS("upnp");
     public static int customPort = 25565;
     public static String upnpIp = null;
     public static boolean serverStopped = false;
     public static Config cfg = null;
 
-    public static final Logger LOGGER = LogManager.getLogger("OpenToPublic");
+    public OpenToPublic() {
+        modConfigPath = getConfigsFolder().resolve(OpenToPublic.MOD_ID);
+        openPublic.setCurrentState(2);
 
-    public static void updateConfig(Path path){
+
+        // if world not closed correctly
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            if (OpenToPublic.serverStopped && upnpIp != null && !PortContainer.self.isEmpty()) {
+                LOGGER.info("Closing ports at shutdown..");
+                UpnpThread.runClose();
+            }
+        }));
+    }
+
+    public static void updateConfig(Path path) {
         File folder = OpenToPublic.modConfigPath.toFile();
-        if (!folder.exists()){
+        if (!folder.exists()) {
             boolean created = folder.mkdirs();
             if (!created) {
                 LOGGER.error("Failed to create config folder");
@@ -34,10 +47,7 @@ public abstract class OpenToPublic {
             }
         }
         File file = path.toFile();
-        Gson gson = new GsonBuilder()
-                .setPrettyPrinting()
-                .registerTypeAdapter(Config.class, (InstanceCreator<Config>) type -> new Config())
-                .create();
+        Gson gson = new GsonBuilder().setPrettyPrinting().registerTypeAdapter(Config.class, (InstanceCreator<Config>) type -> new Config()).create();
         if (!file.exists()) {
             try {
                 boolean created = file.createNewFile();
@@ -69,18 +79,4 @@ public abstract class OpenToPublic {
     }
 
     public abstract Path getConfigsFolder();
-
-    public OpenToPublic(){
-        modConfigPath = getConfigsFolder().resolve(OpenToPublic.MOD_ID);
-        openPublic.setCurrentState(2);
-
-
-        // if world not closed correctly
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            if (OpenToPublic.serverStopped && upnpIp != null && !PortContainer.self.isEmpty()) {
-                LOGGER.info("Closing ports at shutdown..");
-                UpnpThread.runClose();
-            }
-        }));
-    }
 }

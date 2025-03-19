@@ -11,7 +11,7 @@ public class Config {
     private final List<Integer> udp;
     private final boolean hideIps;
 
-    public Config(){
+    public Config() {
         this.tcp = new ArrayList<>();
         this.udp = new ArrayList<>();
         this.hideIps = false;

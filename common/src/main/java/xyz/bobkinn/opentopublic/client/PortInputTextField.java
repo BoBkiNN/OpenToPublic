@@ -18,29 +18,21 @@ public class PortInputTextField extends EditBox {
         this.setResponder((text) -> this.setTextColor(validatePort(text) >= 0 ? 0xFFFFFF : 0xFF5555));
     }
 
-    public int getServerPort() {
-        int port = validatePort(getValue());
-        return String.valueOf(port).length() > 0 ? port : defaultPort;
-    }
-
     /**
      * @param text input
-     * @return negative if port is invalid, otherwise the port number
+     * @return -1 if port is invalid, otherwise the port number
      */
     public static int validatePort(String text) {
-        boolean valid = true;
-        int port = -1;
         try {
-            if (text.length() > 0) {
-                port = Integer.parseInt(text);
-                if (port < 0 || port > 65535)
-                    valid = false;
-            }
-            if (text.length() == 0) valid=false;
+            var port = Integer.parseInt(text);
+            return port <= 0 || port > 65535 ? -1 : port;
         } catch (NumberFormatException e) {
-            valid = false;
+            return -1;
         }
+    }
 
-        return valid ? port : -1;
+    public int getServerPort() {
+        int port = validatePort(getValue());
+        return port > 0 ? port : defaultPort;
     }
 }

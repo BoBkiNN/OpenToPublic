@@ -12,16 +12,11 @@ import org.jetbrains.annotations.NotNull;
 public class OtpPersistentState extends SavedData {
 
     public static final String DATA_NAME = "lanOptions";
+    public static final Factory<OtpPersistentState> TYPE = new Factory<>(OtpPersistentState::new, OtpPersistentState::fromNbt, null);
 
     private String motd = null;
     private Integer maxPlayers = null;
     private Boolean enablePvp = null;
-
-    public static final Factory<OtpPersistentState> TYPE = new Factory<>(
-            OtpPersistentState::new,
-            OtpPersistentState::fromNbt,
-            null
-    );
 
     public static @NotNull OtpPersistentState fromNbt(@NotNull CompoundTag tag, HolderLookup.Provider lookup) {
         var otp = new OtpPersistentState();
@@ -32,7 +27,7 @@ public class OtpPersistentState extends SavedData {
     }
 
     @Override
-    public CompoundTag save(CompoundTag nbt, HolderLookup.Provider registryLookup) {
+    public @NotNull CompoundTag save(CompoundTag nbt, HolderLookup.Provider registryLookup) {
         if (motd != null) nbt.putString("motd", motd);
         if (maxPlayers != null) nbt.putInt("maxPlayers", maxPlayers);
         if (enablePvp != null) nbt.putBoolean("enablePvp", enablePvp);

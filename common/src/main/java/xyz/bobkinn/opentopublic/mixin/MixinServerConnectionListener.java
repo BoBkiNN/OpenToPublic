@@ -3,6 +3,7 @@ package xyz.bobkinn.opentopublic.mixin;
 import io.netty.bootstrap.AbstractBootstrap;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ServerChannel;
+import net.minecraft.server.network.ServerConnectionListener;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
@@ -11,7 +12,6 @@ import xyz.bobkinn.opentopublic.OpenedStatus;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import net.minecraft.server.network.ServerConnectionListener;
 
 @Mixin(ServerConnectionListener.class)
 public abstract class MixinServerConnectionListener {

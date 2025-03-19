@@ -20,7 +20,7 @@ public abstract class MixinIntegratedServer {
     }
 
     @Inject(method = "initServer", at = @At("HEAD"))
-    private void onStart(CallbackInfoReturnable<Boolean> cir){
+    private void onStart(CallbackInfoReturnable<Boolean> cir) {
         OpenToPublic.serverStopped = false;
     }
 

@@ -22,12 +22,12 @@ public class MotdInputTextField extends EditBox {
         });
     }
 
-    public String getMotd(){
-        return validate(this.entered) == null ? null : this.entered;
-    }
-
     public static String validate(String text) {
 //        return text.length() < 59 ? text : null;
         return text;
+    }
+
+    public String getMotd() {
+        return validate(this.entered) == null ? null : this.entered;
     }
 }

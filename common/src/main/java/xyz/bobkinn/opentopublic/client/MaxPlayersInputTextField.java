@@ -18,29 +18,21 @@ public class MaxPlayersInputTextField extends EditBox {
         this.setResponder((text) -> this.setTextColor(validateNum(text) >= 0 ? 0xFFFFFF : 0xFF5555));
     }
 
-    public int getVal() {
-        int maxPlayers = validateNum(getValue());
-        return String.valueOf(maxPlayers).length() > 0 ? maxPlayers : defaultVal;
-    }
-
     /**
      * @param text input
      * @return -1 if invalid, otherwise parsed int
      */
     public static int validateNum(String text) {
-        boolean valid = true;
-        int ret = -1;
         try {
-            if (text.length() > 0) {
-                ret = Integer.parseInt(text);
-                if (ret < 1)
-                    valid = false;
-            }
-            if (text.length() == 0) valid=false;
+            var parsed = Integer.parseInt(text);
+            return parsed < 1 ? -1 : parsed;
         } catch (NumberFormatException e) {
-            valid = false;
+            return -1;
         }
+    }
 
-        return valid ? ret : -1;
+    public int getValidValue() {
+        int maxPlayers = validateNum(getValue());
+        return maxPlayers > 0 ? maxPlayers : defaultVal;
     }
 }
