@@ -34,7 +34,7 @@ jobs:
 
       - uses: actions/upload-artifact@v4
         with:
-          name: Fabric Build
+          name: Build Results
           path: |
             fabric/build/libs/*.jar
             forge/build/libs/*.jar
