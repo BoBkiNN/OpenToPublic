@@ -1,5 +1,6 @@
 @file:Suppress("UnstableApiUsage")
 
+import me.modmuss50.mpp.ReleaseType
 import net.fabricmc.loom.api.LoomGradleExtensionAPI
 
 plugins {
@@ -7,6 +8,7 @@ plugins {
     id("architectury-plugin") version "3.4-SNAPSHOT"
     java
     id("com.gradleup.shadow") version "8.3.6" apply false
+    id("me.modmuss50.mod-publish-plugin") version "0.8.4"
 }
 
 val minecraft_version = properties["minecraft_version"] as String
@@ -23,6 +25,7 @@ version = mod_version
 subprojects {
     apply(plugin = "dev.architectury.loom")
     apply(plugin = "architectury-plugin")
+    apply(plugin = "me.modmuss50.mod-publish-plugin")
 
     base.archivesName = "${archives_base_name}-${name}-${minecraft_version}"
     version = mod_version
@@ -53,5 +56,20 @@ subprojects {
             officialMojangMappings()
             parchment("org.parchmentmc.data:parchment-${minecraft_version}:${parchment_version}@zip")
         })
+    }
+}
+
+publishMods {
+    type = ReleaseType.STABLE
+    rootProject.file("changes.txt").let {
+        if (it.canRead()) changelog = it.readText()
+    }
+    github {
+        tagName = "$mod_version-$minecraft_version"
+        commitish = "master"
+        repository = "BoBkiNN/OpenToPublic"
+        accessToken = providers.environmentVariable("GH_TOKEN")
+        displayName = "OpenToPublic $mod_version for $minecraft_version"
+        allowEmptyFiles = true
     }
 }

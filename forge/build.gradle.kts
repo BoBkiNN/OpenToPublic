@@ -1,3 +1,5 @@
+import me.modmuss50.mpp.ReleaseType
+
 plugins {
     `java-library`
     id("com.gradleup.shadow")
@@ -14,8 +16,8 @@ architectury {
     forge()
 }
 
-val forge_version = properties["forge_version"] as String
-val minecraft_version = properties["minecraft_version"] as String
+val forgeVersion = properties["forge_version"] as String
+val minecraftVersion = properties["minecraft_version"] as String
 val shadowCommon = configurations.register("shadowCommon").get()
 val common = configurations.register("common").get()
 
@@ -26,7 +28,7 @@ configurations.apply {
 }
 
 dependencies {
-    configurations.getByName("forge")("net.minecraftforge:forge:$minecraft_version-$forge_version")
+    configurations.getByName("forge")("net.minecraftforge:forge:$minecraftVersion-$forgeVersion")
 
     common(project(path = ":common", configuration = "namedElements")) { isTransitive = false }
     shadowCommon(project(path = ":common", configuration = "transformProductionForge")) {
@@ -58,5 +60,35 @@ tasks.processResources {
     inputs.properties(props)
     filesMatching("META-INF/mods.toml") {
         expand(props)
+    }
+}
+
+publishMods {
+    modLoaders.addAll("forge", "neoforge")
+    file.set(tasks.remapJar.get().archiveFile)
+    type = ReleaseType.STABLE
+    rootProject.file("changes.txt").let {
+        if (it.canRead()) changelog = it.readText()
+    }
+
+    github {
+        accessToken = providers.environmentVariable("GH_TOKEN")
+        parent(rootProject.tasks.named("publishGithub"))
+    }
+
+    modrinth {
+        accessToken = providers.environmentVariable("MODRINTH_TOKEN")
+        projectId = providers.gradleProperty("modrinth_id")
+        minecraftVersions.add(minecraftVersion)
+        displayName = "${project.version} for Forge $minecraftVersion"
+        version = "${project.version}+$minecraftVersion-forge"
+    }
+
+    curseforge {
+        accessToken = providers.environmentVariable("CURSEFORGE_TOKEN")
+        projectId = providers.gradleProperty("curseforge_id")
+        changelogType = "markdown"
+        displayName = "${project.version}+$minecraftVersion-forge"
+        minecraftVersions.add(minecraftVersion)
     }
 }
