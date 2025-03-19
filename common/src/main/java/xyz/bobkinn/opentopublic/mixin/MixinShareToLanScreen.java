@@ -51,8 +51,15 @@ public abstract class MixinShareToLanScreen extends Screen {
 
     @Unique
     private int openToPublic$enteredPort = OpenToPublic.customPort;
+
     @Unique
-    private int openToPublic$enteredMaxPN = OpenToPublic.maxPlayers;
+    public boolean openToPublic$onlineMode = true;
+    @Unique
+    public int openToPublic$maxPlayers = 8;
+    @Unique
+    public boolean openToPublic$enablePvp = true;
+    @Unique
+    private int openToPublic$enteredMaxPN = openToPublic$maxPlayers;
     @Unique
     private String openToPublic$motd = null;
 
@@ -98,23 +105,23 @@ public abstract class MixinShareToLanScreen extends Screen {
             String worldName = server.getWorldData().getLevelName();
 
             OpenToPublic.customPort = openToPublic$enteredPort;
-            OpenToPublic.maxPlayers = openToPublic$enteredMaxPN;
+            openToPublic$maxPlayers = openToPublic$enteredMaxPN;
 
             this.minecraft.setScreen(null);
 
-            if (OpenToPublic.maxPlayers != 8){
-                ((PlayerListAccessor) server.getPlayerList()).setMaxPlayers(OpenToPublic.maxPlayers);
+            if (openToPublic$maxPlayers != 8){
+                ((PlayerListAccessor) server.getPlayerList()).setMaxPlayers(openToPublic$maxPlayers);
             }
 
-            server.setPvpAllowed(OpenToPublic.enablePvp);
-            server.setUsesAuthentication(OpenToPublic.onlineMode);
+            server.setPvpAllowed(openToPublic$enablePvp);
+            server.setUsesAuthentication(openToPublic$onlineMode);
             server.setMotd(Util.parseValues(openToPublic$motd, playerName, worldName));
 
 //          OpenToPublic.LOGGER.info("Saving world custom data...");
             OtpPersistentState ps = new OtpPersistentState();
             ps.setMotd(openToPublic$motd);
-            ps.setMaxPlayers(OpenToPublic.maxPlayers);
-            ps.setEnablePvp(OpenToPublic.enablePvp);
+            ps.setMaxPlayers(openToPublic$maxPlayers);
+            ps.setEnablePvp(openToPublic$enablePvp);
             ps.setDirty();
 //          OpenToPublic.LOGGER.info(nbt.toText().getString());
             var psm = server.overworld().getDataStorage();
@@ -165,8 +172,8 @@ public abstract class MixinShareToLanScreen extends Screen {
         OtpPersistentState ps = loaded != null ? loaded : new OtpPersistentState();
         if (ps.getMotd() != null) this.openToPublic$motd = ps.getMotd();
         if (ps.getMaxPlayers() != null) this.openToPublic$enteredMaxPN = ps.getMaxPlayers();
-        if (ps.getMaxPlayers() != null) OpenToPublic.enablePvp = ps.getEnablePvp();
-        OpenToPublic.maxPlayers = this.openToPublic$enteredMaxPN;
+        if (ps.getMaxPlayers() != null) openToPublic$enablePvp = ps.getEnablePvp();
+        openToPublic$maxPlayers = this.openToPublic$enteredMaxPN;
         // OpenToPublic.LOGGER.info("Loaded! "+ nbt);
 
 
@@ -186,9 +193,9 @@ public abstract class MixinShareToLanScreen extends Screen {
 
         // online mode switch
         Tooltip onlineModeTooltip = Tooltip.create(Component.translatable("opentopublic.tooltip.online_mode_tooltip"));
-        openToPublic$onlineModeButton = Button.builder(Util.parseYN("opentopublic.button.online_mode", OpenToPublic.onlineMode),
+        openToPublic$onlineModeButton = Button.builder(Util.parseYN("opentopublic.button.online_mode", openToPublic$onlineMode),
                 (w) -> {
-                    OpenToPublic.onlineMode = !OpenToPublic.onlineMode;
+                    openToPublic$onlineMode = !openToPublic$onlineMode;
                     openToPublic$updateButtonText();
                 })
                 .bounds(this.width / 2 - 155, 144, 150, 20)
@@ -197,9 +204,9 @@ public abstract class MixinShareToLanScreen extends Screen {
         this.addRenderableWidget(openToPublic$onlineModeButton);
 
         // pvp on/off button
-        openToPublic$pvpButton = Button.builder(Util.parseYN("opentopublic.button.enable_pvp", OpenToPublic.enablePvp),
+        openToPublic$pvpButton = Button.builder(Util.parseYN("opentopublic.button.enable_pvp", openToPublic$enablePvp),
                 (w) -> {
-                    OpenToPublic.enablePvp = ! OpenToPublic.enablePvp;
+                    openToPublic$enablePvp = !openToPublic$enablePvp;
                     openToPublic$updateButtonText();
                 })
                 .bounds(this.width / 2 + 5, 144, 150, 20)
@@ -207,8 +214,8 @@ public abstract class MixinShareToLanScreen extends Screen {
         this.addRenderableWidget(openToPublic$pvpButton);
 
         // max player input field
-        MaxPlayersInputTextField maxPlayers = openToPublic$getMaxPlayersInputTextField();
-        this.addRenderableWidget(maxPlayers);
+        MaxPlayersInputTextField maxPlayersField = openToPublic$getMaxPlayersInputTextField();
+        this.addRenderableWidget(maxPlayersField);
 
         // motd input
         openToPublic$motdInput = new MotdInputTextField(this.font, this.width / 2 -155, 215, 311, 20, Component.translatable("opentopublic.button.motd"), openToPublic$motd);
@@ -218,13 +225,13 @@ public abstract class MixinShareToLanScreen extends Screen {
 
     @Unique
     private @NotNull MaxPlayersInputTextField openToPublic$getMaxPlayersInputTextField() {
-        MaxPlayersInputTextField maxPlayers = new MaxPlayersInputTextField(this.font, this.width / 2 -155, 180, 150,20, Component.translatable("opentopublic.button.max_players"), OpenToPublic.maxPlayers);
-        maxPlayers.setResponder((text) -> {
-            maxPlayers.setTextColor(MaxPlayersInputTextField.validateNum(text) >= 0 ? 0xFFFFFF : 0xFF5555);
-            openToPublic$enteredMaxPN = maxPlayers.getVal();
+        MaxPlayersInputTextField maxPlayersField = new MaxPlayersInputTextField(this.font, this.width / 2 -155, 180, 150,20, Component.translatable("opentopublic.button.max_players"), openToPublic$maxPlayers);
+        maxPlayersField.setResponder((text) -> {
+            maxPlayersField.setTextColor(MaxPlayersInputTextField.validateNum(text) >= 0 ? 0xFFFFFF : 0xFF5555);
+            openToPublic$enteredMaxPN = maxPlayersField.getVal();
 //            player.sendMessage(new LiteralText("max players change: "+enteredMaxPN), false);
         });
-        return maxPlayers;
+        return maxPlayersField;
     }
 
     @Unique
@@ -255,7 +262,7 @@ public abstract class MixinShareToLanScreen extends Screen {
             wanTooltip = "opentopublic.tooltip.wan_tooltip.upnp";
         }
         this.openToPublic$openToWan.setTooltip(Tooltip.create(Component.translatable(wanTooltip)));
-        this.openToPublic$onlineModeButton.setMessage(Util.parseYN("opentopublic.button.online_mode", OpenToPublic.onlineMode));
-        this.openToPublic$pvpButton.setMessage(Util.parseYN("opentopublic.button.enable_pvp",  OpenToPublic.enablePvp));
+        this.openToPublic$onlineModeButton.setMessage(Util.parseYN("opentopublic.button.online_mode", openToPublic$onlineMode));
+        this.openToPublic$pvpButton.setMessage(Util.parseYN("opentopublic.button.enable_pvp", openToPublic$enablePvp));
     }
 }

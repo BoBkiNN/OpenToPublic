@@ -18,10 +18,6 @@ public abstract class OpenToPublic {
     public static boolean lanOpening = false;
     public static final ThreeLean<Boolean, Boolean, String> openPublic = ThreeLean.newBBS("upnp");
     public static int customPort = 25565;
-    public static boolean onlineMode = true;
-    public static int maxPlayers = 8;
-    public static boolean enablePvp = true;
-    public static boolean upnpSuccess = false;
     public static String upnpIp = null;
     public static boolean serverStopped = false;
     public static Config cfg = null;

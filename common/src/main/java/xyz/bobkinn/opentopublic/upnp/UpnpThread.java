@@ -108,8 +108,8 @@ public class UpnpThread extends Thread{
         }
 
         try {
-            OpenToPublic.upnpSuccess = UPnP.openPortTCP(OpenToPublic.customPort);
-            if (!OpenToPublic.upnpSuccess) throw new RuntimeException();
+            var success = UPnP.openPortTCP(OpenToPublic.customPort);
+            if (!success) throw new RuntimeException("Unknown error");
         } catch (Exception e){
             OpenToPublic.LOGGER.error("Failed to open main port: ", e);
             throw new UpnpEx(UpnpEnum.OPEN_PORT, e);
