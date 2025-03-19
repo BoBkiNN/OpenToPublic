@@ -27,7 +27,6 @@ If ON, then Minecraft will be check players for license, else players with crack
  
 Planned versions:
  - 1.20.6 for Forge
- - 1.21.4 for Fabric & Forge
  - 1.18.2 for Fabric & Forge ([#6](https://github.com/BoBkiNN/OpenToPublic/issues/6))
 
 ## Credits
