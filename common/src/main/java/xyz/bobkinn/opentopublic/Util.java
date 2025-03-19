@@ -37,7 +37,7 @@ public class Util {
             successWAN = Component.translatable("opentopublic.publish.started_wan_noIp", Integer.toString(OpenToPublic.customPort));
         }
         MutableComponent text;
-        if (OpenToPublic.openPublic.isTrue() || OpenToPublic.openPublic.isThird())
+        if (OpenToPublic.openedMode != null && OpenToPublic.openedMode != OpenMode.LAN)
             text = successOpen ? successWAN : Component.translatable("opentopublic.publish.failed_wan");
         else {
             text = successOpen ? Component.translatable("commands.publish.started", OpenToPublic.customPort) : Component.translatable("commands.publish.failed");

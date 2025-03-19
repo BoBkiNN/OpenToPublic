@@ -30,6 +30,7 @@ dependencies {
         isTransitive = false
     }
     shadowCommon(project(path = ":common", configuration = "includeJar"))
+    implementation(project(path = ":common", configuration = "includeJar"))
 
     // for runtime
     modRuntimeOnly("com.terraformersmc:modmenu:11.0.3") // ModMenu for runtime

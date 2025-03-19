@@ -8,7 +8,6 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import xyz.bobkinn.opentopublic.OpenToPublic;
-import xyz.bobkinn.opentopublic.OpenedStatus;
 import xyz.bobkinn.opentopublic.upnp.UpnpThread;
 
 @Mixin(IntegratedServer.class)
@@ -26,11 +25,11 @@ public abstract class MixinIntegratedServer {
 
     @Inject(at = @At("HEAD"), method = "halt")
     private void atServerStop(boolean bl, CallbackInfo ci) {
-        OpenedStatus.current = null;
+        OpenToPublic.openedMode = null;
         var wasOpen = OpenToPublic.upnpIp != null;
         OpenToPublic.upnpIp = null;
         OpenToPublic.serverStopped = true;
-        if (OpenToPublic.openPublic.isThird() && wasOpen) UpnpThread.runClose();
+        if (wasOpen) UpnpThread.runClose();
     }
 }
 

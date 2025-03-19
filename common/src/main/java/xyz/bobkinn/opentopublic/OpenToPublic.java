@@ -12,9 +12,9 @@ import java.nio.file.Path;
 
 public abstract class OpenToPublic {
     public static final String MOD_ID = "opentopublic";
-    public static final ThreeLean<Boolean, Boolean, String> openPublic = ThreeLean.newBBS("upnp");
     public static final Logger LOGGER = LogManager.getLogger("OpenToPublic");
-
+    public static OpenMode selectedMode = OpenMode.LAN;
+    public static OpenMode openedMode = null;
     public static Path modConfigPath = null;
     public static File backupFile = null;
     public static boolean lanOpening = false;
@@ -25,8 +25,6 @@ public abstract class OpenToPublic {
 
     public OpenToPublic() {
         modConfigPath = getConfigsFolder().resolve(OpenToPublic.MOD_ID);
-        openPublic.setCurrentState(2);
-
 
         // if world not closed correctly
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {

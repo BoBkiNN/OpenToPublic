@@ -15,8 +15,8 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import xyz.bobkinn.opentopublic.OpenMode;
 import xyz.bobkinn.opentopublic.OpenToPublic;
-import xyz.bobkinn.opentopublic.OpenedStatus;
 import xyz.bobkinn.opentopublic.PortContainer;
 import xyz.bobkinn.opentopublic.upnp.UpnpThread;
 
@@ -72,15 +72,15 @@ public abstract class MixinMinecraft {
         if (clientPlayNetworkHandler != null && clientPlayNetworkHandler.getConnection().isConnected()) {
             stringBuilder.append(" - ");
             var info = this.getCurrentServer();
-            if (this.singleplayerServer != null && !this.singleplayerServer.isPublished() || OpenedStatus.current == null) {
+            if (this.singleplayerServer != null && !this.singleplayerServer.isPublished() || OpenToPublic.openedMode == null) {
                 stringBuilder.append(I18n.get("title.singleplayer"));
             } else if (info != null && info.isRealm()) {
                 stringBuilder.append(I18n.get("title.multiplayer.realms"));
-            } else if (OpenedStatus.current == OpenedStatus.UPNP) {
+            } else if (OpenToPublic.openedMode == OpenMode.UPNP) {
                 stringBuilder.append(I18n.get("opentopublic.title.multiplayer.upnp"));
-            } else if (OpenedStatus.current == OpenedStatus.MANUAL) {
+            } else if (OpenToPublic.openedMode == OpenMode.MANUAL) {
                 stringBuilder.append(I18n.get("opentopublic.title.multiplayer.wan"));
-            } else if (OpenedStatus.current == OpenedStatus.LAN) {
+            } else if (OpenToPublic.openedMode == OpenMode.LAN) {
                 stringBuilder.append(I18n.get("title.multiplayer.lan"));
             } else {
                 stringBuilder.append(I18n.get("title.multiplayer.other"));

@@ -21,10 +21,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import xyz.bobkinn.opentopublic.OpenToPublic;
-import xyz.bobkinn.opentopublic.OtpPersistentState;
-import xyz.bobkinn.opentopublic.PortContainer;
-import xyz.bobkinn.opentopublic.Util;
+import xyz.bobkinn.opentopublic.*;
 import xyz.bobkinn.opentopublic.client.MaxPlayersInputTextField;
 import xyz.bobkinn.opentopublic.client.MotdInputTextField;
 import xyz.bobkinn.opentopublic.client.PortInputTextField;
@@ -62,14 +59,7 @@ public abstract class MixinShareToLanScreen extends Screen {
 
     @Unique
     private static @NotNull Tooltip openToPublic$getWanTooltip() {
-        String tooltipTextKey;
-        if (OpenToPublic.openPublic.isTrue()) {
-            tooltipTextKey = "opentopublic.tooltip.wan_tooltip.manual";
-        } else if (OpenToPublic.openPublic.isFalse()) {
-            tooltipTextKey = "opentopublic.tooltip.wan_tooltip.lan";
-        } else {
-            tooltipTextKey = "opentopublic.tooltip.wan_tooltip.upnp";
-        }
+        String tooltipTextKey = "opentopublic.tooltip.wan_tooltip." + OpenToPublic.selectedMode.name().toLowerCase();
         return Tooltip.create(Component.translatable(tooltipTextKey));
     }
 
@@ -134,7 +124,7 @@ public abstract class MixinShareToLanScreen extends Screen {
             psm.set(OtpPersistentState.DATA_NAME, ps);
 //          OpenToPublic.LOGGER.info("Saved");
 
-            boolean doUPnP = OpenToPublic.openPublic.isThird();
+            boolean doUPnP = OpenToPublic.selectedMode == OpenMode.UPNP;
             if (doUPnP) {
                 PortContainer.self.mainPort = OpenToPublic.customPort;
                 PortContainer.saveBackup(PortContainer.self, OpenToPublic.backupFile);
@@ -186,7 +176,7 @@ public abstract class MixinShareToLanScreen extends Screen {
         Tooltip wanTooltip = openToPublic$getWanTooltip();
 
         openToPublic$openToWan = Button.builder(Component.translatable("opentopublic.button.open_public"), (w) -> {
-            OpenToPublic.openPublic.next();
+            OpenToPublic.selectedMode = OpenToPublic.selectedMode.next();
             openToPublic$updateButtonText();
         }).bounds(this.width / 2 + 5, this.height - 54, 150, 20).tooltip(wanTooltip).build();
         this.addRenderableWidget(openToPublic$openToWan);
@@ -228,21 +218,13 @@ public abstract class MixinShareToLanScreen extends Screen {
 
     @Unique
     private void openToPublic$updateButtonText() {
-        if (OpenToPublic.openPublic.isTrue())
-            this.openToPublic$openToWan.setMessage(Component.translatable("opentopublic.button.open_public", Component.translatable("opentopublic.text.manual")));
-        else if (OpenToPublic.openPublic.isFalse())
-            this.openToPublic$openToWan.setMessage(Component.translatable("opentopublic.button.open_public", CommonComponents.OPTION_OFF));
-        else if (OpenToPublic.openPublic.isThird())
-            this.openToPublic$openToWan.setMessage(Component.translatable("opentopublic.button.open_public", "UPnP"));
-        String wanTooltip;
-        if (OpenToPublic.openPublic.isTrue()) {
-            wanTooltip = "opentopublic.tooltip.wan_tooltip.manual";
-        } else if (OpenToPublic.openPublic.isFalse()) {
-            wanTooltip = "opentopublic.tooltip.wan_tooltip.lan";
-        } else {
-            wanTooltip = "opentopublic.tooltip.wan_tooltip.upnp";
-        }
-        this.openToPublic$openToWan.setTooltip(Tooltip.create(Component.translatable(wanTooltip)));
+        var arg = switch (OpenToPublic.selectedMode) {
+            case LAN -> CommonComponents.OPTION_OFF;
+            case MANUAL -> Component.translatable("opentopublic.text.manual");
+            case UPNP -> "UPnP";
+        };
+        openToPublic$openToWan.setMessage(Component.translatable("opentopublic.button.open_public", arg));
+        this.openToPublic$openToWan.setTooltip(openToPublic$getWanTooltip());
         this.openToPublic$onlineModeButton.setMessage(Util.parseYN("opentopublic.button.online_mode", openToPublic$onlineMode));
         this.openToPublic$pvpButton.setMessage(Util.parseYN("opentopublic.button.enable_pvp", openToPublic$enablePvp));
     }
