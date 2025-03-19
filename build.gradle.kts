@@ -11,24 +11,24 @@ plugins {
     id("me.modmuss50.mod-publish-plugin") version "0.8.4"
 }
 
-val minecraft_version = properties["minecraft_version"] as String
-val parchment_version = properties["parchment_version"] as String
-val archives_base_name = properties["archives_base_name"] as String
-val mod_version = properties["mod_version"] as String
+val minecraftVersion = properties["minecraft_version"] as String
+val parchmentVersion = properties["parchment_version"] as String
+val archivesBaseName = properties["archives_base_name"] as String
+val modVersion = properties["mod_version"] as String
 
 architectury {
-    minecraft = minecraft_version
+    minecraft = minecraftVersion
 }
 
-version = mod_version
+version = modVersion
 
 subprojects {
     apply(plugin = "dev.architectury.loom")
     apply(plugin = "architectury-plugin")
     apply(plugin = "me.modmuss50.mod-publish-plugin")
 
-    base.archivesName = "${archives_base_name}-${name}-${minecraft_version}"
-    version = mod_version
+    base.archivesName = "${archivesBaseName}-${name}-${minecraftVersion}"
+    version = modVersion
 
     val loom = extensions.getByType(LoomGradleExtensionAPI::class)
 
@@ -51,10 +51,10 @@ subprojects {
     }
 
     dependencies {
-        configurations.getByName("minecraft")("com.mojang:minecraft:${minecraft_version}")
+        configurations.getByName("minecraft")("com.mojang:minecraft:${minecraftVersion}")
         configurations.getByName("mappings")(loom.layered {
             officialMojangMappings()
-            parchment("org.parchmentmc.data:parchment-${minecraft_version}:${parchment_version}@zip")
+            parchment("org.parchmentmc.data:parchment-${minecraftVersion}:${parchmentVersion}@zip")
         })
     }
 }
@@ -65,11 +65,11 @@ publishMods {
         if (it.canRead()) changelog = it.readText()
     }
     github {
-        tagName = "$mod_version-$minecraft_version"
+        tagName = "$modVersion-$minecraftVersion"
         commitish = "master"
         repository = "BoBkiNN/OpenToPublic"
         accessToken = providers.environmentVariable("GH_TOKEN")
-        displayName = "OpenToPublic $mod_version for $minecraft_version"
+        displayName = "OpenToPublic $modVersion for $minecraftVersion"
         allowEmptyFiles = true
     }
 }
