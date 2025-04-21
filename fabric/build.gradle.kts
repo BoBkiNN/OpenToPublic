@@ -36,8 +36,8 @@ dependencies {
     implementation(project(path = ":common", configuration = "includeJar"))
 
     // for runtime
-    modRuntimeOnly("com.terraformersmc:modmenu:13.0.3") // ModMenu for runtime
-    modRuntimeOnly(fabricApi.module("fabric-api", "0.119.0+1.21.4"))
+    modRuntimeOnly("com.terraformersmc:modmenu:4.1.2") // ModMenu for runtime
+    modRuntimeOnly(fabricApi.module("fabric-api", "0.77.0+1.19.2"))
 }
 
 tasks.jar {
