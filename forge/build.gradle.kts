@@ -54,7 +54,13 @@ tasks.remapJar {
     dependsOn(tasks.shadowJar)
 }
 
+tasks.register<Copy>("copyIcon") {
+    from(project(":common").layout.projectDirectory.file("src/main/resources/icon.png"))
+    into(layout.buildDirectory.dir("resources/main"))
+}
+
 tasks.processResources {
+    dependsOn("copyIcon")
     filteringCharset = "UTF-8"
     val props = properties.filterValues { it is String }
     inputs.properties(props)
