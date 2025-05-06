@@ -62,7 +62,8 @@ tasks.register<Copy>("copyIcon") {
 tasks.processResources {
     dependsOn("copyIcon")
     filteringCharset = "UTF-8"
-    val props = properties.filterValues { it is String }
+    val props = properties.filterValues { it is String }.toMutableMap()
+    props["fullVersion"] = "$version+$minecraftVersion-${project.name}"
     inputs.properties(props)
     filesMatching("META-INF/mods.toml") {
         expand(props)

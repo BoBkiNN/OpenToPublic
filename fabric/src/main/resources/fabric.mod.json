@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "opentopublic",
-  "version": "${version}",
+  "version": "${fullVersion}",
   "name": "OpenToPublic",
   "description": "Allows you to open LAN world to WAN and set server settings",
   "authors": [
