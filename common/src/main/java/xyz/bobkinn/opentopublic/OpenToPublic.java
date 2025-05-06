@@ -28,7 +28,7 @@ public abstract class OpenToPublic {
 
         // if world not closed correctly
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            if (OpenToPublic.serverStopped && upnpIp != null && !PortContainer.self.isEmpty()) {
+            if (OpenToPublic.serverStopped && upnpIp != null && !PortContainer.INSTANCE.isEmpty()) {
                 LOGGER.info("Closing ports at shutdown..");
                 UpnpThread.runClose();
             }
@@ -64,8 +64,8 @@ public abstract class OpenToPublic {
         try {
             FileReader fr = new FileReader(file);
             Config cfg = gson.fromJson(fr, Config.class);
-            cfg.getTcp().forEach((p) -> PortContainer.self.addTCP(p));
-            cfg.getUdp().forEach((p) -> PortContainer.self.addUDP(p));
+            cfg.getTcp().forEach((p) -> PortContainer.INSTANCE.addTCP(p));
+            cfg.getUdp().forEach((p) -> PortContainer.INSTANCE.addUDP(p));
             OpenToPublic.cfg = cfg;
             // save config to fill missing entries
             FileWriter fw = new FileWriter(file);

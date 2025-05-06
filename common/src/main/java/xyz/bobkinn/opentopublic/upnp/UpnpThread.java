@@ -48,13 +48,13 @@ public class UpnpThread extends Thread {
         OpenToPublic.LOGGER.info("Closing main port {}", OpenToPublic.customPort);
         try {
             if (!UPnP.closePortTCP(OpenToPublic.customPort)) throw new RuntimeException();
-            PortContainer.self.mainPort = null;
+            PortContainer.INSTANCE.mainPort = null;
         } catch (Exception e) {
             OpenToPublic.LOGGER.error("Failed close of main port {}", OpenToPublic.customPort, e);
         }
 
         ArrayList<Integer> closedTcp = new ArrayList<>();
-        for (int port : PortContainer.self.getTcpPorts()) {
+        for (int port : PortContainer.INSTANCE.getTcpPorts()) {
             try {
                 if (!UPnP.closePortTCP(port)) throw new RuntimeException();
                 closedTcp.add(port);
@@ -63,10 +63,10 @@ public class UpnpThread extends Thread {
             }
         }
         if (!closedTcp.isEmpty()) OpenToPublic.LOGGER.info("Closed TCP ports: {}", closedTcp);
-        PortContainer.self.upnpPorts.get("tcp").clear();
+        PortContainer.INSTANCE.upnpPorts.get("tcp").clear();
 
         ArrayList<Integer> closedUdp = new ArrayList<>();
-        for (int port : PortContainer.self.getUdpPorts()) {
+        for (int port : PortContainer.INSTANCE.getUdpPorts()) {
             try {
                 if (!UPnP.closePortUDP(port)) throw new RuntimeException();
                 closedUdp.add(port);
@@ -75,7 +75,7 @@ public class UpnpThread extends Thread {
             }
         }
         if (!closedUdp.isEmpty()) OpenToPublic.LOGGER.info("Closed UDP ports: {}", closedUdp);
-        PortContainer.self.upnpPorts.get("udp").clear();
+        PortContainer.INSTANCE.upnpPorts.get("udp").clear();
         if (!OpenToPublic.backupFile.delete()) OpenToPublic.LOGGER.error("Failed to delete container file");
     }
 
@@ -106,14 +106,14 @@ public class UpnpThread extends Thread {
 
         Util.atSuccessOpen(true);
 
-        for (int port : PortContainer.self.getTcpPorts()) {
+        for (int port : PortContainer.INSTANCE.getTcpPorts()) {
             try {
                 if (!UPnP.openPortTCP(port)) throw new RuntimeException();
             } catch (Exception e) {
                 Util.addChatMsg(Component.translatable("opentopublic.message.additional_open_fail", port + " [TCP]").withStyle(ChatFormatting.RED));
             }
         }
-        for (int port : PortContainer.self.getUdpPorts()) {
+        for (int port : PortContainer.INSTANCE.getUdpPorts()) {
             try {
                 if (!UPnP.openPortUDP(port)) throw new RuntimeException();
             } catch (Exception e) {

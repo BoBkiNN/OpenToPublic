@@ -128,8 +128,8 @@ public abstract class MixinShareToLanScreen extends Screen {
 
             boolean doUPnP = OpenToPublic.selectedMode == OpenMode.UPNP;
             if (doUPnP) {
-                PortContainer.self.mainPort = OpenToPublic.customPort;
-                PortContainer.saveBackup(PortContainer.self, OpenToPublic.backupFile);
+                PortContainer.INSTANCE.mainPort = OpenToPublic.customPort;
+                PortContainer.saveBackup(PortContainer.INSTANCE, OpenToPublic.backupFile);
             }
 
             boolean successOpen = server.publishServer(this.gameMode, this.commands, OpenToPublic.customPort);

@@ -10,13 +10,13 @@ public class PortContainer implements Serializable {
     @Serial
     private static final long serialVersionUID = 42L;
 
-    public static PortContainer self;
+    public static PortContainer INSTANCE;
     public final Map<String, ArrayList<Integer>> upnpPorts;
     public Integer mainPort;
     public boolean fileExists;
 
     public PortContainer(Map<String, ArrayList<Integer>> upnpPorts, Integer mainPort) {
-        if (self != null) throw new RuntimeException("Container filled");
+        if (INSTANCE != null) throw new RuntimeException("Container filled");
         this.upnpPorts = upnpPorts;
         this.mainPort = mainPort;
     }
@@ -36,7 +36,7 @@ public class PortContainer implements Serializable {
             ObjectOutputStream oos = new ObjectOutputStream(Files.newOutputStream(file.toPath()));
             oos.writeObject(container);
             oos.close();
-            PortContainer.self.fileExists = true;
+            PortContainer.INSTANCE.fileExists = true;
         } catch (IOException e) {
             OpenToPublic.LOGGER.error("Failed to save container backup", e);
         }

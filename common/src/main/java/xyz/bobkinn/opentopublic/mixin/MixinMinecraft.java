@@ -38,9 +38,9 @@ public abstract class MixinMinecraft {
         }
         OpenToPublic.backupFile = new File(OpenToPublic.modConfigPath.toFile(), "opened_ports.ser");
         PortContainer t = PortContainer.loadBackup(OpenToPublic.backupFile);
-        PortContainer.self = t == null ? PortContainer.newEmpty() : t;
+        PortContainer.INSTANCE = t == null ? PortContainer.newEmpty() : t;
 //        OpenToPublic.LOGGER.info("At client run container: " + PortContainer.self);
-        if (!PortContainer.self.isEmpty()) {
+        if (!PortContainer.INSTANCE.isEmpty()) {
             OpenToPublic.LOGGER.info("Closing opened ports from last session..");
             UpnpThread.runClose();
         }
