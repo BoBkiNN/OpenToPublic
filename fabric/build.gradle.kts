@@ -19,6 +19,11 @@ configurations.apply {
     compileClasspath.configure { extendsFrom(common) }
     runtimeClasspath.configure { extendsFrom(common) }
     named("developmentFabric").configure { extendsFrom(common) }
+    all {
+        resolutionStrategy {
+            force("net.fabricmc:fabric-loader:$fabricLoaderVersion")
+        }
+    }
 }
 
 repositories {
