@@ -34,7 +34,7 @@ jobs:
 
       - uses: actions/upload-artifact@v4
         with:
-          name: Build Results
+          name: CI Release Build ${{github.run_number}}
           path: |
             fabric/build/libs/*.jar
             forge/build/libs/*.jar
