@@ -13,7 +13,7 @@
     "homepage": "https://modrinth.com/mod/opentopublic"
   },
   "license": "MIT",
-  "icon": "assets/opentopublic/icon.png",
+  "icon": "icon.png",
   "environment": "client",
   "entrypoints": {
     "main": [
