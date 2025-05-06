@@ -4,7 +4,6 @@ import com.mojang.blaze3d.platform.Window;
 import net.minecraft.SharedConstants;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientPacketListener;
-import net.minecraft.client.multiplayer.ServerData;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.client.server.IntegratedServer;
 import org.jetbrains.annotations.Nullable;
@@ -51,9 +50,7 @@ public abstract class MixinMinecraft {
     @Shadow
     public abstract @Nullable ClientPacketListener getConnection();
 
-    @Shadow
-    @Nullable
-    public abstract ServerData getCurrentServer();
+    @Shadow public abstract boolean isConnectedToRealms();
 
     @Inject(method = "updateTitle", at = @At("RETURN"))
     public void onUpdateWindowTitle(CallbackInfo ci) {
@@ -71,10 +68,9 @@ public abstract class MixinMinecraft {
         ClientPacketListener clientPlayNetworkHandler = this.getConnection();
         if (clientPlayNetworkHandler != null && clientPlayNetworkHandler.getConnection().isConnected()) {
             stringBuilder.append(" - ");
-            var info = this.getCurrentServer();
             if (this.singleplayerServer != null && !this.singleplayerServer.isPublished() || OpenToPublic.openedMode == null) {
                 stringBuilder.append(I18n.get("title.singleplayer"));
-            } else if (info != null && info.isRealm()) {
+            } else if (isConnectedToRealms()) {
                 stringBuilder.append(I18n.get("title.multiplayer.realms"));
             } else if (OpenToPublic.openedMode == OpenMode.UPNP) {
                 stringBuilder.append(I18n.get("opentopublic.title.multiplayer.upnp"));

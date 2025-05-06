@@ -1,10 +1,10 @@
 package xyz.bobkinn.opentopublic.mixin;
 
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiComponent;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
-import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.ShareToLanScreen;
@@ -26,6 +26,8 @@ import xyz.bobkinn.opentopublic.client.MaxPlayersInputTextField;
 import xyz.bobkinn.opentopublic.client.MotdInputTextField;
 import xyz.bobkinn.opentopublic.client.PortInputTextField;
 import xyz.bobkinn.opentopublic.upnp.UpnpThread;
+
+import java.util.function.Supplier;
 
 import static xyz.bobkinn.opentopublic.client.PortInputTextField.validatePort;
 
@@ -58,20 +60,20 @@ public abstract class MixinShareToLanScreen extends Screen {
     }
 
     @Unique
-    private static @NotNull Tooltip openToPublic$getWanTooltip() {
-        String tooltipTextKey = "opentopublic.tooltip.wan_tooltip." + OpenToPublic.selectedMode.name().toLowerCase();
-        return Tooltip.create(Component.translatable(tooltipTextKey));
+    private @NotNull Button.OnTooltip openToPublic$createTooltip(Supplier<Component> provider) {
+        return (b, s, x, y) -> this.renderTooltip(s, provider.get(), x, y);
     }
 
     @Inject(at = @At("HEAD"), method = "render", cancellable = true)
-    public void render(GuiGraphics context, int mouseX, int mouseY, float delta, CallbackInfo ci) {
-        super.render(context, mouseX, mouseY, delta);
-        context.drawCenteredString(this.font, this.title.getVisualOrderText(), this.width / 2, 50, 0xFFFFFF);
-        context.drawCenteredString(this.font, Component.translatable("opentopublic.gui.new_player_settings").getVisualOrderText(), this.width / 2, 82, 0xFFFFFF);
-        context.drawCenteredString(this.font, Component.translatable("opentopublic.gui.server_settings").getVisualOrderText(), this.width / 2, 130, 0xFFFFFF);
-        context.drawString(this.font, Component.translatable("opentopublic.button.port"), this.width / 2 - 154, this.height - 48, 0xFFFFFF);
-        context.drawString(this.font, Component.translatable("opentopublic.button.max_players"), this.width / 2 - 154, 168, 0xFFFFFF);
-        context.drawString(this.font, Component.translatable("opentopublic.button.motd"), this.width / 2 - 154, 204, 0xFFFFFF);
+    public void render(PoseStack stack, int mouseX, int mouseY, float delta, CallbackInfo ci) {
+        this.renderBackground(stack);
+        GuiComponent.drawCenteredString(stack, this.font, this.title.getVisualOrderText(), this.width / 2, 50, 0xFFFFFF);
+        GuiComponent.drawCenteredString(stack, this.font, Component.translatable("opentopublic.gui.new_player_settings").getVisualOrderText(), this.width / 2, 82, 0xFFFFFF);
+        GuiComponent.drawCenteredString(stack, this.font, Component.translatable("opentopublic.gui.server_settings").getVisualOrderText(), this.width / 2, 130, 0xFFFFFF);
+        GuiComponent.drawString(stack, this.font, Component.translatable("opentopublic.button.port"), this.width / 2 - 154, this.height - 48, 0xFFFFFF);
+        GuiComponent.drawString(stack, this.font, Component.translatable("opentopublic.button.max_players"), this.width / 2 - 154, 168, 0xFFFFFF);
+        GuiComponent.drawString(stack, this.font, Component.translatable("opentopublic.button.motd"), this.width / 2 - 154, 204, 0xFFFFFF);
+        super.render(stack, mouseX, mouseY, delta);
         ci.cancel();
     }
 
@@ -143,7 +145,7 @@ public abstract class MixinShareToLanScreen extends Screen {
             }
             this.minecraft.updateTitle();
         };
-        AbstractWidget newBtn = Button.builder(Component.translatable("lanServer.start"), act).bounds(this.width / 2 - 155, this.height - 28, 150, 20).build();
+        AbstractWidget newBtn = new Button(this.width / 2 - 155, this.height - 28, 150, 20, Component.translatable("lanServer.start"), act);
         this.addRenderableWidget(newBtn);
         return newBtn;
     }
@@ -163,7 +165,7 @@ public abstract class MixinShareToLanScreen extends Screen {
         // load data
         // OpenToPublic.LOGGER.info("Loading world custom data...");
         var psm = server.overworld().getDataStorage();
-        var loaded = psm.get(OtpPersistentState.TYPE, OtpPersistentState.DATA_NAME);
+        var loaded = psm.get(OtpPersistentState.FACTORY, OtpPersistentState.DATA_NAME);
         OtpPersistentState ps = loaded != null ? loaded : new OtpPersistentState();
         if (ps.getMotd() != null) this.openToPublic$motd = ps.getMotd();
         if (ps.getMaxPlayers() != null) this.openToPublic$enteredMaxPN = ps.getMaxPlayers();
@@ -173,27 +175,30 @@ public abstract class MixinShareToLanScreen extends Screen {
 
 
         // open to wan button
-        Tooltip wanTooltip = openToPublic$getWanTooltip();
-
-        openToPublic$openToWan = Button.builder(Component.translatable("opentopublic.button.open_public"), (w) -> {
-            OpenToPublic.selectedMode = OpenToPublic.selectedMode.next();
-            openToPublic$updateButtonText();
-        }).bounds(this.width / 2 + 5, this.height - 54, 150, 20).tooltip(wanTooltip).build();
+        openToPublic$openToWan = new Button(this.width / 2 + 5, this.height - 54, 150, 20,
+                Component.translatable("opentopublic.button.open_public"),
+                (b) -> {
+                    OpenToPublic.selectedMode = OpenToPublic.selectedMode.next();
+                    openToPublic$updateButtonText();
+                }, openToPublic$createTooltip(() -> Component.translatable("opentopublic.tooltip.wan_tooltip." + OpenToPublic.selectedMode.name().toLowerCase())));
         this.addRenderableWidget(openToPublic$openToWan);
 
         // online mode switch
-        Tooltip onlineModeTooltip = Tooltip.create(Component.translatable("opentopublic.tooltip.online_mode_tooltip"));
-        openToPublic$onlineModeButton = Button.builder(Util.parseYN("opentopublic.button.online_mode", openToPublic$onlineMode), (w) -> {
-            openToPublic$onlineMode = !openToPublic$onlineMode;
-            openToPublic$updateButtonText();
-        }).bounds(this.width / 2 - 155, 144, 150, 20).tooltip(onlineModeTooltip).build();
+        openToPublic$onlineModeButton = new Button(this.width / 2 - 155, 144, 150, 20,
+                Util.parseYN("opentopublic.button.online_mode", openToPublic$onlineMode),
+                (b) -> {
+                    openToPublic$onlineMode = !openToPublic$onlineMode;
+                    openToPublic$updateButtonText();
+                }, openToPublic$createTooltip(() -> Component.translatable("opentopublic.tooltip.online_mode_tooltip")));
         this.addRenderableWidget(openToPublic$onlineModeButton);
 
         // pvp on/off button
-        openToPublic$pvpButton = Button.builder(Util.parseYN("opentopublic.button.enable_pvp", openToPublic$enablePvp), (w) -> {
-            openToPublic$enablePvp = !openToPublic$enablePvp;
-            openToPublic$updateButtonText();
-        }).bounds(this.width / 2 + 5, 144, 150, 20).build();
+        openToPublic$pvpButton = new Button(this.width / 2 + 5, 144, 150, 20,
+                Util.parseYN("opentopublic.button.enable_pvp", openToPublic$enablePvp),
+                (b) -> {
+                    openToPublic$enablePvp = !openToPublic$enablePvp;
+                    openToPublic$updateButtonText();
+                });
         this.addRenderableWidget(openToPublic$pvpButton);
 
         // max player input field
@@ -224,7 +229,6 @@ public abstract class MixinShareToLanScreen extends Screen {
             case UPNP -> "UPnP";
         };
         openToPublic$openToWan.setMessage(Component.translatable("opentopublic.button.open_public", arg));
-        this.openToPublic$openToWan.setTooltip(openToPublic$getWanTooltip());
         this.openToPublic$onlineModeButton.setMessage(Util.parseYN("opentopublic.button.online_mode", openToPublic$onlineMode));
         this.openToPublic$pvpButton.setMessage(Util.parseYN("opentopublic.button.enable_pvp", openToPublic$enablePvp));
     }
