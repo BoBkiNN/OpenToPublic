@@ -61,7 +61,7 @@ subprojects {
 
 publishMods {
     type = ReleaseType.STABLE
-    rootProject.file("changes.txt").let {
+    rootProject.file("changes.md").let {
         if (it.canRead()) changelog = it.readText()
     }
     github {
