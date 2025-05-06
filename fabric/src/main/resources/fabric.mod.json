@@ -17,7 +17,7 @@
   "environment": "client",
   "entrypoints": {
     "main": [
-      "xyz.bobkinn.opentopublic.OpenToPublicFabric"
+      "xyz.bobkinn.opentopublic.fabric.OpenToPublicFabric"
     ]
   },
   "custom": {

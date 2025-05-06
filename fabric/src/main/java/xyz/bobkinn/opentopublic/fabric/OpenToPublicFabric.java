@@ -1,7 +1,8 @@
-package xyz.bobkinn.opentopublic;
+package xyz.bobkinn.opentopublic.fabric;
 
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.loader.api.FabricLoader;
+import xyz.bobkinn.opentopublic.OpenToPublic;
 
 import java.nio.file.Path;
 
