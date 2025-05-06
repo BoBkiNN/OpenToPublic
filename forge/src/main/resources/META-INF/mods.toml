@@ -22,7 +22,7 @@ version = "${version}"
 # A display name for the mod
 displayName = "OpenToPublic" #mandatory
 # A URL to query for updates for this mod. See the JSON update specification <here>
-#updateJSONURL="http://myurl.me/" #optional
+updateJSONURL="https://api.modrinth.com/updates/${modrinth_id}/forge_updates.json" #optional
 # A URL for the "homepage" for this mod, displayed in the mod UI
 displayURL="https://modrinth.com/mod/opentopublic" #optional
 # A file name (in the root of the mod JAR) containing a logo for display
@@ -51,6 +51,6 @@ side = "BOTH"
 [[dependencies.opentopublic]]
 modId = "minecraft"
 mandatory = true
-versionRange = "[1.19.2]"
+versionRange = "[1.19.1, 1.19.2]"
 ordering = "NONE"
 side = "BOTH"

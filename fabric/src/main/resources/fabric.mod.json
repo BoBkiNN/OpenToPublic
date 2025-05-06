@@ -10,7 +10,7 @@
   "contact": {
     "issues": "https://github.com/BoBkiNN/OpenToPublic/issues",
     "sources": "https://github.com/BoBkiNN/OpenToPublic",
-    "homepage": "https://modrinth.com/user/BoBkiNN"
+    "homepage": "https://modrinth.com/mod/opentopublic"
   },
   "license": "MIT",
   "icon": "assets/opentopublic/icon.png",
@@ -33,6 +33,6 @@
   ],
   "depends": {
     "fabricloader": ">=${fabric_loader_version}",
-    "minecraft": ["1.21.4"]
+    "minecraft": ["1.19.1", "1.19.2"]
   }
 }
