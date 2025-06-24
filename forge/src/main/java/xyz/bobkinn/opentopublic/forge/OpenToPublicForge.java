@@ -11,7 +11,7 @@ import java.nio.file.Path;
 @Mod("opentopublic")
 public class OpenToPublicForge extends OpenToPublic {
     public OpenToPublicForge(FMLJavaModLoadingContext context) {
-        context.registerExtensionPoint(IExtensionPoint.DisplayTest.class, () -> new IExtensionPoint.DisplayTest(() -> IExtensionPoint.DisplayTest.IGNORESERVERONLY, (a, b) -> true));
+        context.registerExtensionPoint(IExtensionPoint.DisplayTest.class, IExtensionPoint.DisplayTest.IGNORE_SERVER_VERSION);
     }
 
     @Override

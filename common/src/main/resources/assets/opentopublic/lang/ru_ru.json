@@ -20,5 +20,12 @@
   "opentopublic.title.multiplayer.upnp": "Сетевая игра (публичная - UPnP)",
   "opentopublic.toast.upnp_in_process.title": "Пожалуйста подождите",
   "opentopublic.toast.upnp_in_process.desc": "Открытие игры с помощью UPnP в процессе..",
-  "opentopublic.text.manual": "Вручную"
+  "opentopublic.text.manual": "Вручную",
+  "opentopublic.config.hideIps.tooltip": "Скрывать IP-адреса при открытии во внешнюю сеть",
+  "opentopublic.config.hideIps.name": "Скрывать IP-адреса",
+  "opentopublic.config.tcpPorts.tooltip": "Дополнительные TCP порты при открытии с помощью UPnP",
+  "opentopublic.config.tcpPorts.name": "TCP порты",
+  "opentopublic.config.udpPorts.tooltip": "Дополнительные UDP порты при открытии с помощью UPnP",
+  "opentopublic.config.udpPorts.name": "UDP порты",
+  "opentopublic.config.title": "Настройки OpenToPublic"
 }

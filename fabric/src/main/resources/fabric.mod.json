@@ -18,6 +18,9 @@
   "entrypoints": {
     "main": [
       "xyz.bobkinn.opentopublic.fabric.OpenToPublicFabric"
+    ],
+    "modmenu": [
+      "xyz.bobkinn.opentopublic.fabric.ModMenuCompat"
     ]
   },
   "custom": {
@@ -34,5 +37,8 @@
   "depends": {
     "fabricloader": ">=${fabric_loader_version}",
     "minecraft": ["1.19.1", "1.19.2"]
+  },
+  "suggests": {
+    "cloth-config": "*"
   }
 }

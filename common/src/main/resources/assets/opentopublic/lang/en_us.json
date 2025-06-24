@@ -20,5 +20,12 @@
   "opentopublic.title.multiplayer.upnp": "Multiplayer (WAN - UPnP)",
   "opentopublic.toast.upnp_in_process.title": "Please wait",
   "opentopublic.toast.upnp_in_process.desc": "Sharing through UPnP in process..",
-  "opentopublic.text.manual": "Manual"
+  "opentopublic.text.manual": "Manual",
+  "opentopublic.config.hideIps.tooltip": "Hide IP addresses when opening to WAN",
+  "opentopublic.config.hideIps.name": "Hide IP addresses",
+  "opentopublic.config.tcpPorts.tooltip": "Additional TCP ports to open when publishing through UPnP",
+  "opentopublic.config.tcpPorts.name": "TCP ports",
+  "opentopublic.config.udpPorts.tooltip": "Additional UDP ports to open when publishing through UPnP",
+  "opentopublic.config.udpPorts.name": "UDP ports",
+  "opentopublic.config.title": "OpenToPublic settings"
 }

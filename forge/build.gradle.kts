@@ -35,6 +35,8 @@ dependencies {
         isTransitive = false
     }
     shadowCommon(files("../libs/WaifUPnP-1.2.0.jar"))
+
+    modRuntimeOnly("me.shedaniel.cloth:cloth-config-forge:${properties["cloth_config_version"]}")
 }
 
 tasks.jar {

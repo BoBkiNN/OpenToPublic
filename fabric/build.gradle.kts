@@ -40,9 +40,12 @@ dependencies {
     shadowCommon(project(path = ":common", configuration = "includeJar"))
     implementation(project(path = ":common", configuration = "includeJar"))
 
+    modApi("com.terraformersmc:modmenu:4.1.2")
+
     // for runtime
     modRuntimeOnly("com.terraformersmc:modmenu:4.1.2") // ModMenu for runtime
     modRuntimeOnly(fabricApi.module("fabric-api", "0.77.0+1.19.2"))
+    modRuntimeOnly("me.shedaniel.cloth:cloth-config-fabric:${properties["cloth_config_version"]}")
 }
 
 tasks.jar {

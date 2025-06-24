@@ -35,8 +35,34 @@ public abstract class OpenToPublic {
         }));
     }
 
+    public static void saveConfig(Path to) {
+        var cfg = OpenToPublic.cfg;
+        if (cfg == null) return;
+        File folder = to.getParent().toFile();
+        if (!folder.exists()) {
+            boolean created = folder.mkdirs();
+            if (!created) {
+                LOGGER.error("Failed to create config folder");
+                return;
+            }
+        }
+        var file = to.toFile();
+        try {
+            BufferedWriter bw = new BufferedWriter(new FileWriter(file));
+            bw.write(GSON.toJson(cfg, Config.class));
+            bw.close();
+        } catch (IOException e) {
+            LOGGER.error("Failed to save config file", e);
+        }
+    }
+
+    private static final Gson GSON = new GsonBuilder()
+            .setPrettyPrinting()
+            .registerTypeAdapter(Config.class, (InstanceCreator<Config>) type -> new Config())
+            .create();
+
     public static void updateConfig(Path path) {
-        File folder = OpenToPublic.modConfigPath.toFile();
+        File folder = path.getParent().toFile();
         if (!folder.exists()) {
             boolean created = folder.mkdirs();
             if (!created) {
@@ -45,7 +71,6 @@ public abstract class OpenToPublic {
             }
         }
         File file = path.toFile();
-        Gson gson = new GsonBuilder().setPrettyPrinting().registerTypeAdapter(Config.class, (InstanceCreator<Config>) type -> new Config()).create();
         if (!file.exists()) {
             try {
                 boolean created = file.createNewFile();
@@ -54,7 +79,7 @@ public abstract class OpenToPublic {
                     return;
                 }
                 BufferedWriter bw = new BufferedWriter(new FileWriter(file));
-                bw.write(gson.toJson(new Config(), Config.class));
+                bw.write(GSON.toJson(new Config(), Config.class));
                 bw.close();
             } catch (IOException e) {
                 LOGGER.error("Failed to write config file", e);
@@ -63,13 +88,13 @@ public abstract class OpenToPublic {
         }
         try {
             FileReader fr = new FileReader(file);
-            Config cfg = gson.fromJson(fr, Config.class);
+            Config cfg = GSON.fromJson(fr, Config.class);
             cfg.getTcp().forEach((p) -> PortContainer.INSTANCE.addTCP(p));
             cfg.getUdp().forEach((p) -> PortContainer.INSTANCE.addUDP(p));
             OpenToPublic.cfg = cfg;
             // save config to fill missing entries
             FileWriter fw = new FileWriter(file);
-            gson.toJson(OpenToPublic.cfg, Config.class, fw);
+            GSON.toJson(OpenToPublic.cfg, Config.class, fw);
             fw.close();
         } catch (IOException e) {
             LOGGER.error("Failed to update config.json", e);

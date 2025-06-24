@@ -48,6 +48,7 @@ subprojects {
         mavenLocal()
         mavenCentral()
         maven("https://maven.parchmentmc.org")
+        maven("https://maven.shedaniel.me/")
     }
 
     dependencies {
@@ -56,6 +57,7 @@ subprojects {
             officialMojangMappings()
             parchment("org.parchmentmc.data:parchment-${minecraftVersion}:${parchmentVersion}@zip")
         })
+        add("modApi", "me.shedaniel.cloth:cloth-config:${properties["cloth_config_version"]}")
     }
 }
 
