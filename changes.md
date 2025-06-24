@@ -1,1 +1,2 @@
 - Updated minecraft title updater to be more compatible with other mods
+- Config can now be edited in-game if running Fabric with cloth-config installed
