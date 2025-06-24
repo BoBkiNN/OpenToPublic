@@ -50,3 +50,4 @@ Example config:
  - `tcp` - list of additional TCP ports to open if Open to WAN button set to UPnP
  - `udp` - list of additional UDP ports to open if Open to WAN button set to UPnP
  - `hideIps` - hide IP addresses when opening to WAN? (`true` or `false`)
+ - `setWindowTitle` - update minecraft window title to reflect online/offline status?  (`true` or `false`)

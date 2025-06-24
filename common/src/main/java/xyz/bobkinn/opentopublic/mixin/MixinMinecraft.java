@@ -54,7 +54,9 @@ public abstract class MixinMinecraft {
 
     @Inject(method = "updateTitle", at = @At("RETURN"))
     public void onUpdateWindowTitle(CallbackInfo ci) {
-        this.window.setTitle(openToPublic$getTitle());
+        if ((OpenToPublic.cfg != null) && (OpenToPublic.cfg.isSetWindowTitle())) {
+            this.window.setTitle(openToPublic$getTitle());
+        }
     }
 
     @Unique
