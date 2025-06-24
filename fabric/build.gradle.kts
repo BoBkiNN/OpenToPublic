@@ -100,6 +100,7 @@ publishMods {
         minecraftVersions.add(minecraftVersion)
         displayName = "${project.version} for Fabric $minecraftVersion"
         version = "${project.version}+$minecraftVersion-fabric"
+        optional("cloth-config")
     }
 
     curseforge {
@@ -108,5 +109,6 @@ publishMods {
         changelogType = "markdown"
         displayName = "${project.version} for Fabric $minecraftVersion"
         minecraftVersions.add(minecraftVersion)
+        optional("cloth-config")
     }
 }
