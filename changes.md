@@ -1,1 +1,1 @@
-- backported to 1.19.2 from 1.21.4
+- Updated minecraft title updater to be more compatible with other mods
