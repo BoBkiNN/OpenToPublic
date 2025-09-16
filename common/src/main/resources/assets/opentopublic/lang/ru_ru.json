@@ -9,7 +9,6 @@
   "opentopublic.tooltip.wan_tooltip.manual": "Открывает сервер во внешнюю сеть. Требуется открытый порт на роутере",
   "opentopublic.tooltip.wan_tooltip.lan": "Открывает сервер во внутреннюю сеть.",
   "opentopublic.tooltip.wan_tooltip.upnp": "Открывает сервер во внешнюю сеть. Может не работать на некоторых роутерах",
-  "opentopublic.gui.new_player_settings": "Настройки для новых игроков",
   "opentopublic.gui.server_settings": "Настройки сервера",
   "opentopublic.button.enable_pvp": "PVP: %s",
   "opentopublic.button.motd": "MOTD",

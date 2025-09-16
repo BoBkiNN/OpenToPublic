@@ -9,7 +9,6 @@
   "opentopublic.tooltip.wan_tooltip.manual": "Opens world to outer network. Requires opened port on router",
   "opentopublic.tooltip.wan_tooltip.lan": "Opens world to inner network.",
   "opentopublic.tooltip.wan_tooltip.upnp": "Opens world to outer network. May not work on some routers",
-  "opentopublic.gui.new_player_settings": "Settings for new players",
   "opentopublic.gui.server_settings": "Server settings",
   "opentopublic.button.enable_pvp": "PVP: %s",
   "opentopublic.button.motd": "MOTD",

@@ -68,7 +68,7 @@ public abstract class MixinShareToLanScreen extends Screen {
     public void render(PoseStack stack, int mouseX, int mouseY, float delta, CallbackInfo ci) {
         this.renderBackground(stack);
         GuiComponent.drawCenteredString(stack, this.font, this.title.getVisualOrderText(), this.width / 2, 50, 0xFFFFFF);
-        GuiComponent.drawCenteredString(stack, this.font, Component.translatable("opentopublic.gui.new_player_settings").getVisualOrderText(), this.width / 2, 82, 0xFFFFFF);
+        GuiComponent.drawCenteredString(stack, this.font, Component.translatable("lanServer.otherPlayers"), this.width / 2, 82, 0xFFFFFF);
         GuiComponent.drawCenteredString(stack, this.font, Component.translatable("opentopublic.gui.server_settings").getVisualOrderText(), this.width / 2, 130, 0xFFFFFF);
         GuiComponent.drawString(stack, this.font, Component.translatable("opentopublic.button.port"), this.width / 2 - 154, this.height - 48, 0xFFFFFF);
         GuiComponent.drawString(stack, this.font, Component.translatable("opentopublic.button.max_players"), this.width / 2 - 154, 168, 0xFFFFFF);

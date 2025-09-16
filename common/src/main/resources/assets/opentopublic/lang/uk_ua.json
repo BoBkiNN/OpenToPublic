@@ -9,7 +9,6 @@
   "opentopublic.tooltip.wan_tooltip.manual": "Відкриває сервер до глобальної мережі. Потребує відкритий порт на роутері",
   "opentopublic.tooltip.wan_tooltip.lan": "Відкриває сервер у локальну мережу",
   "opentopublic.tooltip.wan_tooltip.upnp": "Відкриває сервер у глобальну мережу. Може не підтримуватись деякими роутерами",
-  "opentopublic.gui.new_player_settings": "Налаштування для нових гравців",
   "opentopublic.gui.server_settings": "Налаштування сервера",
   "opentopublic.button.enable_pvp": "PVP: %s",
   "opentopublic.button.motd": "MOTD",
