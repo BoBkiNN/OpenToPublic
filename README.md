@@ -5,7 +5,7 @@ With this mod, you can make "Open to LAN" button open your world to outer networ
 ## Features
  - Enable/Disable online mode
  - Enable/Disable PVP
- - You can set custom port
+ - Set custom port
  - Set server MOTD (Support colors)
  - Set max player value
  - Open to WAN button to open world to outer network (Requires opened port on router if set to Manual)
