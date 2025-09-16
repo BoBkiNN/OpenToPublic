@@ -11,14 +11,12 @@ import java.util.List;
 public class Config {
     private final List<Integer> tcp;
     private final List<Integer> udp;
-    private boolean hideIps;
-    private boolean changeWindowTitle;
+    private boolean hideIps = false;
+    private boolean changeWindowTitle = true;
 
     public Config() {
         this.tcp = new ArrayList<>();
         this.udp = new ArrayList<>();
-        this.hideIps = false;
-        this.changeWindowTitle = true;
     }
 
 }
