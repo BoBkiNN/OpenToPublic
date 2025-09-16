@@ -12,11 +12,13 @@ public class Config {
     private final List<Integer> tcp;
     private final List<Integer> udp;
     private boolean hideIps;
+    private boolean changeWindowTitle;
 
     public Config() {
         this.tcp = new ArrayList<>();
         this.udp = new ArrayList<>();
         this.hideIps = false;
+        this.changeWindowTitle = true;
     }
 
 }

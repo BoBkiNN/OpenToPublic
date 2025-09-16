@@ -27,5 +27,7 @@
   "opentopublic.config.tcpPorts.name": "TCP ports",
   "opentopublic.config.udpPorts.tooltip": "Additional UDP ports to open when publishing through UPnP",
   "opentopublic.config.udpPorts.name": "UDP ports",
+  "opentopublic.config.changeTitle.tooltip": "Changes game window title to match open status instead of LAN",
+  "opentopublic.config.changeTitle.name": "Change window title",
   "opentopublic.config.title": "OpenToPublic settings"
 }

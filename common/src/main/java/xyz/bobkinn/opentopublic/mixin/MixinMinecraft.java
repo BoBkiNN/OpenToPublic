@@ -37,7 +37,8 @@ public abstract class MixinMinecraft {
     // we don't use ordinal here because some other mods can add other calls
     @Redirect(method = "createTitle", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/resources/language/I18n;get(Ljava/lang/String;[Ljava/lang/Object;)Ljava/lang/String;"))
     public String onWindowTitleLanBranch(String key, Object[] args) {
-        if (!key.equals("title.multiplayer.lan")) { // process other calls as usual
+        var enabled = OpenToPublic.cfg != null && OpenToPublic.cfg.isChangeWindowTitle();
+        if (!enabled || !key.equals("title.multiplayer.lan")) { // process other calls as usual
             return I18n.get(key, args);
         }
         // now overriding only lan

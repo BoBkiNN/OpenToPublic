@@ -27,5 +27,7 @@
   "opentopublic.config.tcpPorts.name": "TCP порты",
   "opentopublic.config.udpPorts.tooltip": "Дополнительные UDP порты при открытии с помощью UPnP",
   "opentopublic.config.udpPorts.name": "UDP порты",
+  "opentopublic.config.changeTitle.tooltip": "Изменяет имя окна чтобы соответствовать статусу открытия игры вместо LAN",
+  "opentopublic.config.changeTitle.name": "Изменять имя окна",
   "opentopublic.config.title": "Настройки OpenToPublic"
 }
