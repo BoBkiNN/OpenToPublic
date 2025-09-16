@@ -44,9 +44,11 @@ Example config:
   "udp": [
     60606
   ],
-  "hideIps": false
+  "hideIps": false,
+  "changeWindowTitle": true
 }
 ```
  - `tcp` - list of additional TCP ports to open if Open to WAN button set to UPnP
  - `udp` - list of additional UDP ports to open if Open to WAN button set to UPnP
  - `hideIps` - hide IP addresses when opening to WAN? (`true` or `false`)
+ - `changeWindowTitle` - Change window title to correct open status instead of LAN text? (`true` or `false`)
