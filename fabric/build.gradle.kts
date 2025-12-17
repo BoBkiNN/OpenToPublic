@@ -12,6 +12,8 @@ architectury {
 
 val minecraftVersion = properties["minecraft_version"] as String
 val fabricLoaderVersion = properties["fabric_loader_version"] as String
+val fabricApiVersion = properties["fabric_api_version"] as String + "+" + minecraftVersion
+val modMenuVersion = properties["modmenu_version"] as String
 val shadowCommon = configurations.register("shadowCommon").get()
 val common = configurations.register("common").get()
 
@@ -40,15 +42,15 @@ dependencies {
     shadowCommon(project(path = ":common", configuration = "includeJar"))
     implementation(project(path = ":common", configuration = "includeJar"))
 
-    modCompileOnly("com.terraformersmc:modmenu:13.0.3")
+    modCompileOnly("com.terraformersmc:modmenu:$modMenuVersion")
     // include fabric-resource-loader and fabric-api-base to load mod resources
-    include(fabricApi.module("fabric-resource-loader-v0", "0.119.4+1.21.4"))
-    include(fabricApi.module("fabric-api-base", "0.119.4+1.21.4"))
+    include(fabricApi.module("fabric-resource-loader-v0", fabricApiVersion))
+    include(fabricApi.module("fabric-api-base", fabricApiVersion))
 
 
     // for runtime
-    modRuntimeOnly("com.terraformersmc:modmenu:13.0.3") // ModMenu for runtime
-    modRuntimeOnly(fabricApi.module("fabric-api", "0.119.4+1.21.4"))
+    modRuntimeOnly("com.terraformersmc:modmenu:$modMenuVersion") // ModMenu for runtime
+    modRuntimeOnly(fabricApi.module("fabric-api", fabricApiVersion))
     modRuntimeOnly("me.shedaniel.cloth:cloth-config-fabric:${properties["cloth_config_version"]}")
 }
 
