@@ -66,12 +66,12 @@ public abstract class MixinShareToLanScreen extends Screen {
     @Inject(at = @At("HEAD"), method = "render", cancellable = true)
     public void render(GuiGraphics context, int mouseX, int mouseY, float delta, CallbackInfo ci) {
         super.render(context, mouseX, mouseY, delta);
-        context.drawCenteredString(this.font, this.title.getVisualOrderText(), this.width / 2, 50, 0xFFFFFF);
-        context.drawCenteredString(this.font, Component.translatable("lanServer.otherPlayers").getVisualOrderText(), this.width / 2, 82, 0xFFFFFF);
-        context.drawCenteredString(this.font, Component.translatable("opentopublic.gui.server_settings").getVisualOrderText(), this.width / 2, 130, 0xFFFFFF);
-        context.drawString(this.font, Component.translatable("opentopublic.button.port"), this.width / 2 - 154, this.height - 48, 0xFFFFFF);
-        context.drawString(this.font, Component.translatable("opentopublic.button.max_players"), this.width / 2 - 154, 168, 0xFFFFFF);
-        context.drawString(this.font, Component.translatable("opentopublic.button.motd"), this.width / 2 - 154, 204, 0xFFFFFF);
+        context.drawCenteredString(this.font, this.title.getVisualOrderText(), this.width / 2, 50, 0xFFFFFFFF);
+        context.drawCenteredString(this.font, Component.translatable("lanServer.otherPlayers").getVisualOrderText(), this.width / 2, 82, 0xFFFFFFFF);
+        context.drawCenteredString(this.font, Component.translatable("opentopublic.gui.server_settings").getVisualOrderText(), this.width / 2, 130, 0xFFFFFFFF);
+        context.drawString(this.font, Component.translatable("opentopublic.button.port"), this.width / 2 - 154, this.height - 48, 0xFFFFFFFF);
+        context.drawString(this.font, Component.translatable("opentopublic.button.max_players"), this.width / 2 - 154, 168, 0xFFFFFFFF);
+        context.drawString(this.font, Component.translatable("opentopublic.button.motd"), this.width / 2 - 154, 204, 0xFFFFFFFF);
         ci.cancel();
     }
 
