@@ -41,7 +41,7 @@ subprojects {
     }
 
     tasks.withType(JavaCompile::class) {
-        options.release = 17
+        options.release = 21
     }
 
     repositories {
