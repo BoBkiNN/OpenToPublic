@@ -15,7 +15,7 @@ public class MaxPlayersInputTextField extends EditBox {
         this.defaultVal = defaultVal;
         this.setValue(String.valueOf(defaultVal));
         // Check the format, make sure the text is a valid integer
-        this.setResponder((text) -> this.setTextColor(validateNum(text) >= 0 ? 0xFFFFFF : 0xFF5555));
+        this.setResponder((text) -> this.setTextColor(validateNum(text) >= 0 ? 0xFFE0E0E0 : 0xFFFF5555));
     }
 
     /**

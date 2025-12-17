@@ -79,7 +79,7 @@ public abstract class MixinShareToLanScreen extends Screen {
     private GuiEventListener redirectPort(ShareToLanScreen instance, GuiEventListener element) {
         PortInputTextField portField = new PortInputTextField(font, this.width / 2 - 154 + 147 / 2, this.height - 54, 147 / 2, 20, Component.translatable("opentopublic.button.port"), OpenToPublic.customPort);
         portField.setResponder((text) -> {
-            portField.setTextColor(validatePort(text) >= 0 ? 0xFFFFFF : 0xFF5555);
+            portField.setTextColor(validatePort(text) >= 0 ? 0xFFFFFFFF : 0xFFFF5555);
             openToPublic$enteredPort = portField.getServerPort();
         });
         return this.addRenderableWidget(portField);
@@ -121,7 +121,7 @@ public abstract class MixinShareToLanScreen extends Screen {
             ps.setDirty();
 //          OpenToPublic.LOGGER.info(nbt.toText().getString());
             var psm = server.overworld().getDataStorage();
-            psm.set(OtpPersistentState.DATA_NAME, ps);
+            psm.set(OtpPersistentState.TYPE, ps);
 //          OpenToPublic.LOGGER.info("Saved");
 
             boolean doUPnP = OpenToPublic.selectedMode == OpenMode.UPNP;
@@ -163,7 +163,7 @@ public abstract class MixinShareToLanScreen extends Screen {
         // load data
         // OpenToPublic.LOGGER.info("Loading world custom data...");
         var psm = server.overworld().getDataStorage();
-        var loaded = psm.get(OtpPersistentState.TYPE, OtpPersistentState.DATA_NAME);
+        var loaded = psm.get(OtpPersistentState.TYPE);
         OtpPersistentState ps = loaded != null ? loaded : new OtpPersistentState();
         if (ps.getMotd() != null) this.openToPublic$motd = ps.getMotd();
         if (ps.getMaxPlayers() != null) this.openToPublic$enteredMaxPN = ps.getMaxPlayers();
@@ -210,7 +210,7 @@ public abstract class MixinShareToLanScreen extends Screen {
     private @NotNull MaxPlayersInputTextField openToPublic$getMaxPlayersInputTextField() {
         MaxPlayersInputTextField maxPlayersField = new MaxPlayersInputTextField(this.font, this.width / 2 - 155, 180, 150, 20, Component.translatable("opentopublic.button.max_players"), openToPublic$maxPlayers);
         maxPlayersField.setResponder((text) -> {
-            maxPlayersField.setTextColor(MaxPlayersInputTextField.validateNum(text) >= 0 ? 0xFFFFFF : 0xFF5555);
+            maxPlayersField.setTextColor(MaxPlayersInputTextField.validateNum(text) >= 0 ? 0xFFFFFFFF : 0xFFFF5555);
             openToPublic$enteredMaxPN = maxPlayersField.getValidValue();
         });
         return maxPlayersField;

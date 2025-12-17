@@ -1,38 +1,37 @@
 package xyz.bobkinn.opentopublic;
 
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import lombok.Getter;
 import lombok.Setter;
-import net.minecraft.core.HolderLookup;
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.util.datafix.DataFixTypes;
 import net.minecraft.world.level.saveddata.SavedData;
-import org.jetbrains.annotations.NotNull;
+import net.minecraft.world.level.saveddata.SavedDataType;
 
 @Getter
 @Setter
 public class OtpPersistentState extends SavedData {
 
     public static final String DATA_NAME = "lanOptions";
-    public static final Factory<OtpPersistentState> TYPE = new Factory<>(OtpPersistentState::new, OtpPersistentState::fromNbt, null);
 
     private String motd = null;
     private Integer maxPlayers = null;
     private Boolean enablePvp = null;
 
-    public static @NotNull OtpPersistentState fromNbt(@NotNull CompoundTag tag, HolderLookup.Provider lookup) {
-        var otp = new OtpPersistentState();
-        if (tag.contains("motd")) otp.motd = tag.getString("motd");
-        if (tag.contains("maxPlayers")) otp.maxPlayers = tag.getInt("maxPlayers");
-        if (tag.contains("enablePvp")) otp.enablePvp = tag.getBoolean("enablePvp");
-        return otp;
-    }
+    public static final Codec<OtpPersistentState> CODEC = RecordCodecBuilder.create(inst -> inst.group(
+            Codec.STRING.optionalFieldOf("motd", null).forGetter(OtpPersistentState::getMotd),
+            Codec.INT.optionalFieldOf("maxPlayers", null).forGetter(OtpPersistentState::getMaxPlayers),
+            Codec.BOOL.optionalFieldOf("enablePvp", null).forGetter(OtpPersistentState::getEnablePvp)
+    ).apply(inst, (m, mp, pvp) -> {
+        var r = new OtpPersistentState();
+        r.motd = m;
+        r.maxPlayers = mp;
+        r.enablePvp = pvp;
+        return r;
+    }));
 
-    @Override
-    public @NotNull CompoundTag save(CompoundTag nbt, HolderLookup.Provider registryLookup) {
-        if (motd != null) nbt.putString("motd", motd);
-        if (maxPlayers != null) nbt.putInt("maxPlayers", maxPlayers);
-        if (enablePvp != null) nbt.putBoolean("enablePvp", enablePvp);
-        return nbt;
-    }
+    public static final SavedDataType<OtpPersistentState> TYPE = new SavedDataType<>(DATA_NAME,
+            OtpPersistentState::new, CODEC, DataFixTypes.SAVED_DATA_MAP_INDEX);
 
 }
 

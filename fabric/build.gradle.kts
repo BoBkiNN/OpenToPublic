@@ -50,7 +50,7 @@ dependencies {
 
     // for runtime
     modRuntimeOnly("com.terraformersmc:modmenu:$modMenuVersion") // ModMenu for runtime
-    modRuntimeOnly(fabricApi.module("fabric-api", fabricApiVersion))
+    modRuntimeOnly("net.fabricmc.fabric-api:fabric-api:$fabricApiVersion")
     modRuntimeOnly("me.shedaniel.cloth:cloth-config-fabric:${properties["cloth_config_version"]}")
 }
 

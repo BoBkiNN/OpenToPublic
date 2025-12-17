@@ -17,7 +17,7 @@ public class MotdInputTextField extends EditBox {
         this.entered = defaultMotd;
 
         this.setResponder((text) -> {
-            this.setTextColor(validate(text) != null ? 0xFFFFFF : 0xFF5555);
+            this.setTextColor(validate(text) != null ? 0xFFFFFFFF : 0xFFFF5555);
             this.entered = text;
         });
     }

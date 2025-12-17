@@ -32,7 +32,10 @@ public class Util {
         MutableComponent successWAN;
         String ip = (OpenToPublic.upnpIp == null) ? "0.0.0.0" : OpenToPublic.upnpIp;
         if (!OpenToPublic.cfg.isHideIps()) {
-            successWAN = Component.translatable("opentopublic.publish.started_wan", ip + ":" + OpenToPublic.customPort).withStyle((style -> style.withClickEvent(new ClickEvent(ClickEvent.Action.COPY_TO_CLIPBOARD, ip + ":" + OpenToPublic.customPort)).withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.translatable("chat.copy.click")))));
+            var clickEvent = new ClickEvent.CopyToClipboard(ip + ":" + OpenToPublic.customPort);
+            var hoverEvent = new HoverEvent.ShowText(Component.translatable("chat.copy.click"));
+            successWAN = Component.translatable("opentopublic.publish.started_wan", ip + ":" + OpenToPublic.customPort)
+                    .withStyle((style -> style.withClickEvent(clickEvent).withHoverEvent(hoverEvent)));
         } else {
             successWAN = Component.translatable("opentopublic.publish.started_wan_noIp", Integer.toString(OpenToPublic.customPort));
         }
