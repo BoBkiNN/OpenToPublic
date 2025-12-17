@@ -1,1 +1,2 @@
 - port new features from backport-1.19.2
+- fixed missing translations when fabric-api is not installed
