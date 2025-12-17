@@ -40,7 +40,11 @@ dependencies {
     shadowCommon(project(path = ":common", configuration = "includeJar"))
     implementation(project(path = ":common", configuration = "includeJar"))
 
-    modApi("com.terraformersmc:modmenu:13.0.3")
+    modCompileOnly("com.terraformersmc:modmenu:13.0.3")
+    // include fabric-resource-loader and fabric-api-base to load mod resources
+    include(fabricApi.module("fabric-resource-loader-v0", "0.119.4+1.21.4"))
+    include(fabricApi.module("fabric-api-base", "0.119.4+1.21.4"))
+
 
     // for runtime
     modRuntimeOnly("com.terraformersmc:modmenu:13.0.3") // ModMenu for runtime
