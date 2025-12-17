@@ -40,11 +40,7 @@ public abstract class OpenToPublic {
         if (cfg == null) return;
         File folder = to.getParent().toFile();
         if (!folder.exists()) {
-            boolean created = folder.mkdirs();
-            if (!created) {
-                LOGGER.error("Failed to create config folder");
-                return;
-            }
+            if (!mkdirs(folder)) return;
         }
         var file = to.toFile();
         try {
@@ -64,11 +60,7 @@ public abstract class OpenToPublic {
     public static void updateConfig(Path path) {
         File folder = path.getParent().toFile();
         if (!folder.exists()) {
-            boolean created = folder.mkdirs();
-            if (!created) {
-                LOGGER.error("Failed to create config folder");
-                return;
-            }
+            if (!mkdirs(folder)) return;
         }
         File file = path.toFile();
         if (!file.exists()) {
@@ -99,6 +91,16 @@ public abstract class OpenToPublic {
         } catch (IOException e) {
             LOGGER.error("Failed to update config.json", e);
         }
+    }
+
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
+    private static boolean mkdirs(File folder) {
+        boolean created = folder.mkdirs();
+        if (!created) {
+            LOGGER.error("Failed to create config folder");
+            return false;
+        }
+        return true;
     }
 
     public abstract Path getConfigsFolder();

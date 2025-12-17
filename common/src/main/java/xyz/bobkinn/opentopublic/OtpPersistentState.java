@@ -14,10 +14,6 @@ public class OtpPersistentState extends SavedData {
 
     public static final String DATA_NAME = "lanOptions";
 
-    private String motd = null;
-    private Integer maxPlayers = null;
-    private Boolean enablePvp = null;
-
     public static final Codec<OtpPersistentState> CODEC = RecordCodecBuilder.create(inst -> inst.group(
             Codec.STRING.optionalFieldOf("motd", null).forGetter(OtpPersistentState::getMotd),
             Codec.INT.optionalFieldOf("maxPlayers", null).forGetter(OtpPersistentState::getMaxPlayers),
@@ -32,6 +28,10 @@ public class OtpPersistentState extends SavedData {
 
     public static final SavedDataType<OtpPersistentState> TYPE = new SavedDataType<>(DATA_NAME,
             OtpPersistentState::new, CODEC, DataFixTypes.SAVED_DATA_MAP_INDEX);
+
+    private String motd = null;
+    private Integer maxPlayers = null;
+    private Boolean enablePvp = null;
 
 }
 
