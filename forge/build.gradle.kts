@@ -9,6 +9,8 @@ loom {
     forge {
         mixinConfig("opentopublic.mixins.json")
     }
+    var clientRun = runConfigs["client"]
+    clientRun.programArgs("--launchTarget", "fmlclient")
 }
 
 architectury {
