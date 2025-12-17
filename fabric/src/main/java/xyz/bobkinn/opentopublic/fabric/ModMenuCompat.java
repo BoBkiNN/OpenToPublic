@@ -12,7 +12,7 @@ public class ModMenuCompat implements ModMenuApi {
         if (FabricLoader.getInstance().isModLoaded("cloth-config")) {
             return ClothConfigOptional::createConfigScreen;
         }
-        return (p) -> null;
+        return null; // we return null here to not show settings button
     }
 
 }
