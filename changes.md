@@ -1,3 +1,1 @@
-- port new features from backport-1.19.2
-- fixed missing translations when fabric-api is not installed
-- mod config button is now hidden when cloth-config is not loaded
+- Update to 1.21.6
